@@ -1,0 +1,68 @@
+═════════════════════════════════════════════════════════════════
+  INPUT HEALTH CHECK — upload_20260513_160659_synthetic_test_data.xlsx
+  Run at 2026-05-13 16:06:59
+  Tool version: valve_diagnostics v3.0.0
+═════════════════════════════════════════════════════════════════
+
+  ❌   0 PROBLEMS  (must fix before tool can run)
+  ⚠️    1 WARNINGS  (tool will run but results may be affected)
+  ℹ️    0 INFOS     (observations, no action needed)
+  ✅  35 CHECKS PASSED
+
+─────────────────────────────────────────────────────────────────
+  WARNINGS — review but not blocking
+─────────────────────────────────────────────────────────────────
+
+─────────────────────────────────────────────────────────────────
+  ⚠️   WARNING: [Check 4.4] Data covers only 24.0 hours.
+─────────────────────────────────────────────────────────────────
+
+  WHAT HAPPENED:
+    Tool will run, but full diagnostic coverage typically needs ≥24 hours.
+
+  WHY THIS MATTERS:
+    Slow problems (drift, sluggish tuning) take longer to show.
+
+  HOW TO FIX:
+    For best results, re-export 24 hours or more.
+─────────────────────────────────────────────────────────────────
+
+─────────────────────────────────────────────────────────────────
+  CHECKS PASSED — for transparency
+─────────────────────────────────────────────────────────────────
+
+  ✅ [1.1] File exists at the specified path
+  ✅ [1.2] File is not locked by another program
+  ✅ [1.3] File is a valid .xlsx workbook
+  ✅ [1.4] File is not password-protected
+  ✅ [1.5] File size is reasonable
+  ✅ [2.1] Data sheet found ('Sheet1')
+  ✅ [2.6] TIMESTAMP column header present
+  ✅ [2.2] Sheet 'DIAGNOSTIC_CONFIG' present
+  ✅ [2.3] Sheet 'MODE_MAPPING' present
+  ✅ [2.4] Sheet 'UNIT_MAPPING' present
+  ✅ [2.5] Sheet 'DIAGNOSTIC_SELECTION' present
+  ✅ [2.8] Loop columns recognised (8 loop bases)
+  ✅ [2.10] Column naming separator is consistent
+  ✅ [2.11] All loops have complete PV/OP/SP/Mode columns
+  ✅ [2.12] No duplicate column names
+  ✅ [3.2] All config values are numeric
+  ✅ [3.1] All expected config parameters present
+  ✅ [3.3] All config values are in sensible ranges
+  ✅ [3.4] Stiction confidence thresholds ordered
+  ✅ [4.5] Data sheet has 1,440 rows
+  ✅ [4.1] Timestamps are in chronological order
+  ✅ [4.2] No duplicate timestamps
+  ✅ [4.3] Sampling rate is regular (~60s)
+  ✅ [4.7] No Excel error markers in data
+  ✅ [4.8] No literal NaN text in numeric columns
+  ✅ [4.10] No quality flag text in numeric columns
+  ✅ [4.9] All numeric columns contain valid numbers (or recognised gaps)
+  ✅ [4.11] No suspected sentinel values found
+  ✅ [4.14] No infinity values
+  ✅ [4.10b] All loops have <30% missing data
+  ✅ [4.7] OP values are in expected 0–100% range
+  ✅ [3.5] MODE_MAPPING contains AUTO category
+  ✅ [3.6] Every Mode value seen in the data is mapped
+  ✅ [5.4] Multiple stiction methods enabled
+  ✅ [5.5] Loop count is reasonable (8)

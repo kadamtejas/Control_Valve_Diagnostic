@@ -1,0 +1,31 @@
+═════════════════════════════════════════════════════════════════
+  valve_diagnostics v3.0.0  —  calibration mode: AUTO
+═════════════════════════════════════════════════════════════════
+  This run used AUTO-CALIBRATED thresholds derived from your data.
+  To use your manual DIAGNOSTIC_CONFIG values instead, re-run with --manual.
+
+  ⚠️  Warnings were raised during the run — see health_check_report.txt.
+═════════════════════════════════════════════════════════════════
+
+Input file:       test_data/synthetic_test_data.xlsx
+Output folder:    example_output
+Run started:      2026-05-06 04:47:04.325124
+Run finished:     2026-05-06 04:47:14.962808
+Health check:     0 problems, 1 warnings, 35 passed
+Repairs:          0 actions, 0 loops skipped
+Outlier actions:  0
+Auto-calibration: 6 params calibrated, 0 fell back to manual
+
+Files produced:
+  Executive_summary.pdf
+  Loop_diagnostics_v2.xlsx
+  auto_calibration_report.txt
+  data_repair_report.txt
+  data_v3_processed.xlsx
+  diagnostic_heatmap.png
+  diagnostics.log
+  health_check_report.txt
+  outlier_handling_report.txt
+  plant_dashboard.png
+  plots
+  v3_run_summary.txt

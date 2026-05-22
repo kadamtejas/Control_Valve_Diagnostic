@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sign In — Valve Diagnostics</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f2744;--blue:#2e86de;--blue-lt:#4ea8f8;
+  --blue-pale:#e8f3fd;--blue-pale2:#d0e8f8;
+  --crit:#dc2626;--crit-bg:#fdf0ef;
+  --bg:#f0f4f8;--surface:#fff;
+  --border:#d8e2ec;--text:#0f2744;--text2:#3a5068;--text3:#6b8299;
+  --r:8px;--shadow-md:0 4px 24px rgba(15,39,68,.12);
+}
+html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text)}
+.page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+
+/* ── Card ── */
+.card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow-md);width:100%;max-width:420px;overflow:hidden}
+.card-header{background:var(--navy);padding:32px 36px 28px;text-align:center}
+.logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px}
+.logo-hex{width:40px;height:40px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-hex svg{width:22px;height:22px;fill:#fff}
+.logo-text{color:#fff;font-size:17px;font-weight:700;font-family:'IBM Plex Mono',monospace;letter-spacing:-.3px}
+.logo-text span{color:var(--blue-lt);font-weight:400}
+.card-subtitle{color:#7aaccf;font-size:13px;letter-spacing:.3px}
+
+/* ── Form body ── */
+.card-body{padding:32px 36px 36px}
+.form-group{margin-bottom:20px}
+label{display:block;font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:7px}
+input{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);
+  font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--text);background:#fff;
+  transition:border-color .2s,box-shadow .2s;outline:none
+}
+input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,134,222,.12)}
+input::placeholder{color:#b0c4d8}
+.btn-login{
+  width:100%;padding:13px;background:var(--blue);color:#fff;border:none;
+  border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:15px;
+  font-weight:600;cursor:pointer;transition:background .2s,transform .1s;margin-top:4px
+}
+.btn-login:hover{background:#2272c3}
+.btn-login:active{transform:scale(.99)}
+
+/* ── Error ── */
+.error-box{background:var(--crit-bg);border:1px solid #f5aaaa;border-radius:var(--r);
+  padding:11px 14px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--crit)}
+.error-box svg{flex-shrink:0;width:16px;height:16px}
+
+/* ── Footer ── */
+.footer{margin-top:28px;text-align:center;font-size:12px;color:var(--text3)}
+.footer a{color:var(--blue);text-decoration:none}
+
+/* ── Divider hint ── */
+.hint{font-size:12px;color:var(--text3);text-align:center;margin-top:18px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="card">
+    <div class="card-header">
+      <div class="logo">
+        <div class="logo-hex">
+          <!-- valve icon -->
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 3a1.5 1.5 0 1 1-1.5 1.5A1.5 1.5 0 0 1 12 5zm-5.5 6.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1 0-1zm1.5 4h8l-1.5 3.5h-5z"/>
+          </svg>
+        </div>
+        <div class="logo-text">VALVE<span>diagnostics</span></div>
+      </div>
+      <div class="card-subtitle">POC Client Portal — Sign In</div>
+    </div>
+
+    <div class="card-body">
+      {% if error %}
+      <div class="error-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <form method="post" action="/login" autocomplete="on">
+        <div class="form-group">
+          <label for="email">Company Email</label>
+          <input type="email" id="email" name="email" placeholder="you@company.com" required autofocus/>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required/>
+        </div>
+        <button type="submit" class="btn-login">Sign In</button>
+      </form>
+
+      <p class="hint">Access is by invitation only.<br/>Contact your Ingenero representative to get credentials.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    &copy; 2024 Ingenero Technologies &nbsp;·&nbsp;
+    <a href="mailto:support@ingenero.com">support@ingenero.com</a>
+  </div>
+</div>
+</body>
+</html>

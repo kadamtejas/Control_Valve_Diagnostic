@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Upload Data — Valve Diagnostics</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f2744;--blue:#2e86de;--blue-lt:#4ea8f8;
+  --blue-pale:#e8f3fd;--blue-pale2:#d0e8f8;
+  --ok:#1a9e5a;--ok-bg:#e6f7ef;--ok-border:#a3d9bc;
+  --crit:#dc2626;--crit-bg:#fdf0ef;
+  --warn:#d97706;--warn-bg:#fef3e2;
+  --bg:#f0f4f8;--surface:#fff;--border:#d8e2ec;
+  --text:#0f2744;--text2:#3a5068;--text3:#6b8299;
+  --r:8px;--shadow-md:0 4px 24px rgba(15,39,68,.12);
+}
+html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text)}
+.topbar{background:var(--navy);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-hex{width:32px;height:32px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.logo-hex svg{width:18px;height:18px;fill:#fff}
+.logo-text{color:#fff;font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.logo-text span{color:var(--blue-lt);font-weight:400}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.user-pill{background:rgba(255,255,255,.1);color:#a8c8f0;font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.12)}
+.btn-logout{color:#7aaccf;font-size:12px;background:none;border:none;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;padding:4px 8px;border-radius:6px;transition:background .2s}
+.btn-logout:hover{background:rgba(255,255,255,.1);color:#fff}
+.page{min-height:calc(100vh - 54px);display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow-md);width:100%;max-width:580px;padding:40px 44px}
+.card-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.card-sub{font-size:13px;color:var(--text3);margin-bottom:32px}
+.mode-label{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px}
+.mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:28px}
+.mode-btn{padding:14px 16px;cursor:pointer;transition:background .2s,color .2s;border:none;font-family:'IBM Plex Sans',sans-serif;background:var(--surface);position:relative}
+.mode-btn:first-child{border-right:1px solid var(--border)}
+.mode-btn.active{background:var(--navy);color:#fff}
+.mode-btn:not(.active){color:var(--text2)}
+.mode-btn:not(.active):hover{background:var(--bg)}
+.mode-name{font-size:14px;font-weight:700;margin-bottom:4px}
+.mode-desc{font-size:11px;line-height:1.55;opacity:.8}
+.mode-btn.active .mode-desc{opacity:.7;color:#a8c8f0}
+.mode-btn:not(.active) .mode-desc{color:var(--text3)}
+.mode-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:6px;letter-spacing:.5px}
+.badge-auto{background:#e8f3fd;color:var(--blue);border:1px solid var(--blue-pale2)}
+.badge-manual{background:#f3f0ff;color:#7c3aed;border:1px solid #c4b5fd}
+.mode-btn.active .badge-auto{background:rgba(78,168,248,.2);color:#7fd3ff;border-color:rgba(78,168,248,.3)}
+.mode-btn.active .badge-manual{background:rgba(196,181,253,.2);color:#c4b5fd;border-color:rgba(196,181,253,.3)}
+.drop-zone{border:2px dashed var(--border);border-radius:12px;padding:48px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#fafcfe;position:relative}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--blue);background:var(--blue-pale)}
+.drop-icon{width:48px;height:48px;margin:0 auto 16px;background:var(--blue-pale);border-radius:12px;display:flex;align-items:center;justify-content:center}
+.drop-icon svg{width:26px;height:26px;stroke:var(--blue);fill:none;stroke-width:1.8}
+.drop-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
+.drop-hint{font-size:13px;color:var(--text3)}
+.drop-hint b{color:var(--blue)}
+.drop-types{display:inline-block;margin-top:12px;font-size:11px;color:var(--text3);background:#f0f4f8;padding:4px 12px;border-radius:20px;font-family:'IBM Plex Mono',monospace}
+#file-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.file-pill{display:none;margin-top:16px;background:var(--blue-pale);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;align-items:center;gap:12px}
+.file-pill.show{display:flex}
+.file-pill-icon{width:32px;height:32px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border)}
+.file-pill-icon svg{width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:1.8}
+.file-pill-name{font-size:13px;font-weight:600;color:var(--navy);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.file-pill-size{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;flex-shrink:0}
+.file-pill-remove{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:4px;transition:color .2s}
+.file-pill-remove:hover{color:var(--crit)}
+.btn-run{width:100%;margin-top:24px;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-run:hover:not(:disabled){background:#2272c3}
+.btn-run:disabled{opacity:.45;cursor:not-allowed}
+.error-box{background:var(--crit-bg);border:1px solid #f5aaaa;border-radius:var(--r);padding:12px 16px;margin-top:16px;font-size:13px;color:var(--crit);display:none;line-height:1.6}
+.error-box.show{display:block}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(15,39,68,.82);z-index:999;flex-direction:column;align-items:center;justify-content:center;font-family:'IBM Plex Sans',sans-serif;color:#fff}
+.loading-overlay.show{display:flex}
+.spinner{width:56px;height:56px;border:4px solid rgba(255,255,255,.15);border-top-color:var(--blue-lt);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:24px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-title{font-size:18px;font-weight:600;margin-bottom:8px}
+.loading-sub{font-size:13px;color:#7aaccf;text-align:center;line-height:1.7;max-width:320px}
+.loading-mode-badge{display:inline-block;margin-top:10px;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;font-family:'IBM Plex Mono',monospace}
+.lmb-auto{background:rgba(46,134,222,.25);color:#7fd3ff;border:1px solid rgba(78,168,248,.3)}
+.lmb-manual{background:rgba(124,58,237,.25);color:#c4b5fd;border:1px solid rgba(196,181,253,.3)}
+.loading-steps{margin-top:28px;display:flex;flex-direction:column;gap:10px;width:280px}
+.step{display:flex;align-items:center;gap:10px;font-size:12px;color:#7aaccf;opacity:.35;transition:opacity .4s,color .4s}
+.step.active{opacity:1;color:#fff}
+.step.done{opacity:.65;color:var(--ok)}
+.step-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
+.step.done .step-dot{background:var(--ok)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="logo" href="/">
+    <div class="logo-hex">
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 3a1.5 1.5 0 1 1-1.5 1.5A1.5 1.5 0 0 1 12 5zm-5.5 6.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1 0-1zm1.5 4h8l-1.5 3.5h-5z"/></svg>
+    </div>
+    <div class="logo-text">VALVE<span>diagnostics</span></div>
+  </a>
+  <div class="topbar-right">
+    <span class="user-pill">{{ user.name }}</span>
+    <a href="/logout" class="btn-logout">Sign out</a>
+  </div>
+</div>
+
+<div class="page">
+  <div class="card">
+    <div class="card-title">Upload Diagnostic Data</div>
+    <div class="card-sub">Choose a run mode, upload your plant Excel file, then review settings before running.</div>
+
+    <div class="mode-label">Run Mode</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btn-auto" onclick="setMode('auto')">
+        <div class="mode-badge badge-auto">AUTO</div>
+        <div class="mode-name">Auto Calibration</div>
+        <div class="mode-desc">Engine calibrates thresholds from your data. Recommended for first-time runs.</div>
+      </button>
+      <button class="mode-btn" id="btn-manual" onclick="setMode('manual')">
+        <div class="mode-badge badge-manual">MANUAL</div>
+        <div class="mode-name">Manual Config</div>
+        <div class="mode-desc">Uses your DIAGNOSTIC_CONFIG values exactly. Same as v2 diagnostics engine.</div>
+      </button>
+    </div>
+
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept=".xlsx,.xls"/>
+      <div class="drop-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div class="drop-title">Drag &amp; drop your Excel file here</div>
+      <div class="drop-hint">or <b>click to browse</b></div>
+      <div class="drop-types">.xlsx &nbsp;/&nbsp; .xls</div>
+    </div>
+
+    <div class="file-pill" id="file-pill">
+      <div class="file-pill-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <span class="file-pill-name" id="pill-name"></span>
+      <span class="file-pill-size" id="pill-size"></span>
+      <button class="file-pill-remove" id="pill-remove" title="Remove">✕</button>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <button class="btn-run" id="btn-run" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <span id="btn-run-txt">Upload &amp; Run</span>
+    </button>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-title" id="ltxt">Uploading file…</div>
+  <div class="loading-sub">Please wait while your file is uploaded.</div>
+  <div id="loading-mode-badge" class="loading-mode-badge lmb-auto">AUTO MODE</div>
+  <div class="loading-steps">
+  <div class="step" id="step-1"><span class="step-dot"></span>Uploading file to server</div>
+  <div class="step" id="step-2"><span class="step-dot"></span>Validating file format</div>
+  <div class="step" id="step-3"><span class="step-dot"></span>Applying configuration</div>
+  <div class="step" id="step-4"><span class="step-dot"></span>Running diagnostics engine</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  let selectedFile = null;
+  let currentMode  = 'auto';
+  let pollTimer    = null;
+
+  window.setMode = function(mode){
+    currentMode = mode;
+    document.getElementById('btn-auto').classList.toggle('active', mode === 'auto');
+    document.getElementById('btn-manual').classList.toggle('active', mode === 'manual');
+  };
+
+  function formatBytes(b){
+    if(b<1024)return b+'B';
+    if(b<1048576)return (b/1024).toFixed(1)+'KB';
+    return (b/1048576).toFixed(1)+'MB';
+  }
+
+  function setFile(f){
+    const ext = f.name.split('.').pop().toLowerCase();
+    if(!['xlsx','xls'].includes(ext)){ showError('Only .xlsx and .xls files are accepted.'); return; }
+    selectedFile = f;
+    document.getElementById('pill-name').textContent = f.name;
+    document.getElementById('pill-size').textContent = formatBytes(f.size);
+    document.getElementById('file-pill').classList.add('show');
+    document.getElementById('btn-run').disabled = false;
+    hideError();
+  }
+
+  function clearFile(){
+    selectedFile = null;
+    document.getElementById('file-pill').classList.remove('show');
+    document.getElementById('btn-run').disabled = true;
+    document.getElementById('file-input').value = '';
+  }
+
+  function showError(msg){ const b=document.getElementById('error-box');b.innerHTML=msg;b.classList.add('show'); }
+  function hideError(){ document.getElementById('error-box').classList.remove('show'); }
+
+  document.getElementById('file-input').addEventListener('change', e => { if(e.target.files[0]) setFile(e.target.files[0]); });
+  document.getElementById('pill-remove').addEventListener('click', clearFile);
+
+  const dz = document.getElementById('drop-zone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); if(e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
+
+  // Activate upload step animation
+  function startSteps(){
+    for(let i=1;i<=4;i++) document.getElementById('step-'+i)?.classList.remove('active','done');
+    let s=1;
+    function next(){ 
+      if(s>1) document.getElementById('step-'+(s-1))?.classList.replace('active','done');
+      const el=document.getElementById('step-'+s);
+      if(el) el.classList.add('active');
+      s++;
+    }
+    next();
+    pollTimer=setInterval(()=>{ if(s<=4) next(); else clearInterval(pollTimer); }, 600);
+  }
+
+  document.getElementById('btn-run').addEventListener('click', async () => {
+    if(!selectedFile){ showError('Please select a file first.'); return; }
+    hideError();
+
+    const badge = document.getElementById('loading-mode-badge');
+    badge.textContent = currentMode === 'auto' ? 'AUTO MODE' : 'MANUAL MODE';
+    badge.className = 'loading-mode-badge ' + (currentMode === 'auto' ? 'lmb-auto' : 'lmb-manual');
+    document.getElementById('loading-overlay').classList.add('show');
+    document.getElementById('btn-run').disabled = true;
+    startSteps();
+
+    const fd = new FormData();
+    fd.append('file', selectedFile);
+    fd.append('mode', currentMode);
+
+    try{
+      const res = await fetch('/upload', { method:'POST', body:fd });
+      const data = await res.json();
+
+      if(!res.ok){
+        clearInterval(pollTimer);
+        document.getElementById('loading-overlay').classList.remove('show');
+        showError('Upload error: ' + (data.detail || 'Unknown error.'));
+        document.getElementById('btn-run').disabled = false;
+        return;
+      }
+
+      // Engine started — poll job until done then redirect
+      if(data.job_id){
+        const jobId = data.job_id;
+        document.getElementById('ltxt').textContent = 'Running diagnostics engine…';
+        // Advance steps to reflect engine stage
+        clearInterval(pollTimer);
+        for(let i=1;i<=4;i++) document.getElementById('step-'+i)?.classList.remove('active','done');
+        ['step-1','step-2','step-3'].forEach(id=>document.getElementById(id)?.classList.add('done'));
+        document.getElementById('step-4')?.classList.add('active');
+
+        const poll = setInterval(async ()=>{
+          try{
+            const pr = await fetch('/api/job/'+jobId);
+            const pd = await pr.json();
+            if(pd.status==='done'){
+              clearInterval(poll);
+              window.location.href = '/';
+            } else if(pd.status==='error'){
+              clearInterval(poll);
+              document.getElementById('loading-overlay').classList.remove('show');
+              showError('Engine error: '+(pd.detail||'Unknown error.'));
+              document.getElementById('btn-run').disabled = false;
+            }
+          } catch{ /* retry */ }
+        }, 2000);
+        return;
+      }
+
+      // Fallback
+      clearInterval(pollTimer);
+      document.getElementById('loading-overlay').classList.remove('show');
+
+    } catch(e){
+      clearInterval(pollTimer);
+      document.getElementById('loading-overlay').classList.remove('show');
+      showError('Network error — please try again.');
+      document.getElementById('btn-run').disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>

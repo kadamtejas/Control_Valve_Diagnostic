@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.log
+results_*/
+uploads/
+*.xlsx
+*.xls
+*.pdf
+*.zip
+user_configs/
+diagnostic_heatmap.png
+plant_dashboard.png
+plots/
+.DS_Store
+Thumbs.db
+.vscode/ 

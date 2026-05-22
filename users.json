@@ -1,0 +1,16 @@
+{
+  "users": [
+    {
+      "email": "admin@ingenero.com",
+      "password": "admin123",
+      "name": "Ingenero Admin",
+      "role": "admin"
+    },
+    {
+      "email": "demo@client.com",
+      "password": "demo123",
+      "name": "Demo Client",
+      "role": "client"
+    }
+  ]
+}

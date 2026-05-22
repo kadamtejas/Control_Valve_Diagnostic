@@ -1,0 +1,8 @@
+
+═════════════════════════════════════════════════════════════════
+  OUTLIER HANDLING REPORT — automatic
+═════════════════════════════════════════════════════════════════
+
+The tool examined every value for physical plausibility and statistical consistency. Below is exactly what was removed, what was kept, and why. Original file unchanged.
+
+  No outliers detected.
