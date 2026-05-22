@@ -15,18 +15,30 @@ import jwt
 from fastapi import Cookie, HTTPException, status
 
 # ── Config ────────────────────────────────────────────────────────────────────
-SECRET_KEY = "ingenero-valve-poc-secret-key-2024"   # change before Azure deploy
+SECRET_KEY = os.environ.get("SECRET_KEY", "ingenero-valve-poc-secret-key-2024")
 ALGORITHM  = "HS256"
 TOKEN_TTL_HOURS = 8
 
 USERS_FILE = Path(__file__).parent.parent / "users.json"
 
+# ── Built-in fallback users (used when users.json is not present e.g. on Render)
+FALLBACK_USERS = [
+    {
+        "email": "admin@ingenero.com",
+        "password": "ingenero@2024",
+        "name": "Ingenero Admin",
+        "role": "admin"
+    }
+]
+
 
 # ── User store ────────────────────────────────────────────────────────────────
 
 def _load_users() -> list[dict]:
-    with open(USERS_FILE, "r") as f:
-        return json.load(f)["users"]
+    if USERS_FILE.exists():
+        with open(USERS_FILE, "r") as f:
+            return json.load(f)["users"]
+    return FALLBACK_USERS
 
 
 def authenticate_user(email: str, password: str) -> Optional[dict]:
@@ -51,7 +63,7 @@ def create_access_token(user: dict) -> str:
 
 
 def decode_token(token: str) -> dict:
-    """Decode and validate a JWT.  Raises HTTPException on failure."""
+    """Decode and validate a JWT. Raises HTTPException on failure."""
     try:
         return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except jwt.ExpiredSignatureError:
