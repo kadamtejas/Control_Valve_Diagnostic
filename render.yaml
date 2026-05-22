@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: valve-diagnostics
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd dashboard && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        value: ingenero-valve-poc-secret-key-2024
+      - key: PYTHON_VERSION
+        value: 3.11.0
