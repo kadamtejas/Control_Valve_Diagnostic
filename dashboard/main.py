@@ -1251,6 +1251,119 @@ async def download_report(current_user: dict = Depends(get_current_user)):  # no
 
 
 
+# ── Tuning Tool ───────────────────────────────────────────────────────────────
+
+# In-memory store for tuning recommendations  { email: { loop_tag: { ...rec } } }
+tuning_recs: dict[str, dict] = {}
+
+@app.get("/tune/{loop_name:path}", response_class=HTMLResponse)
+async def tune_page(loop_name: str, request: Request, current_user: dict = Depends(get_current_user)):
+    """Serve the full-page tuning tool for a specific loop."""
+    response = templates.TemplateResponse(request, "tune.html", {
+        "loop_name": loop_name,
+        "user": current_user,
+    })
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    return response
+
+
+@app.get("/api/tune/timeseries/{loop_name:path}")
+async def get_tune_timeseries(loop_name: str, current_user: dict = Depends(get_current_user)):
+    """Return PV, OP, SP arrays for the tuning tool, sampled to max 1440 points."""
+    rd = _get_user_results_dir(current_user)
+    try:
+        data = read_loop_timeseries(rd, loop_name)
+    except (FileNotFoundError, ValueError) as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    pv  = [v for v in data["pv"]  if v is not None]
+    op  = [v for v in data["op"]  if v is not None]
+    sp  = [v for v in data["sp"]  if v is not None]
+    lbl = data["timestamps"]
+
+    # Downsample to max 1440 points so the chart stays snappy
+    N = len(pv)
+    if N > 1440:
+        step = N // 1440
+        pv  = pv[::step][:1440]
+        op  = op[::step][:1440]
+        sp  = sp[::step][:1440]
+        lbl = lbl[::step][:1440]
+
+    # Detect loop type from tag name prefix
+    tag_up = loop_name.upper()
+    if   tag_up.startswith("FI") or tag_up.startswith("FC") or tag_up.startswith("FF"):
+        loop_type = "flow"
+    elif tag_up.startswith("PI") or tag_up.startswith("PC") or tag_up.startswith("PRC"):
+        loop_type = "pressure"
+    elif tag_up.startswith("TI") or tag_up.startswith("TC"):
+        loop_type = "temperature"
+    elif tag_up.startswith("LI") or tag_up.startswith("LC"):
+        loop_type = "level"
+    else:
+        loop_type = "unknown"
+
+    return JSONResponse(content={
+        "loop": loop_name,
+        "loop_type": loop_type,
+        "n_samples": len(pv),
+        "pv":  pv,
+        "op":  op,
+        "sp":  sp,
+        "labels": lbl,
+    })
+
+
+@app.post("/api/tune/save/{loop_name:path}")
+async def save_tuning_rec(loop_name: str, request: Request, current_user: dict = Depends(get_current_user)):
+    """Save an accepted tuning recommendation for a loop."""
+    body = await request.json()
+    from datetime import datetime
+    email = current_user["sub"]
+    if email not in tuning_recs:
+        tuning_recs[email] = {}
+    tuning_recs[email][loop_name] = {
+        "loop":       loop_name,
+        "loop_type":  body.get("loop_type", "unknown"),
+        "K":          body.get("K"),
+        "tau":        body.get("tau"),
+        "theta":      body.get("theta"),
+        "Tu":         body.get("Tu"),
+        "lambda":     body.get("lambda"),
+        "Kp_old":     body.get("Kp_old"),
+        "Ti_old":     body.get("Ti_old"),
+        "Kp_new":     body.get("Kp_new"),
+        "Ti_new":     body.get("Ti_new"),
+        "conf_K":     body.get("conf_K"),
+        "r2":         body.get("r2"),
+        "iae_pct":    body.get("iae_pct"),
+        "status":     body.get("status", "accepted"),  # accepted | rejected | pending
+        "notes":      body.get("notes", ""),
+        "saved_at":   datetime.now().isoformat(timespec="seconds"),
+    }
+    return JSONResponse(content={"status": "ok", "loop": loop_name})
+
+
+@app.get("/api/tune/recommendations")
+async def get_tuning_recs(current_user: dict = Depends(get_current_user)):
+    """Return all saved tuning recommendations for the current user."""
+    email = current_user["sub"]
+    recs  = tuning_recs.get(email, {})
+    return JSONResponse(content={"recommendations": list(recs.values())})
+
+
+@app.get("/api/tune/recommendation/{loop_name:path}")
+async def get_tuning_rec(loop_name: str, current_user: dict = Depends(get_current_user)):
+    """Return the saved tuning recommendation for a specific loop, if any."""
+    email = current_user["sub"]
+    rec   = tuning_recs.get(email, {}).get(loop_name)
+    if not rec:
+        return JSONResponse(content={"recommendation": None})
+    return JSONResponse(content={"recommendation": rec})
+
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     if exc.status_code == 401:

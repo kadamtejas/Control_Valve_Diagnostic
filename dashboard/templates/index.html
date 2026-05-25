@@ -26,22 +26,22 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
 button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;background:none}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-.topbar{background:var(--navy);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.07)}
+.topbar{background:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;border-bottom:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .topbar-left{display:flex;align-items:center;gap:16px}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-hex{width:34px;height:34px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-text{color:#fff;font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace}
-.logo-text span{color:var(--blue-lt);font-weight:400}
-.run-badge{background:rgba(255,255,255,.09);color:#a8c8f0;font-size:11px;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Mono',monospace;border:1px solid rgba(255,255,255,.12)}
+.logo-text{color:#0f172a;font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.logo-text span{color:#3b82f6;font-weight:400}
+.run-badge{background:#eff6ff;color:#1d4ed8;font-size:11px;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Mono',monospace;border:1px solid #bfdbfe}
 .topbar-right{display:flex;align-items:center;gap:10px}
-.ts-txt{color:#6a92b5;font-size:11px;font-family:'IBM Plex Mono',monospace}
-.btn-upload{display:flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(46,134,222,.25);border:1px solid rgba(46,134,222,.45);border-radius:7px;color:#7fd3ff;font-size:12px;font-weight:600;transition:all .2s;text-decoration:none}
-.btn-upload:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
-.btn-settings{display:flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:7px;color:#a8c8f0;font-size:12px;font-weight:600;transition:all .2s;cursor:pointer}
-.btn-settings:hover{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3)}
-.user-pill{background:rgba(255,255,255,.09);color:#a8c8f0;font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.12)}
-.btn-logout{color:#6a92b5;font-size:12px;padding:4px 8px;border-radius:6px;transition:all .2s}
-.btn-logout:hover{background:rgba(255,255,255,.09);color:#fff}
+.ts-txt{color:#94a3b8;font-size:11px;font-family:'IBM Plex Mono',monospace}
+.btn-upload{display:flex;align-items:center;gap:6px;padding:6px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;color:#1d4ed8;font-size:12px;font-weight:600;transition:all .2s;text-decoration:none}
+.btn-upload:hover{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.btn-settings{display:flex;align-items:center;gap:6px;padding:6px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;color:#475569;font-size:12px;font-weight:600;transition:all .2s;cursor:pointer}
+.btn-settings:hover{background:#f1f5f9;color:#0f172a;border-color:#cbd5e1}
+.user-pill{background:#f1f5f9;color:#475569;font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid #e2e8f0}
+.btn-logout{color:#94a3b8;font-size:12px;padding:4px 8px;border-radius:6px;transition:all .2s}
+.btn-logout:hover{background:#f1f5f9;color:#0f172a}
 .alert-bar{background:#fff8ed;border-bottom:2px solid #fde8b4;padding:10px 24px;display:none;align-items:center;gap:10px;font-size:12px;color:#92400e}
 .alert-bar.show{display:flex}
 .alert-dot{width:8px;height:8px;background:#f59e0b;border-radius:50%;animation:pulse 1.5s infinite;flex-shrink:0}
@@ -55,59 +55,59 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 
 /* Base hero card — full gradient, vertical layout */
 .hero-card{border-radius:14px;color:#fff;cursor:pointer;transition:transform .18s,box-shadow .18s;position:relative;overflow:hidden;min-height:140px;display:flex;flex-direction:column;box-shadow:0 4px 18px rgba(0,0,0,.18)}
-.hero-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.22)}
+.hero-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.22);background:#2e86de!important}
 /* decorative circle accent top-right */
 
 
 
 /* Plant Health card */
-.hc-health{background:linear-gradient(135deg,#1a7a96 0%,#2aa8cc 100%);flex-direction:row;padding:0;overflow:hidden}
+.hc-health{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
 .phi-left{flex:0 0 auto;padding:10px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
-.phi-right{flex:1;border-left:1px solid rgba(255,255,255,.2);padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:5px;background:rgba(0,0,0,.15)}
-.phi-right-title{font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:2px}
+.phi-right{flex:1;border-left:1px solid #bfdbfe;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:5px;background:#eff6ff}
+.phi-right-title{font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94a3b8;margin-bottom:2px}
 .phi-status-row{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 0;cursor:pointer;transition:opacity .15s}
-.phi-status-row:hover{opacity:.8}
+.phi-status-row:hover{opacity:.8;background:rgba(46,134,222,0.10);border-radius:5px}
 .phi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.phi-status-lbl{font-size:10px;opacity:.85;flex:1}
+.phi-status-lbl{font-size:10px;color:#475569;flex:1}
 .phi-status-num{font-size:14px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1}
-.phi-divider{height:1px;background:rgba(255,255,255,.15);margin:3px 0}
-.phi-total-row{display:flex;align-items:center;justify-content:space-between;padding:0}
+.phi-divider{height:1px;background:#e2e8f0;margin:3px 0}
+.phi-total-row{display:flex;align-items:center;justify-content:space-between;padding:0;color:#64748b;font-size:9px}
 .phi-bar-wrap{margin-top:6px}
 .phi-bar-track{height:4px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
 .phi-bar-fill{height:100%;background:linear-gradient(90deg,rgba(255,255,255,.9),rgba(255,255,255,.6));border-radius:3px;transition:width .6s ease}
 .phi-reason{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 0}
-.phi-reason-lbl{font-size:9px;font-weight:700;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.phi-reason-val{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:700;color:#fff;white-space:nowrap}
+.phi-reason-lbl{font-size:9px;font-weight:700;color:#334155;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phi-reason-val{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0f172a;white-space:nowrap}
 .phi-reason-val.crit{color:#fca5a5}
 .phi-reason-val.warn{color:#fde68a}
 .health-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
 .health-icon-circle{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.health-pct{font-size:30px;font-weight:700;line-height:1;font-family:'IBM Plex Mono',monospace}
-.health-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+.health-pct{font-size:30px;font-weight:700;line-height:1;font-family:'IBM Plex Mono',monospace;color:#0f2744}
+.health-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0f2744}
 /* legacy sl-* */
 .sl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .sl-lbl{font-size:10px;opacity:.85;flex:1}
 .sl-num{font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1}
 
 /* Group hero cards — same full-card vertical style */
-.hc-valve{background:linear-gradient(135deg,#f4645f 0%,#d94f4a 100%);flex-direction:row;padding:0;overflow:hidden}
-.hc-tuning{background:linear-gradient(135deg,#e8a020 0%,#f7d060 100%);flex-direction:row;padding:0;overflow:hidden}
-.hc-ops{background:linear-gradient(135deg,#1abfb8 0%,#3de0d8 100%);flex-direction:row;padding:0;overflow:hidden}
+.hc-valve{background:#dbeafe;border:1px solid #bfdbfe;border-top:3px solid #ef4444;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
+.hc-tuning{background:#dbeafe;border:1px solid #bfdbfe;border-top:3px solid #f59e0b;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
+.hc-ops{background:#dbeafe;border:1px solid #bfdbfe;border-top:3px solid #0d9488;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
 .grp-left{flex:0 0 48%;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px}
-.grp-right{flex:1;border-left:1px solid rgba(255,255,255,.2);padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;background:rgba(0,0,0,.15);overflow:hidden}
+.grp-right{flex:1;border-left:1px solid #bfdbfe;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;background:#eff6ff;overflow:hidden}
 .grp-top-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-.grp-icon-circle{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.grp-icon-circle{width:36px;height:36px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .grp-icon{font-size:20px;opacity:1}
-.grp-pct{font-size:28px;font-weight:900;line-height:1;font-family:'IBM Plex Mono',monospace;color:#fff}
-.grp-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;opacity:1}
-.grp-prob-row{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:2px 0;cursor:pointer;transition:opacity .15s;border-bottom:1px solid rgba(255,255,255,.08)}
+.grp-pct{font-size:28px;font-weight:900;line-height:1;font-family:'IBM Plex Mono',monospace;color:#0f172a}
+.grp-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#475569;opacity:1}
+.grp-prob-row{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:2px 0;cursor:pointer;transition:opacity .15s;border-bottom:1px solid #e2e8f0}
 .grp-prob-row:last-child{border-bottom:none}
 .grp-prob-row:hover{opacity:.8}
-.grp-prob-lbl{font-size:9px;font-weight:700;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.grp-prob-count{font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:700;color:#fff;white-space:nowrap}
-.grp-prob-count.hot{color:#fef08a}
-.grp-arr{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;cursor:pointer;transition:background .15s}
-.grp-arr:hover{background:rgba(255,255,255,.35)}
+.grp-prob-lbl{font-size:9px;font-weight:700;color:#334155;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grp-prob-count{font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:700;color:#475569;white-space:nowrap}
+.grp-prob-count.hot{color:#dc2626}
+.grp-arr{width:20px;height:20px;border-radius:50%;background:#e2e8f0;color:#0f172a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;cursor:pointer;transition:background .15s}
+.grp-arr:hover{background:#3b82f6;color:#fff}
 
 /* ══════════════════════════════════════════
    FULL HEATMAP ON OVERVIEW
@@ -138,7 +138,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .clear-filter-btn{padding:4px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;font-size:10px;color:var(--text3);cursor:pointer;display:none;margin-left:auto}
 .clear-filter-btn:hover{border-color:var(--blue);color:var(--blue)}
 .act-table{width:100%;border-collapse:collapse;font-size:12px}
-.act-table thead tr{background:var(--navy)}
+.act-table thead tr{background:#2e86de}
 .act-table th{padding:9px 12px;text-align:left;font-size:9px;letter-spacing:.6px;text-transform:uppercase;font-weight:700;color:#fff;white-space:nowrap;border:none}
 .act-table th:first-child{border-radius:0}.act-table th:last-child{border-radius:0}
 .act-table tbody tr{border-left:3px solid transparent;transition:all .15s;cursor:pointer}
@@ -275,7 +275,7 @@ table.et tr:last-child td{border-bottom:none}
 .mcls:hover{background:var(--crit-bg);color:var(--crit)}
 .mbdy{padding:16px 22px;overflow-y:auto;flex:1}
 .mlist{display:flex;flex-direction:column;gap:7px}
-.mli{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-radius:8px;background:var(--bg2);border:1px solid var(--border2);cursor:pointer}
+.mli{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:10px;align-items:center;padding:12px 14px;border-radius:8px;background:var(--bg2);border:1px solid var(--border2);cursor:pointer}
 .mli:hover{background:var(--blue-pale)}
 .mli-nm{font-weight:700;color:var(--navy);font-family:'IBM Plex Mono',monospace;font-size:12px}
 .mli-dg{font-size:11px;color:var(--text3)}
@@ -284,16 +284,16 @@ table.et tr:last-child td{border-bottom:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .ltxt{font-size:13px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
 .app-body{display:flex;height:calc(100vh - 56px);overflow:hidden}
-.vnav{width:180px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;padding:16px 0;gap:2px;overflow-y:auto}
-.vnav-tab{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:13px;font-weight:500;color:rgba(255,255,255,.55);cursor:pointer;border-left:3px solid transparent;transition:all .2s;white-space:nowrap;user-select:none}
-.vnav-tab:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.05)}
-.vnav-tab.active{color:#fff;background:rgba(46,134,222,.18);border-left-color:var(--blue);font-weight:600}
+.vnav{width:180px;flex-shrink:0;background:#ffffff;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;padding:16px 0;gap:2px;overflow-y:auto}
+.vnav-tab{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:13px;font-weight:500;color:#64748b;cursor:pointer;border-left:3px solid transparent;transition:all .2s;white-space:nowrap;user-select:none}
+.vnav-tab:hover{color:#0f2744;background:#f0f4f8}
+.vnav-tab.active{color:#2e86de;background:#e8f3fd;border-left-color:#2e86de;font-weight:600}
 .vnav-tab.hidden{display:none}
 .vnav-icon{font-size:15px;flex-shrink:0;opacity:.8}
-.vnav-divider{height:1px;background:rgba(255,255,255,.07);margin:8px 16px}
+.vnav-divider{height:1px;background:#e2e8f0;margin:8px 16px}
 .main-content{flex:1;overflow-y:auto;overflow-x:hidden}
-.footer{background:var(--navy);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.ftxt{font-size:11px;color:#6a92b5;font-family:'IBM Plex Mono',monospace}
+.footer{background:#ffffff;border-top:1px solid #e2e8f0;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ftxt{font-size:11px;color:#94a3b8;font-family:'IBM Plex Mono',monospace}
 .hidden{display:none!important}
 .cc{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);overflow:hidden}
 .cc-hdr{padding:12px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between}
@@ -308,7 +308,7 @@ table.et tr:last-child td{border-bottom:none}
 .sb-crit{background:var(--crit-bg);color:var(--crit);border:1px solid var(--crit-border)}
 .hm-tbl{border-collapse:separate;border-spacing:3px;font-size:11px;table-layout:auto}
 .hm-tbl th.hm-row-lbl{text-align:right;padding:4px 12px 4px 4px;font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;min-width:140px;position:sticky;left:0;background:var(--surface);z-index:2}
-.hm-unit-hdr{background:var(--navy);color:#fff;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:5px 4px;border-radius:4px 4px 0 0}
+.hm-unit-hdr{background:#dbeafe;color:#1e40af;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:8px 4px;border-radius:0;border:1px solid #bfdbfe}
 .hm-tbl th.hm-col-lbl{font-size:9px;font-weight:600;color:var(--text2);padding:3px 2px;white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg);height:90px;vertical-align:bottom;max-width:24px;cursor:default;background:var(--surface)}
 .hm-cell{padding:5px 8px;border-radius:4px;text-align:center;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;cursor:pointer;width:72px;transition:filter .15s,transform .15s}
 .hm-cell:hover{filter:brightness(1.12);transform:scale(1.06);z-index:10;position:relative}
@@ -405,11 +405,11 @@ table.et tr:last-child td{border-bottom:none}
 
 <div class="app-body">
 <div class="vnav">
-  <div class="vnav-tab active" data-tab="ov" onclick="switchTab('ov')"><span class="vnav-icon">🏠</span>Overview</div>
-  <div class="vnav-tab" data-tab="tech" onclick="switchTab('tech')"><span class="vnav-icon">📊</span>Technical Details</div>
-  <div class="vnav-tab" data-tab="tr" onclick="switchTab('tr')"><span class="vnav-icon">📈</span>Monitoring</div>
+  <div class="vnav-tab active" data-tab="ov" onclick="switchTab('ov')">Overview</div>
+  <div class="vnav-tab" data-tab="tech" onclick="switchTab('tech')">Technical Details</div>
+  <div class="vnav-tab" data-tab="tr" onclick="switchTab('tr')">Monitoring</div>
   <div class="vnav-divider"></div>
-  <div class="vnav-tab hidden" data-tab="ld" id="ldTab" onclick="switchTab('ld')"><span class="vnav-icon">🔍</span>Loop Detail<span id="ldTabNm" style="display:block;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--blue-lt);margin-top:2px;margin-left:25px"></span></div>
+  <div class="vnav-tab hidden" data-tab="ld" id="ldTab" onclick="switchTab('ld')"><div style="display:flex;flex-direction:column;gap:2px"><span>Loop Detail</span><span id="ldTabNm" style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--blue-lt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px"></span></div></div>
 </div>
 
 <div class="main-content">
@@ -427,18 +427,18 @@ table.et tr:last-child td{border-bottom:none}
       <div class="phi-left">
         <div style="position:relative;width:84px;height:84px;flex-shrink:0">
           <svg width="84" height="84" viewBox="0 0 84 84" style="transform:rotate(-90deg)">
-            <circle cx="42" cy="42" r="35" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
-            <circle id="phiRingFill" cx="42" cy="42" r="35" fill="none" stroke="#fbbf24" stroke-width="7"
+            <circle cx="42" cy="42" r="35" fill="none" stroke="#e2e8f0" stroke-width="7"/>
+            <circle id="phiRingFill" cx="42" cy="42" r="35" fill="none" stroke="#3b82f6" stroke-width="7"
               stroke-linecap="round"
               stroke-dasharray="219.91"
               stroke-dashoffset="219.91"
               style="transition:stroke-dashoffset .8s ease"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
-            <div class="health-pct" id="heroHealth" style="font-size:20px;font-weight:900;line-height:1;color:#fff">—</div>
+            <div class="health-pct" id="heroHealth" style="font-size:20px;font-weight:900;line-height:1;color:#0f2744">—</div>
           </div>
         </div>
-        <div class="health-lbl" style="text-align:center;font-size:11px;font-weight:800;color:#fff;letter-spacing:.08em">PLANT HEALTH</div>
+        <div class="health-lbl" style="text-align:center;font-size:11px;font-weight:800;color:#0f2744;letter-spacing:.08em">PLANT HEALTH</div>
       </div>
       <div class="phi-right" onclick="event.stopPropagation()">
         <div class="phi-right-title">Loop Status</div>
@@ -466,10 +466,10 @@ table.et tr:last-child td{border-bottom:none}
     </div>
 
     <!-- 2. Valve Problems -->
-    <div class="hero-card hc-valve" id="heroValveCard" onclick="openGroupModal('valve')">
+    <div class="hero-card hc-valve" id="heroValveCard" onclick="filterActionsByGroup('valve')">
       <div class="grp-left">
         <div class="grp-top-row">
-          <div class="grp-icon-circle">🔧</div>
+          
           <div><div class="grp-pct" id="heroValvePct">—</div><div class="grp-lbl">Valve Problems</div></div>
         </div>
         <div id="valveLeft" style="display:flex;flex-direction:column;gap:3px;margin-top:6px"></div>
@@ -477,10 +477,10 @@ table.et tr:last-child td{border-bottom:none}
       <div class="grp-right" id="heroValveChips" onclick="event.stopPropagation()"></div>
     </div>
 
-    <div class="hero-card hc-tuning" id="heroTuningCard" onclick="openGroupModal('tuning')">
+    <div class="hero-card hc-tuning" id="heroTuningCard" onclick="filterActionsByGroup('tuning')">
       <div class="grp-left">
         <div class="grp-top-row">
-          <div class="grp-icon-circle">⚙️</div>
+          
           <div><div class="grp-pct" id="heroTuningPct">—</div><div class="grp-lbl">Tuning Issues</div></div>
         </div>
         <div id="tuningLeft" style="display:flex;flex-direction:column;gap:3px;margin-top:6px"></div>
@@ -488,10 +488,10 @@ table.et tr:last-child td{border-bottom:none}
       <div class="grp-right" id="heroTuningChips" onclick="event.stopPropagation()"></div>
     </div>
 
-    <div class="hero-card hc-ops" id="heroOpsCard" onclick="openGroupModal('ops')">
+    <div class="hero-card hc-ops" id="heroOpsCard" onclick="filterActionsByGroup('ops')">
       <div class="grp-left">
         <div class="grp-top-row">
-          <div class="grp-icon-circle">📡</div>
+          
           <div><div class="grp-pct" id="heroOpsPct">—</div><div class="grp-lbl">Operational &amp; Signal</div></div>
         </div>
         <div id="opsLeft" style="display:flex;flex-direction:column;gap:3px;margin-top:6px"></div>
@@ -880,7 +880,7 @@ function renderHeroGroups(){
           <span class="grp-prob-lbl">${p.label}</span>
           <span class="grp-prob-count${isHot?' hot':''}">${pCount}/${total}</span>
         </div>`;
-      }).join('')+'<div style="display:flex;justify-content:flex-end;margin-top:4px"><div class="grp-arr" onclick="filterActionsByGroup(\''+grp.id+'\')" title="Filter Actions Needed">→</div></div>';
+      }).join('')+'<div style="display:flex;justify-content:flex-end;margin-top:4px"><div class="grp-arr" onclick="event.stopPropagation();openGroupModal(\''+grp.id+'\')" title="Show loops">→</div></div>';
     }
   });
 }
@@ -894,27 +894,49 @@ function openGroupModal(groupId){
   document.getElementById('grpModalIcon').style.background=grp.color+'22';
   document.getElementById('grpModalTitle').textContent=grp.label;
   const body=document.getElementById('grpModalBody');
-  body.innerHTML=grp.problems.map(p=>{
+  body.innerHTML=grp.problems.filter(p=>S.loops.filter(l=>(l.diagnosis||"").toLowerCase().includes(p.id.replace(/_/g," "))).length>0).map(p=>{
     const matched=S.loops.filter(l=>(l.diagnosis||'').toLowerCase().includes(p.id.replace(/_/g,' ')));
     const count=matched.length;
     const pct=total>0?Math.round((count/total)*100):0;
     let col='#1a9e5a';if(pct>=40)col='#dc2626';else if(pct>=20)col='#d97706';
     const circ=Math.PI*2*18;const da=`${(pct/100)*circ} ${circ}`;
-    return `<div class="ind-tile" onclick="closeGrpModal();showProblemModal('${p.id}','${p.label}')">
+    return `<div class="ind-tile" onclick="closeGrpModal();filterActionsByProblem('${p.id}')">
       <div class="ind-circle"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="none" stroke="var(--border2)" stroke-width="3"/><circle cx="24" cy="24" r="18" fill="none" stroke="${col}" stroke-width="3" stroke-dasharray="${da}" stroke-linecap="round" transform="rotate(-90 24 24)"/></svg><div class="ind-circle-pct" style="color:${col}">${pct}%</div></div>
       <div class="ind-info"><div class="ind-name">${p.label}</div><div class="ind-ratio" style="color:${col}">${count} / ${total} loops</div></div>
-      <div class="ind-arr" onclick="event.stopPropagation();closeGrpModal();filterActionsByProblem('${p.id}')" title="Filter Actions Needed">→</div>
+      <div class="ind-arr" onclick="event.stopPropagation();closeGrpModal();showProblemModal('${p.id}','${p.label}')" title="Show loops">→</div>
     </div>`;
-  }).join('')+'<div class="grp-modal-note">Click row to see loops · Click → to filter Actions Needed</div>';
+  }).join('')+'<div class="grp-modal-note">Click row to filter Actions Needed · Click → to see loops</div>';
   document.getElementById('grpModal').classList.add('open');
 }
 function closeGrpModal(){document.getElementById('grpModal').classList.remove('open');}
 
+/* ── Tuning recommendations cache (loaded once per session) ── */
+const T_RECS={};
+async function loadTuningRecs(){
+  try{
+    const r=await fetch('/api/tune/recommendations');
+    if(!r.ok)return;
+    const d=await r.json();
+    (d.recommendations||[]).forEach(rec=>{if(rec.loop)T_RECS[rec.loop]=rec;});
+  }catch{}
+}
+
+function isTuningGroup(problemId){
+  const TUNING_PROBS=['sluggishness','aggressive_tuning','sluggish_tuning','unresponsive'];
+  return TUNING_PROBS.includes(problemId);
+}
+
 function showProblemModal(problemId,problemLabel){
   const loops=S.loops.filter(l=>(l.diagnosis||'').toLowerCase().includes(problemId.replace(/_/g,' ')));
+  const isTuning=isTuningGroup(problemId);
   document.getElementById('tmTitle').textContent=`Loops with ${problemLabel}`;
   document.getElementById('tmList').innerHTML=loops.length
-    ?loops.map(l=>`<div class="mli" onclick="document.getElementById('tileModal').classList.remove('open');openLD('${l.loop.replace(/'/g,"\\'")}')"><span>${badge(sc(l))}</span><div><div class="mli-nm">${l.loop}</div><div class="mli-dg">${pdiag(l.diagnosis)}</div></div><span style="color:var(--text3);font-size:16px">›</span></div>`).join('')
+    ?loops.map(l=>{
+      const tuned=T_RECS[l.loop];
+      const tunedBadge=tuned?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border);flex-shrink:0">✓ Tuned</span>`:'';
+      const tuneBtn=isTuning?`<a href="/tune/${encodeURIComponent(l.loop)}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:var(--warn-bg);color:var(--amber,#b45309);border:1px solid var(--warn-border);text-decoration:none;flex-shrink:0;white-space:nowrap"><svg width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.3'><circle cx='12' cy='12' r='3'/><path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z'/></svg>Tune</a>`:'';
+      return `<div class="mli" onclick="document.getElementById('tileModal').classList.remove('open');openLD('${l.loop.replace(/'/g,"\\'")}')"><span>${badge(sc(l))}</span><div style="flex:1;min-width:0"><div class="mli-nm">${l.loop}</div><div class="mli-dg">${pdiag(l.diagnosis)}</div></div>${tunedBadge}${tuneBtn}<span style="color:var(--text3);font-size:16px;flex-shrink:0">›</span></div>`;
+    }).join('')
     :'<p style="padding:16px;color:var(--text4);font-style:italic;font-size:12px">No loops affected by this problem</p>';
   document.getElementById('tileModal').classList.add('open');
 }
@@ -1024,6 +1046,9 @@ const HM_KPI_DESC={
 
 function ovHmInit(){
   OV_HM.allUnits=S.units.length?[...S.units]:[...new Set(S.loops.map(l=>S.unitMap[l.loop]||'Unknown'))].sort();
+  /* Always include 'Unknown' if any loops fall into it */
+  const hasUnknown=S.loops.some(l=>!S.unitMap[l.loop]||S.unitMap[l.loop]==='Unknown');
+  if(hasUnknown&&!OV_HM.allUnits.includes('Unknown'))OV_HM.allUnits.push('Unknown');
   OV_HM.allUnits.forEach(u=>OV_HM.selectedUnits.add(u));
   ovHmPopulateDropdowns();ovHmRenderTable();ovHmInitTooltip();
 }
@@ -1145,10 +1170,34 @@ const OV_PL={margin:{t:28,r:56,b:36,l:50},paper_bgcolor:'rgba(0,0,0,0)',plot_bgc
 const OV_CFG={responsive:true,displayModeBar:false};
 let OV_TS={ts:[],pv:[],sp:[],op:[]};
 
+function smartYRange(pv,sp,padFraction=0.05){
+  const vals=[...pv,...sp].filter(v=>v!=null&&!isNaN(v));
+  if(!vals.length)return undefined;
+  const spMed=sp.filter(v=>v!=null&&!isNaN(v));
+  const spRef=spMed.length?spMed.reduce((a,b)=>a+b,0)/spMed.length:vals.reduce((a,b)=>a+b,0)/vals.length;
+  const dataMin=Math.min(...vals);
+  const dataMax=Math.max(...vals);
+  const dataSpread=dataMax-dataMin;
+  const margin=Math.max(dataSpread*0.5, Math.abs(spRef)*0.005, 0.1);
+  return[dataMin-margin, dataMax+margin];
+}
+
+function smartOpRange(op){
+  const vals=op.filter(v=>v!=null&&!isNaN(v));
+  if(!vals.length)return[0,100];
+  const dataMin=Math.min(...vals);
+  const dataMax=Math.max(...vals);
+  const spread=dataMax-dataMin;
+  const margin=Math.max(spread*0.5, 0.5);
+  return[dataMin-margin, dataMax+margin];
+}
+
 function ovDrawChart(){
   const{ts,pv,sp,op}=OV_TS;
   if(!ts.length)return;
   const h=Math.max(document.getElementById('ovC_active').offsetHeight||220,200);
+  const pvRange=smartYRange(pv,sp,0.05);
+  const opRange=smartOpRange(op);
   Plotly.newPlot('ovC_active',[
     {x:ts,y:sp,name:'SP',line:{color:'#2e86de',dash:'dot',width:1.5},type:'scatter',mode:'lines',yaxis:'y'},
     {x:ts,y:pv,name:'PV',line:{color:'#1a9e5a',width:2},type:'scatter',mode:'lines',yaxis:'y'},
@@ -1158,8 +1207,8 @@ function ovDrawChart(){
     showlegend:true,
     legend:{orientation:'h',xanchor:'left',x:0,y:1.10,font:{size:9},bgcolor:'rgba(0,0,0,0)',borderwidth:0},
     xaxis:{type:'date',gridcolor:'#e8eef4',linecolor:'#d8e2ec',zeroline:false},
-    yaxis:{title:{text:'PV / SP',font:{size:9,color:'#1a9e5a'},standoff:2},tickfont:{size:9,color:'#1a9e5a'},gridcolor:'#e8eef4',linecolor:'#d8e2ec',zeroline:false,side:'left'},
-    yaxis2:{overlaying:'y',side:'right',title:{text:'OP %',font:{size:9,color:'#d97706'},standoff:2},tickfont:{size:9,color:'#d97706'},showgrid:false,zeroline:false,rangemode:'tozero'},
+    yaxis:{title:{text:'PV / SP',font:{size:9,color:'#1a9e5a'},standoff:2},tickfont:{size:9,color:'#1a9e5a'},gridcolor:'#e8eef4',linecolor:'#d8e2ec',zeroline:false,side:'left',...(pvRange?{range:pvRange}:{})},
+    yaxis2:{overlaying:'y',side:'right',title:{text:'OP %',font:{size:9,color:'#d97706'},standoff:2},tickfont:{size:9,color:'#d97706'},showgrid:false,zeroline:false,range:opRange},
     hovermode:'x unified',
   },OV_CFG);
 }
@@ -1200,6 +1249,9 @@ function ovResetAxes(){
 const HM={selectedUnits:new Set(),allUnits:[]};
 function loadHeatmapImage(){
   HM.allUnits=S.units.length?[...S.units]:[...new Set(S.loops.map(l=>S.unitMap[l.loop]||'Unknown'))].sort();
+  /* Always include 'Unknown' if any loops fall into it */
+  const hasUnknown=S.loops.some(l=>!S.unitMap[l.loop]||S.unitMap[l.loop]==='Unknown');
+  if(hasUnknown&&!HM.allUnits.includes('Unknown'))HM.allUnits.push('Unknown');
   HM.allUnits.forEach(u=>HM.selectedUnits.add(u));
   renderHmUnitPills();renderHeatmapTable();
 }
@@ -1246,6 +1298,8 @@ async function init(){
     const resolved={};S.loops.forEach(l=>{const tag=l.loop||'';if(S.unitMap[tag])resolved[tag]=S.unitMap[tag];else if(lowerMap[tag.toLowerCase().trim()])resolved[tag]=lowerMap[tag.toLowerCase().trim()];else if(l.unit)resolved[tag]=l.unit;else resolved[tag]='Unknown';});
     S.unitMap=resolved;if(!S.units.length)S.units=[...new Set(Object.values(S.unitMap))].filter(Boolean).sort();
     populateAll(data);
+    /* load tuning recommendations for badge display */
+    loadTuningRecs();
     /* populate loop selects */
     const selTr=document.getElementById('trSel');const selOv=document.getElementById('ovTrSel');
     S.loops.forEach(l=>{if(!l.loop)return;[selTr,selOv].forEach(sel=>{if(sel){const o=document.createElement('option');o.value=l.loop;o.textContent=l.loop;sel.appendChild(o);}});});
@@ -1297,12 +1351,12 @@ const PL={margin:{t:10,r:10,b:36,l:46},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolo
 const CFG={responsive:true,displayModeBar:false};
 async function fetchTS(nm){if(S.tsCache[nm])return S.tsCache[nm];try{const r=await fetch('/api/timeseries/'+encodeURIComponent(nm));if(!r.ok)return null;const d=await r.json();S.tsCache[nm]=d;return d;}catch{return null;}}
 function normTs(raw){if(!raw||!raw.length)return raw;const first=raw[0];if(typeof first==='string'){const n=Number(first);if(!isNaN(n)&&n>1e12)return raw.map(t=>new Date(Number(t)).toISOString().replace('T',' ').slice(0,19));if(!isNaN(n)&&n>1e9)return raw.map(t=>new Date(Number(t)*1000).toISOString().replace('T',' ').slice(0,19));if(!isNaN(n)&&n>30000)return raw.map(t=>new Date((Number(t)-25569)*86400000).toISOString().replace('T',' ').slice(0,19));return raw.map(t=>t?String(t).replace('T',' ').slice(0,19):null);}if(first>1e12)return raw.map(t=>new Date(t).toISOString().replace('T',' ').slice(0,19));if(first>1e9)return raw.map(t=>new Date(t*1000).toISOString().replace('T',' ').slice(0,19));if(first>30000)return raw.map(t=>new Date((t-25569)*86400000).toISOString().replace('T',' ').slice(0,19));const base=Date.now()-first*1000;return raw.map(t=>new Date(base+t*1000).toISOString().replace('T',' ').slice(0,19));}
-function drawCharts(d,pfx){const ts=normTs(d.timestamps||[]),pv=d.pv||[],sp=d.sp||[],op=d.op||[];const err=pv.map((v,i)=>(v!=null&&sp[i]!=null)?v-sp[i]:null).filter(e=>e!=null);Plotly.newPlot(pfx+'pv_sp',[{x:ts,y:sp,name:'SP',line:{color:'#2e86de',dash:'dot',width:1.5},type:'scatter',mode:'lines'},{x:ts,y:pv,name:'PV',line:{color:'#1a9e5a',width:2},type:'scatter',mode:'lines'}],{...PL,height:200},CFG);Plotly.newPlot(pfx+'op',[{x:ts,y:op,name:'OP %',line:{color:'#d97706',width:1.5},type:'scatter',mode:'lines',fill:'tozeroy',fillcolor:'rgba(217,119,6,0.06)'}],{...PL,height:200},CFG);if(pfx==='d_'||pfx==='c_'){Plotly.newPlot(pfx+'sig',[{x:op,y:pv,mode:'markers',marker:{color:'#2e86de',size:3,opacity:.5},type:'scatter',name:'OP vs PV'}],{...PL,height:200,xaxis:{...PL.xaxis,title:'OP (%)',type:'linear'},yaxis:{...PL.yaxis,title:'PV'}},CFG);Plotly.newPlot(pfx+'eh',[{x:err,type:'histogram',name:'Error dist.',nbinsx:30,marker:{color:'#2e86de',opacity:.7}}],{...PL,height:200,xaxis:{...PL.xaxis,title:'PV − SP',type:'linear'},yaxis:{...PL.yaxis,title:'Count'}},CFG);}}
+function drawCharts(d,pfx){const ts=normTs(d.timestamps||[]),pv=d.pv||[],sp=d.sp||[],op=d.op||[];const err=pv.map((v,i)=>(v!=null&&sp[i]!=null)?v-sp[i]:null).filter(e=>e!=null);const pvRange=smartYRange(pv,sp,0.05);const opVals=op.filter(v=>v!=null&&!isNaN(v));const opMax=opVals.length?Math.max(...opVals):100;Plotly.newPlot(pfx+'pv_sp',[{x:ts,y:sp,name:'SP',line:{color:'#2e86de',dash:'dot',width:1.5},type:'scatter',mode:'lines'},{x:ts,y:pv,name:'PV',line:{color:'#1a9e5a',width:2},type:'scatter',mode:'lines'}],{...PL,height:200,...(pvRange?{yaxis:{...PL.yaxis,range:pvRange}}:{})},CFG);Plotly.newPlot(pfx+'op',[{x:ts,y:op,name:'OP %',line:{color:'#d97706',width:1.5},type:'scatter',mode:'lines',fill:'tozeroy',fillcolor:'rgba(217,119,6,0.06)'}],{...PL,height:200,yaxis:{...PL.yaxis,range:[0,Math.max(opMax*1.15,10)]}},CFG);if(pfx==='d_'||pfx==='c_'){Plotly.newPlot(pfx+'sig',[{x:op,y:pv,mode:'markers',marker:{color:'#2e86de',size:3,opacity:.5},type:'scatter',name:'OP vs PV'}],{...PL,height:200,xaxis:{...PL.xaxis,title:'OP (%)',type:'linear'},yaxis:{...PL.yaxis,title:'PV'}},CFG);Plotly.newPlot(pfx+'eh',[{x:err,type:'histogram',name:'Error dist.',nbinsx:30,marker:{color:'#2e86de',opacity:.7}}],{...PL,height:200,xaxis:{...PL.xaxis,title:'PV − SP',type:'linear'},yaxis:{...PL.yaxis,title:'Count'}},CFG);}}
 async function loadTrCharts(){const nm=document.getElementById('trSel').value;if(!nm)return;const d=await fetchTS(nm);if(d)drawCharts(d,'c_');}
 function resetAxes(){['c_pv_sp','c_op','c_sig','c_eh'].forEach(id=>{const el=document.getElementById(id);if(el&&el.data)Plotly.relayout(id,{'xaxis.autorange':true,'yaxis.autorange':true});});}
 function openCM(srcId,title){const el=document.getElementById(srcId);if(!el||!el.data)return;document.getElementById('cmTitle').textContent=title;const body=document.getElementById('cmBody');body.innerHTML='';Plotly.newPlot(body,el.data,{...el.layout,height:460,margin:{t:20,r:20,b:50,l:52}},{responsive:true});document.getElementById('chartModal').classList.add('open');}
 function openTileModal(type){const titles={all:'All Loops',good:'Loops Running OK',poor:'Loops to Watch',critical:'Act Now — Critical Loops'};document.getElementById('tmTitle').textContent=titles[type]||type;const map={good:'good',poor:'poor',critical:'critical'};const rows=type==='all'?S.loops:S.loops.filter(l=>sc(l)===map[type]);document.getElementById('tmList').innerHTML=rows.map(l=>`<div class="mli" onclick="document.getElementById('tileModal').classList.remove('open');openLD('${l.loop.replace(/'/g,"\\'")}')"><span>${badge(sc(l))}</span><div><div class="mli-nm">${l.loop}</div><div class="mli-dg">${pdiag(l.diagnosis)}</div></div><span style="color:var(--text3);font-size:16px">›</span></div>`).join('');document.getElementById('tileModal').classList.add('open');}
-function switchTab(tab){S.tab=tab;document.querySelectorAll('.vnav-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));const map={ov:'sec-ov',tech:'sec-tech',tr:'sec-tr',ld:'sec-ld'};const sec=document.getElementById(map[tab]);if(sec){sec.classList.remove('hidden');sec.classList.add('active');}window.scrollTo({top:0,behavior:'smooth'});}
+function switchTab(tab){S.tab=tab;document.querySelectorAll('.vnav-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));const map={ov:'sec-ov',tech:'sec-tech',tr:'sec-tr',ld:'sec-ld'};const sec=document.getElementById(map[tab]);if(sec){sec.classList.remove('hidden');sec.classList.add('active');}/* Hide loop detail tab when navigating away */if(tab!=='ld'){const ldTab=document.getElementById('ldTab');if(ldTab){ldTab.style.display='none';ldTab.classList.add('hidden');}}window.scrollTo({top:0,behavior:'smooth'});}
 
 async function openLD(nm){S.sel=nm;const l=S.loops.find(x=>x.loop===nm)||{};const sev=sc(l);document.getElementById('ldTab').classList.remove('hidden');document.getElementById('ldTab').style.display='flex';document.getElementById('ldTabNm').textContent=nm;document.getElementById('ldNm').textContent=nm;document.getElementById('ldDg').textContent=l.diagnosis||'';document.getElementById('ldPill').innerHTML=badge(sev);const h=parseFloat(l.health),hN=!isNaN(h)?Math.round(h):null;const sfN=l.service_factor!=null?Math.round(parseFloat(l.service_factor)):null;document.getElementById('dmGrid').innerHTML=`<div class="dmc ${sev==='critical'?'dc-crit':sev==='poor'?'dc-warn':'dc-ok'}"><div class="dmc-lbl">Health Score</div><div class="dmc-val">${hN!==null?hN+'%':'—'}</div><div class="dmc-sub">${badge(sev)}</div></div><div class="dmc"><div class="dmc-lbl">Service Factor</div><div class="dmc-val">${sfN!==null?sfN+'%':'—'}</div><div class="dmc-sub">% time active in AUTO</div></div><div class="dmc"><div class="dmc-lbl">Harris Index</div><div class="dmc-val">${l.harris_index!=null?Number(l.harris_index).toFixed(3):'—'}</div><div class="dmc-sub">min-variance benchmark</div></div><div class="dmc"><div class="dmc-lbl">Stiction</div><div class="dmc-val" style="font-size:16px;margin-top:6px">${l.stiction_label||'—'}</div><div class="dmc-sub">consensus detection</div></div>`;switchTab('ld');const d=await fetchTS(nm);if(d)drawCharts(d,'d_');}
 
@@ -1359,7 +1413,21 @@ function umRemoveLoop(tag,unit){if(UM.map[tag]===unit)delete UM.map[tag];umRende
 function umAddUnit(){const inp=document.getElementById('um-new-unit-input');const name=inp.value.trim();if(!name){alert('Enter a unit name first.');return;}if(UM.units.includes(name)){alert('Unit already exists.');return;}UM.units.push(name);inp.value='';umPopulateFilterDropdown();umRenderUnitCards();document.getElementById('um-status').textContent='⚠ Unsaved changes — click Save & Apply.';document.getElementById('um-status').style.color='var(--warn)';}
 function umDeleteUnit(unit){if(!confirm(`Delete unit "${unit}"? Loops assigned to it will become unassigned.`))return;UM.units=UM.units.filter(u=>u!==unit);Object.keys(UM.map).forEach(tag=>{if(UM.map[tag]===unit)delete UM.map[tag];});umPopulateFilterDropdown();umRenderUnitCards();umRenderLoopList();document.getElementById('um-status').textContent='⚠ Unsaved changes — click Save & Apply.';document.getElementById('um-status').style.color='var(--warn)';}
 async function umSave(){const statusEl=document.getElementById('um-status');statusEl.textContent='Saving…';statusEl.style.color='var(--text3)';try{const res=await fetch('/api/unit-mapping/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({unit_mapping:UM.map})});if(!res.ok)throw new Error('HTTP '+res.status);statusEl.textContent='✅ Saved and applied.';statusEl.style.color='var(--ok)';applyUnitMapUpdate(UM.map,UM.units);}catch(e){statusEl.textContent='❌ Save failed: '+e.message;statusEl.style.color='var(--crit)';}}
-function applyUnitMapUpdate(newMap,newUnits){S.unitMap=Object.assign({},newMap);S.units=newUnits?[...newUnits]:[...new Set(Object.values(newMap))].filter(Boolean).sort();OV_HM.allUnits=[...S.units];OV_HM.selectedUnits=new Set(OV_HM.allUnits);ovHmPopulateDropdowns();ovHmRenderTable();HM.allUnits=[...S.units];HM.selectedUnits=new Set(HM.allUnits);renderHmUnitPills();renderHeatmapTable();if(typeof texRenderList==='function')texRenderList();showToast('Unit mapping applied to all views.');}
+function applyUnitMapUpdate(newMap,newUnits){
+  S.unitMap=Object.assign({},newMap);
+  S.units=newUnits?[...newUnits]:[...new Set(Object.values(newMap))].filter(Boolean).sort();
+  /* Always include 'Unknown' if any loops are unmapped */
+  const hasUnknown=S.loops.some(l=>!S.unitMap[l.loop]||S.unitMap[l.loop]==='Unknown');
+  if(hasUnknown&&!S.units.includes('Unknown'))S.units.push('Unknown');
+  OV_HM.allUnits=[...S.units];
+  OV_HM.selectedUnits=new Set(OV_HM.allUnits);
+  ovHmPopulateDropdowns();ovHmRenderTable();
+  HM.allUnits=[...S.units];
+  HM.selectedUnits=new Set(HM.allUnits);
+  renderHmUnitPills();renderHeatmapTable();
+  if(typeof texRenderList==='function')texRenderList();
+  showToast('Unit mapping applied to all views.');
+}
 
 async function downloadReport(){const btn=document.getElementById('btnDownloadReport');const orig=btn.innerHTML;btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="animation:spin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Generating…`;btn.disabled=true;try{const res=await fetch('/api/report/download');if(!res.ok){const err=await res.json().catch(()=>({detail:'Unknown error'}));throw new Error(err.detail||'HTTP '+res.status);}const blob=await res.blob();const url=URL.createObjectURL(blob);const a=document.createElement('a');const cd=res.headers.get('Content-Disposition')||'';const m=cd.match(/filename=(.+)/);a.href=url;a.download=m?m[1]:'Valve_Diagnostics.zip';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);showToast('✅ Report downloaded — contains PDF summary + Excel detail.');}catch(e){showToast('❌ Report failed: '+e.message,6000);}finally{btn.innerHTML=orig;btn.disabled=false;}}
 
