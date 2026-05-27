@@ -14,3 +14,9 @@ plots/
 .DS_Store
 Thumbs.db
 .vscode/ 
+build/ 
+dist/ 
+*.spec 
+*.bat 
+launcher.py 
+"Untitled video*/" 
