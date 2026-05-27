@@ -26,25 +26,38 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
 button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;background:none}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-.topbar{background:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;border-bottom:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar{background:#fff;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;border-bottom:3px solid #3b82f6;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.topbar-left{display:flex;align-items:center;gap:14px}
 .logo{display:flex;align-items:center;gap:10px}
-.logo-hex{width:34px;height:34px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-text{color:#0f172a;font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace}
-.logo-text span{color:#3b82f6;font-weight:400}
+.logo-hex{width:36px;height:36px;background:#3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-brand{display:flex;flex-direction:column;gap:1px}
+.logo-brand-main{color:#1e3a5f;font-size:15px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;letter-spacing:-.01em;line-height:1}
+.logo-brand-main span{color:#3b82f6;font-weight:300}
+.logo-brand-sub{color:#64748b;font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif}
+.topbar-divider{width:1px;height:24px;background:#e2e8f0;flex-shrink:0}
 .run-badge{background:#eff6ff;color:#1d4ed8;font-size:11px;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Mono',monospace;border:1px solid #bfdbfe}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.ts-txt{color:#94a3b8;font-size:11px;font-family:'IBM Plex Mono',monospace}
-.btn-upload{display:flex;align-items:center;gap:6px;padding:6px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;color:#1d4ed8;font-size:12px;font-weight:600;transition:all .2s;text-decoration:none}
-.btn-upload:hover{background:#3b82f6;color:#fff;border-color:#3b82f6}
-.btn-settings{display:flex;align-items:center;gap:6px;padding:6px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;color:#475569;font-size:12px;font-weight:600;transition:all .2s;cursor:pointer}
-.btn-settings:hover{background:#f1f5f9;color:#0f172a;border-color:#cbd5e1}
-.user-pill{background:#f1f5f9;color:#475569;font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid #e2e8f0}
-.btn-logout{color:#94a3b8;font-size:12px;padding:4px 8px;border-radius:6px;transition:all .2s}
-.btn-logout:hover{background:#f1f5f9;color:#0f172a}
-.alert-bar{background:#fff8ed;border-bottom:2px solid #fde8b4;padding:10px 24px;display:none;align-items:center;gap:10px;font-size:12px;color:#92400e}
-.alert-bar.show{display:flex}
-.alert-dot{width:8px;height:8px;background:#f59e0b;border-radius:50%;animation:pulse 1.5s infinite;flex-shrink:0}
+.topbar-right{display:flex;align-items:center;gap:4px}
+.ts-txt{color:#94a3b8;font-size:11px;font-family:'IBM Plex Mono',monospace;margin-right:6px}
+.btn-icon{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#64748b;cursor:pointer;border:none;background:transparent;transition:all .18s;flex-shrink:0}
+.btn-icon:hover{background:#f1f5f9;color:#1e3a5f}
+.btn-upload{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:7px;color:#64748b;transition:all .18s;text-decoration:none;border:none;background:transparent;flex-shrink:0}
+.btn-upload:hover{background:#f1f5f9;color:#1e3a5f}
+.btn-settings{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:7px;color:#64748b;transition:all .18s;cursor:pointer;background:transparent;border:none;flex-shrink:0}
+.btn-settings:hover{background:#f1f5f9;color:#1e3a5f}
+.topbar-sep{width:1px;height:28px;background:#e2e8f0;margin:0 6px;flex-shrink:0}
+.user-wrap{display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:all .18s}
+.user-wrap:hover{background:#f8fafc;border-color:#e2e8f0}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1d4ed8;flex-shrink:0}
+.user-info{display:flex;flex-direction:column;gap:0}
+.user-welcome{font-size:9px;color:#3b82f6;font-weight:600;text-transform:uppercase;letter-spacing:.06em;line-height:1.2}
+.user-name{font-size:12px;font-weight:600;color:#1e293b;line-height:1.2}
+.user-role{font-size:10px;color:#94a3b8;line-height:1.2}
+.btn-logout{color:#94a3b8;font-size:11px;padding:4px 6px;border-radius:6px;transition:all .2s;cursor:pointer;text-decoration:none;border:none;background:transparent}
+.btn-logout:hover{background:#f1f5f9;color:#1e3a5f}
+.company-mark{display:flex;flex-direction:column;align-items:flex-end;gap:0;padding-left:6px}
+.company-name{font-size:14px;font-weight:800;color:#1e3a5f;letter-spacing:.01em;line-height:1.1}
+.company-tag{font-size:9px;color:#3b82f6;letter-spacing:.08em;text-transform:uppercase;font-weight:600;line-height:1.1}
+.alert-bar{display:none!important}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .section{display:none}.section.active{display:block}
 
@@ -55,7 +68,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 
 /* Base hero card — full gradient, vertical layout */
 .hero-card{border-radius:14px;color:#fff;cursor:pointer;transition:transform .18s,box-shadow .18s;position:relative;overflow:hidden;min-height:140px;display:flex;flex-direction:column;box-shadow:0 4px 18px rgba(0,0,0,.18)}
-.hero-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.22);background:#2e86de!important}
+.hero-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.22);background:#1a7fd4!important}
 /* decorative circle accent top-right */
 
 
@@ -90,16 +103,16 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .sl-num{font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1}
 
 /* Group hero cards — same full-card vertical style */
-.hc-valve{background:#dbeafe;border:1px solid #bfdbfe;border-top:3px solid #ef4444;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
-.hc-tuning{background:#dbeafe;border:1px solid #bfdbfe;border-top:3px solid #f59e0b;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
-.hc-ops{background:#dbeafe;border:1px solid #bfdbfe;border-top:3px solid #0d9488;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
+.hc-valve{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
+.hc-tuning{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
+.hc-ops{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
 .grp-left{flex:0 0 48%;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px}
 .grp-right{flex:1;border-left:1px solid #bfdbfe;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;background:#eff6ff;overflow:hidden}
 .grp-top-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
 .grp-icon-circle{width:36px;height:36px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .grp-icon{font-size:20px;opacity:1}
 .grp-pct{font-size:28px;font-weight:900;line-height:1;font-family:'IBM Plex Mono',monospace;color:#0f172a}
-.grp-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#475569;opacity:1}
+.grp-lbl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#0f2744;opacity:1}
 .grp-prob-row{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:2px 0;cursor:pointer;transition:opacity .15s;border-bottom:1px solid #e2e8f0}
 .grp-prob-row:last-child{border-bottom:none}
 .grp-prob-row:hover{opacity:.8}
@@ -132,38 +145,40 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 /* Actions card */
 .act-sec{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden}
 .act-sec-header{padding:11px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.act-sec-title{font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px}
-.act-title-icon{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#e74c3c,#c0392b);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.act-sec-title{font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.05em}
+.act-title-icon{display:none}
 .act-count-badge{background:var(--crit-bg);color:var(--crit);border:1px solid var(--crit-border);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
 .clear-filter-btn{padding:4px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;font-size:10px;color:var(--text3);cursor:pointer;display:none;margin-left:auto}
 .clear-filter-btn:hover{border-color:var(--blue);color:var(--blue)}
 .act-table{width:100%;border-collapse:collapse;font-size:12px}
-.act-table thead tr{background:#2e86de}
+.act-table thead tr{background:#1a7fd4}
 .act-table th{padding:9px 12px;text-align:left;font-size:9px;letter-spacing:.6px;text-transform:uppercase;font-weight:700;color:#fff;white-space:nowrap;border:none}
 .act-table th:first-child{border-radius:0}.act-table th:last-child{border-radius:0}
 .act-table tbody tr{border-left:3px solid transparent;transition:all .15s;cursor:pointer}
-.act-table tbody tr.row-crit{border-left-color:var(--crit);background:#fffafa}
-.act-table tbody tr.row-warn{border-left-color:var(--warn);background:#fffdf5}
-.act-table tbody tr.row-crit:hover{background:#fdecea}
-.act-table tbody tr.row-warn:hover{background:#fef8e7}
+.act-table tbody tr.row-crit{border-left-color:transparent;background:#fff}
+.act-table tbody tr.row-warn{border-left-color:transparent;background:#fff}
+.act-table tbody tr.row-crit:hover{background:#dbeafe}
+.act-table tbody tr.row-warn:hover{background:#dbeafe}
 .act-table td{padding:10px 12px;border-bottom:1px solid var(--border2);vertical-align:middle}
 .act-table tr:last-child td{border-bottom:none}
-.grp-hover{background:#fdecea!important}
-.row-warn .grp-hover,.act-table tbody tr.row-warn td.grp-hover{background:#fef8e7!important}
+.grp-hover{background:#dbeafe!important}
+.row-warn .grp-hover,.act-table tbody tr.row-warn td.grp-hover{background:#dbeafe!important}
 .act-kpi{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700}
-.act-kpi.crit{background:var(--crit-bg);color:var(--crit);border:1px solid var(--crit-border)}
-.act-kpi.warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
+.act-kpi.crit{background:none;color:var(--navy);border:none;text-transform:uppercase}
+.act-kpi.warn{background:none;color:var(--navy);border:none;text-transform:uppercase}
 .act-val{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--crit);font-weight:700;display:flex;flex-direction:column;gap:2px}
 .act-opt{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#059669;font-weight:600;display:flex;flex-direction:column;gap:2px}
 .act-cause{font-size:12px!important;color:#0f2744!important;font-weight:800!important}
-.act-suggestion{font-size:12px!important;color:#0f2744!important;font-weight:800!important;line-height:1.5;max-width:220px}
-.act-loop{display:inline-flex;align-items:center;gap:5px;background:#f0f4f8;color:var(--navy);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;white-space:nowrap;border:1px solid var(--border)}
+.act-suggestion{font-size:12px!important;color:#0f2744!important;font-weight:800!important;line-height:1.5}
+.act-table td:nth-child(3){width:130px;max-width:130px}
+.act-loop{display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--navy);white-space:nowrap;transition:all .15s;cursor:pointer}
+.act-loop:hover{color:#1d4ed8;box-shadow:0 3px 10px rgba(59,130,246,.2);transform:translateY(-2px);text-decoration:underline}
 
 /* Trends tile */
 .trends-card{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .trends-hdr{padding:11px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;flex-shrink:0}
-.trends-icon{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#2e86de,#1a5fa8);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.trends-title{font-size:13px;font-weight:700;color:var(--navy)}
+.trends-icon{display:none}
+.trends-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em}
 .trends-loop-sel{margin-left:auto;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text2);outline:none;max-width:140px;font-family:'IBM Plex Mono',monospace}
 .trends-body{flex:1;padding:6px 8px 0;display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .ov-chart-wrap{flex:1;display:flex;flex-direction:column;min-height:0}
@@ -310,9 +325,9 @@ table.et tr:last-child td{border-bottom:none}
 .hm-tbl th.hm-row-lbl{text-align:right;padding:4px 12px 4px 4px;font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;min-width:140px;position:sticky;left:0;background:var(--surface);z-index:2}
 .hm-unit-hdr{background:#dbeafe;color:#1e40af;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:8px 4px;border-radius:0;border:1px solid #bfdbfe}
 .hm-tbl th.hm-col-lbl{font-size:9px;font-weight:600;color:var(--text2);padding:3px 2px;white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg);height:90px;vertical-align:bottom;max-width:24px;cursor:default;background:var(--surface)}
-.hm-cell{padding:5px 8px;border-radius:4px;text-align:center;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;cursor:pointer;width:72px;transition:filter .15s,transform .15s}
+.hm-cell{padding:5px 8px;border-radius:4px;text-align:center;font-size:10px;font-weight:700;color:#1e3a2f;white-space:nowrap;cursor:pointer;width:72px;transition:filter .15s,transform .15s}
 .hm-cell:hover{filter:brightness(1.12);transform:scale(1.06);z-index:10;position:relative}
-.hm-cell.hm-ok{background:#2db89b}.hm-cell.hm-warn{background:#f59e0b}.hm-cell.hm-crit{background:#dc2626}.hm-cell.hm-na{background:#9ca3af}.hm-cell.hm-dash{background:#e5e7eb;color:#9ca3af}
+.hm-cell.hm-ok{background:#bfdbfe;color:#1e3a5f}.hm-cell.hm-warn{background:#fcd34d}.hm-cell.hm-crit{background:#fca5a5}.hm-cell.hm-na{background:#e2e8f0;color:#6b8299}.hm-cell.hm-dash{background:#f1f5f9;color:#9ca3af}
 #hmTip{display:none;position:fixed;z-index:9999;background:#0f2744;color:#e8f3fd;font-size:12px;font-family:'IBM Plex Sans',sans-serif;padding:12px 16px;border-radius:10px;width:260px;pointer-events:none;box-shadow:0 8px 32px rgba(15,39,68,.3);border:1px solid rgba(255,255,255,.12)}
 #hmTip .ht-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7fd3ff;margin-bottom:6px;word-break:break-all}
 #hmTip .ht-kpi{font-weight:700;font-size:13px;margin-bottom:4px}
@@ -386,18 +401,38 @@ table.et tr:last-child td{border-bottom:none}
 <div class="topbar">
   <div class="topbar-left">
     <div class="logo">
-      <div class="logo-hex"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1L2 5v8l7 4 7-4V5L9 1z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 6v5M6.5 7.5L9 6l2.5 1.5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-      <span class="logo-text">Valve<span>Diagnostics</span></span>
+      <div class="logo-hex"><svg width="20" height="20" viewBox="0 0 18 18" fill="none"><path d="M9 1L2 5v8l7 4 7-4V5L9 1z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 6v5M6.5 7.5L9 6l2.5 1.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+      <div class="logo-brand">
+        <div class="logo-brand-main">Ingenero<span> 360 AI</span></div>
+        <div class="logo-brand-sub">Control Valve Diagnostics</div>
+      </div>
     </div>
+    <div class="topbar-divider"></div>
     <span class="run-badge" id="runBadge">Loading…</span>
-    <span id="defaultConfigBadge" style="display:none;background:rgba(217,119,6,.2);color:#fbbf24;font-size:10px;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Mono',monospace;border:1px solid rgba(217,119,6,.35);cursor:pointer" onclick="openSettings()" title="Click to change settings">⚙ Default Config</span>
+    <span id="defaultConfigBadge" style="display:none;background:#fff7ed;color:#b45309;font-size:10px;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Mono',monospace;border:1px solid #fed7aa;cursor:pointer" onclick="openSettings()" title="Click to change settings">⚙ Default Config</span>
   </div>
   <div class="topbar-right">
     <span class="ts-txt" id="topTs"></span>
-    <a href="/upload" class="btn-upload"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>New Upload</a>
-    <button class="btn-settings" id="btnDownloadReport" onclick="downloadReport()" title="Download PDF report + Excel (zipped)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download Report</button>
-    <button class="btn-settings" id="btnSettings" onclick="openSettings()" title="Configuration Settings"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
-    {% if user is defined %}<span class="user-pill">{{ user.name }}</span><a href="/logout" class="btn-logout">Sign out</a>{% endif %}
+    <a href="/upload" class="btn-upload" title="New Upload"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></a>
+    <button class="btn-settings" id="btnDownloadReport" onclick="downloadReport()" title="Download Report"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+    <button class="btn-settings" id="btnSettings" onclick="openSettings()" title="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    <div class="topbar-sep"></div>
+    {% if user is defined %}
+    <div class="user-wrap">
+      <div class="user-avatar">{{ user.name[:2].upper() if user.name else 'IA' }}</div>
+      <div class="user-info">
+        <div class="user-welcome">Welcome</div>
+        <div class="user-name">{{ user.name }}</div>
+        <div class="user-role">Corporate</div>
+      </div>
+    </div>
+    <a href="/logout" class="btn-logout">Sign out</a>
+    {% endif %}
+    <div class="topbar-sep"></div>
+    <div class="company-mark">
+      <div class="company-name">Ingenero</div>
+      <div class="company-tag">360 AI</div>
+    </div>
   </div>
 </div>
 
@@ -522,10 +557,10 @@ table.et tr:last-child td{border-bottom:none}
         </div>
       </div>
       <div class="ov-hm-legend">
-        <span class="ov-hm-dot" style="background:#2db89b"></span>Healthy
-        <span class="ov-hm-dot" style="background:#f59e0b;margin-left:5px"></span>Watch
-        <span class="ov-hm-dot" style="background:#dc2626;margin-left:5px"></span>Problem
-        <span class="ov-hm-dot" style="background:#9ca3af;margin-left:5px"></span>N/A
+        <span class="ov-hm-dot" style="background:#bfdbfe"></span>Healthy
+        <span class="ov-hm-dot" style="background:#fcd34d;margin-left:5px"></span>Watch
+        <span class="ov-hm-dot" style="background:#fca5a5;margin-left:5px"></span>Problem
+        <span class="ov-hm-dot" style="background:#e2e8f0;margin-left:5px"></span>N/A
       </div>
     </div>
     <div class="ov-hm-scroll">
@@ -548,7 +583,7 @@ table.et tr:last-child td{border-bottom:none}
         <button class="clear-filter-btn" id="clearFilterBtn" onclick="clearActionsFilter()">✕ Clear Filter</button>
       </div>
       <div style="overflow-x:auto;overflow-y:auto;max-height:380px">
-        <table class="act-table" style="min-width:820px">
+        <table class="act-table" style="width:100%">
           <thead style="position:sticky;top:0;z-index:2">
             <tr><th>Issue</th><th>Cause Parameter</th><th>Loop</th><th>Actual Value</th><th>Target / Threshold</th><th>Recommended Action</th></tr>
           </thead>
@@ -596,22 +631,6 @@ table.et tr:last-child td{border-bottom:none}
       <div class="ekpi ekpi-iae"><div class="ekpi-lbl">IAE / hr <span class="ibt" data-t="mean(iae_per_hour) — integrated absolute error/hr">ⓘ</span></div><div class="ekpi-val" id="ekI">—</div><div class="ekpi-sub">avg error per hour</div></div>
       <div class="ekpi ekpi-osc"><div class="ekpi-lbl">Oscillation <span class="ibt" data-t="mean(hagglund_regularity × 100)">ⓘ</span></div><div class="ekpi-val" id="ekO">—</div><div class="ekpi-sub">Hägglund regularity</div></div>
     </div>
-    <div class="hm-bar" style="padding-bottom:0">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-        <span class="hm-label">Diagnostic Heatmap</span>
-        <div style="display:flex;align-items:center;gap:6px;margin-left:auto;font-size:11px;flex-wrap:wrap">
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:11px;height:11px;border-radius:2px;background:#2db89b;display:inline-block"></span>Healthy</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:11px;height:11px;border-radius:2px;background:#f59e0b;display:inline-block"></span>Borderline</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:11px;height:11px;border-radius:2px;background:#dc2626;display:inline-block"></span>Problem</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:11px;height:11px;border-radius:2px;background:#9ca3af;display:inline-block"></span>N/A</span>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--border2);flex-wrap:wrap">
-        <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap">Filter by Unit:</span>
-        <div id="hmUnitPills" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-      </div>
-    </div>
-    <div style="overflow-x:auto;padding:0 24px 20px"><div id="hmTable"></div></div>
     <div class="tbl-bar">
       <span style="font-size:12px;font-weight:700;color:var(--navy)">All Loops — Technical Detail</span>
       <div class="srch"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="var(--text4)" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="var(--text4)" stroke-width="1.5" stroke-linecap="round"/></svg><input type="text" id="srchEng" placeholder="Search loops…" oninput="renderTech()"/></div>
@@ -993,7 +1012,7 @@ function renderActionsTable(){
     tr.addEventListener('mouseenter',()=>{
       const g=tr.dataset.group;
       tbody.querySelectorAll('.grp-span[data-group="'+g+'"]').forEach(td=>td.classList.add('grp-hover'));
-      tr.querySelectorAll('td').forEach(td=>td.classList.add('grp-hover'));
+      tbody.querySelectorAll('tr[data-group="'+g+'"]').forEach(row=>row.querySelectorAll('td').forEach(td=>td.classList.add('grp-hover')));
     });
     tr.addEventListener('mouseleave',()=>{
       tbody.querySelectorAll('.grp-span,.grp-hover').forEach(td=>td.classList.remove('grp-hover'));
@@ -1288,6 +1307,7 @@ async function init(){
     if(!res.ok){let detail='HTTP '+res.status;try{const j=await res.json();detail=j.detail||detail;}catch{}if(res.status===404)throw new Error('no_results');throw new Error(detail);}
     const data=await res.json();
     S.loops=data.loops||[];S.plant=data.plant||{};S.runFolder=data.run_folder||'';
+    S.isCustomConfig=data.is_custom_config||false;
     if(!S.loops.length)throw new Error('no_results');
     try{
       const umRes=await fetch('/api/unit-mapping');
@@ -1303,8 +1323,12 @@ async function init(){
     /* populate loop selects */
     const selTr=document.getElementById('trSel');const selOv=document.getElementById('ovTrSel');
     S.loops.forEach(l=>{if(!l.loop)return;[selTr,selOv].forEach(sel=>{if(sel){const o=document.createElement('option');o.value=l.loop;o.textContent=l.loop;sel.appendChild(o);}});});
-    showToast('Running with default configuration — use ⚙ Settings to customise.');
-    document.getElementById('defaultConfigBadge').style.display='inline';
+    if(!S.isCustomConfig){
+      showToast('Running with default configuration — use ⚙ Settings to customise.');
+      document.getElementById('defaultConfigBadge').style.display='inline';
+    } else {
+      document.getElementById('defaultConfigBadge').style.display='none';
+    }
   }catch(e){console.error(e);showErr(e.message);}
   finally{document.getElementById('lov').style.display='none';}
 }

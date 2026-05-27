@@ -23,97 +23,107 @@
   --shadow:0 1px 4px rgba(15,39,68,.07);
   --shadow-md:0 4px 16px rgba(15,39,68,.11);
 }
-html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+html,body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
 button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;background:none}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 /* ── TOP BAR ── */
-.topbar{background:var(--navy);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(255,255,255,.07)}
-.tb-left{display:flex;align-items:center;gap:12px}
-.back-btn{display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:7px;color:#a8c8f0;font-size:12px;font-weight:600;text-decoration:none;transition:all .2s}
-.back-btn:hover{background:rgba(255,255,255,.15);color:#fff}
-.tb-tag{background:rgba(46,134,222,.25);border:1px solid rgba(46,134,222,.45);color:#7fd3ff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Mono',monospace}
-.tb-title{color:#fff;font-size:14px;font-weight:600}
+.topbar{background:#fff;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:200;border-bottom:3px solid #3b82f6;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.tb-left{display:flex;align-items:center;gap:10px}
+.back-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:7px;color:#475569;font-size:12px;font-weight:600;text-decoration:none;transition:all .2s}
+.back-btn:hover{background:#e2e8f0;color:#1e293b}
+.logo-brand-tune{display:flex;flex-direction:column;gap:1px}
+.logo-brand-tune-main{color:#1e3a5f;font-size:14px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;letter-spacing:-.01em;line-height:1}
+.logo-brand-tune-main span{color:#3b82f6;font-weight:300}
+.logo-brand-tune-sub{color:#64748b;font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
+.tb-tag{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Mono',monospace}
+.tb-title{color:#64748b;font-size:13px;font-weight:500}
 .tb-type-badge{font-size:10px;padding:2px 9px;border-radius:12px;font-weight:700;border:1px solid;margin-left:4px}
-.tb-type-flow{background:rgba(26,159,90,.18);color:#34d399;border-color:rgba(52,211,153,.3)}
-.tb-type-pressure{background:rgba(99,102,241,.18);color:#a5b4fc;border-color:rgba(165,180,252,.3)}
-.tb-type-temperature{background:rgba(239,68,68,.18);color:#fca5a5;border-color:rgba(252,165,165,.3)}
-.tb-type-level{background:rgba(14,165,233,.18);color:#7dd3fc;border-color:rgba(125,211,252,.3)}
-.tb-type-unknown{background:rgba(156,163,175,.18);color:#d1d5db;border-color:rgba(209,213,219,.3)}
+.tb-type-badge{font-size:10px;padding:2px 9px;border-radius:12px;font-weight:700;border:1px solid;margin-left:4px}
+.tb-type-flow{background:#ecfdf5;color:#065f46;border-color:#6ee7b7}
+.tb-type-pressure{background:#eef2ff;color:#3730a3;border-color:#a5b4fc}
+.tb-type-temperature{background:#fef2f2;color:#991b1b;border-color:#fca5a5}
+.tb-type-level{background:#e0f2fe;color:#0c4a6e;border-color:#7dd3fc}
+.tb-type-unknown{background:#f1f5f9;color:#475569;border-color:#cbd5e1}
 .tb-right{display:flex;align-items:center;gap:8px}
-.save-btn{display:flex;align-items:center;gap:6px;padding:6px 16px;background:var(--ok);color:#fff;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;border:none}
-.save-btn:hover{background:#147a45}
+.save-btn{display:flex;align-items:center;gap:6px;padding:6px 16px;background:#3b82f6;color:#fff;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;border:none}
+.save-btn:hover{background:#1d4ed8}
 .save-btn:disabled{opacity:.45;cursor:not-allowed}
 .save-badge{font-size:10px;padding:2px 8px;border-radius:12px;font-weight:700;border:1px solid}
 .sb-accepted{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border)}
 .sb-pending{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-border)}
 
-/* ── TAB BAR ── */
-.tabbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:2px;position:sticky;top:52px;z-index:100;overflow-x:auto}
-.tabbar::-webkit-scrollbar{height:0}
-.tab{font-size:12px;font-weight:400;padding:11px 14px;border:none;background:transparent;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;display:flex;align-items:center;gap:5px;white-space:nowrap;font-family:'IBM Plex Sans',sans-serif}
-.tab:hover{color:var(--text)}
-.tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
-
-/* ── PAGES ── */
-.page{display:none;padding:20px 24px;max-width:1200px;margin:0 auto}
-.page.on{display:flex;flex-direction:column;gap:14px}
-
-/* ── WARNING BANNER ── */
-.warn-banner{background:var(--amber-bg);border:1px solid var(--warn-border);border-radius:var(--r);padding:12px 16px;display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--amber)}
-.warn-banner b{color:var(--amber)}
-
-/* ── LOADING / ERROR ── */
-.load-overlay{position:fixed;inset:0;background:rgba(240,244,248,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px}
+/* ── LOADING ── */
+.load-overlay{position:fixed;inset:0;background:rgba(240,244,248,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px}
 .spin{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .ltxt{font-size:13px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
-.err-box{background:var(--crit-bg);border:1px solid var(--crit-border);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--crit);text-align:center;margin:40px auto;max-width:480px}
+
+/* ── WARN BANNER ── */
+.warn-banner{background:var(--amber-bg);border:1px solid var(--warn-border);border-radius:var(--r);padding:12px 16px;display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--amber)}
 
 /* ── CARD ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden}
 .ch{padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;min-height:40px}
-.cht{font-size:12px;font-weight:600;color:var(--navy);flex:1}
+.cht{font-size:11px;font-weight:700;color:var(--navy);flex:1;text-transform:uppercase;letter-spacing:.06em}
 .cb{padding:14px}
 
-/* ── KPI STRIP ── */
-.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-@media(max-width:900px){.kpi-strip{grid-template-columns:repeat(3,1fr)}}
-.kt{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px;box-shadow:var(--shadow);position:relative}
-.kt::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--rl) var(--rl) 0 0}
-.kt-b::after{background:var(--blue)}.kt-g::after{background:var(--ok)}.kt-r::after{background:var(--crit)}.kt-a::after{background:var(--warn)}.kt-p::after{background:#7c3aed}.kt-t::after{background:#0891b2}
-.kl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:6px;display:flex;align-items:center;gap:4px;position:relative}
-.kv{font-size:24px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy);line-height:1;margin-bottom:2px}
-.ks{font-size:10px;color:var(--text4)}
+/* ── MAIN LAYOUT ── */
+.page-wrap{padding:16px 20px;max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 
-/* ── CONFIDENCE STRIP ── */
-.conf-strip{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:var(--shadow)}
-.cs-lbl{font-size:10px;font-weight:600;color:var(--text3);flex-shrink:0}
-.cs-params{display:flex;gap:10px;flex:1;min-width:200px;flex-wrap:wrap}
-.cs-p{display:flex;align-items:center;gap:6px;flex:1;min-width:80px}
-.cs-name{font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:600;width:28px;flex-shrink:0;color:var(--navy)}
-.cs-track{flex:1;background:var(--border2);border-radius:10px;height:6px;overflow:hidden}
-.cs-fill{height:100%;border-radius:10px;transition:width .5s}
-.cs-pct{font-size:9px;font-family:'IBM Plex Mono',monospace;width:26px;text-align:right;flex-shrink:0;font-weight:600}
+/* ── MODEL PARAMS TABLE (replaces hero cards) ── */
+.mp-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.mp-tbl th{padding:5px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2);background:var(--bg2);text-align:left}
+.mp-tbl td{padding:6px 8px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.mp-tbl tr:last-child td{border-bottom:none}
+.mp-param{font-size:10px;font-weight:700;color:var(--navy);font-family:'IBM Plex Mono',monospace}
+.mp-val{font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)}
+.mp-sub{font-size:8px;color:var(--text4);margin-top:1px}
+.mp-conf-wrap{display:flex;align-items:center;gap:4px}
+.mp-conf-track{flex:1;min-width:40px;background:var(--border2);border-radius:6px;height:4px;overflow:hidden}
+.mp-conf-fill{height:100%;border-radius:6px;transition:width .5s}
+.mp-conf-pct{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:600;white-space:nowrap}
+.mp-badge{font-size:8px;font-weight:700;padding:1px 5px;border-radius:20px;border:1px solid;white-space:nowrap}
+.sb-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border)}
+.sb-warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-border)}
+.sb-lo{background:var(--crit-bg);color:var(--crit);border-color:var(--crit-border)}
 
-/* ── COMPARISON TABLE ── */
-.cmp-row{display:grid;grid-template-columns:1.5fr 1fr .3fr 1fr 1.5fr;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border2);transition:.15s}
-.cmp-row:last-child{border:none}
-.cmp-row:hover{background:var(--bg2)}
-.cmp-name{font-size:11px;font-weight:600;color:var(--navy)}
-.cmp-desc{font-size:9px;color:var(--text4);display:block;margin-top:1px}
-.oval{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--crit);padding:3px 4px;display:inline-block}
-.nval{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--ok);padding:3px 4px;display:inline-block}
-.ibt{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:var(--border2);color:var(--text3);font-size:8px;font-weight:400;cursor:pointer;flex-shrink:0;border:1px solid var(--border);font-style:italic;line-height:1;position:relative}
-#ibtTip{display:none;position:fixed;background:#0f2744;color:#e8f3fd;font-size:11px;padding:8px 12px;border-radius:7px;z-index:99999;font-family:'IBM Plex Sans',sans-serif;line-height:1.5;max-width:220px;white-space:normal;pointer-events:none;font-weight:400;box-shadow:0 4px 16px rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.1)}
-.arr{text-align:center;font-size:14px;color:var(--text4)}
-.why{padding-left:10px}
-.why-pct{font-size:12px;font-weight:700;color:var(--ok)}
-.why-txt{font-size:10px;color:var(--text3);line-height:1.4}
+/* ── SPLIT COMPARISON TABLE ── */
+.sc-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.sc-tbl th{padding:5px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2);background:var(--bg2);text-align:center}
+.sc-tbl th:first-child{text-align:left}
+.sc-tbl td{padding:7px 8px;border-bottom:1px solid var(--border2);text-align:center;vertical-align:middle;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600}
+.sc-tbl td:first-child{text-align:left;font-family:'IBM Plex Sans',sans-serif;font-size:10px;font-weight:700;color:var(--navy)}
+.sc-tbl tr:last-child td{border-bottom:none}
+.sc-tbl tr:hover td{background:var(--bg2)}
+.sc-empty{text-align:center;padding:20px 10px;font-size:10px;color:var(--text4);font-style:italic}
+
+/* ── TWO-COLUMN BODY ── */
+.body-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+
+/* ── PARAMETER TABLE ── */
+.param-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.param-tbl th{padding:7px 12px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2);background:var(--bg2)}
+.param-tbl th:not(:first-child){text-align:center}
+.param-tbl td{padding:9px 12px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.param-tbl tr:last-child td{border-bottom:none}
+.param-tbl tr:hover td{background:var(--bg2)}
+.oval{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--crit)}
+.nval{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--ok)}
+.why-pct{font-size:11px;font-weight:700;color:var(--ok)}
+.why-txt{font-size:10px;color:var(--text3);line-height:1.4;margin-top:1px}
+
+/* ── OUTCOME TABLE ── */
+.out-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.out-tbl th{padding:7px 12px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2);background:var(--bg2)}
+.out-tbl th:not(:first-child){text-align:center}
+.out-tbl td{padding:8px 12px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.out-tbl tr:last-child td{border-bottom:none}
 
 /* ── ACTION ITEMS ── */
-.ai{display:flex;gap:8px;padding:9px 11px;border-radius:8px;margin-bottom:5px;font-size:11px;line-height:1.55;border:1px solid transparent}
+.ai{display:flex;gap:8px;padding:9px 11px;border-radius:8px;margin-bottom:6px;font-size:11px;line-height:1.55;border:1px solid transparent}
+.ai:last-child{margin-bottom:0}
 .ai-r{background:var(--crit-bg);border-color:rgba(220,38,38,.12)}
 .ai-a{background:var(--amber-bg);border-color:rgba(196,123,12,.12)}
 .ai-g{background:var(--ok-bg);border-color:rgba(26,158,90,.12)}
@@ -123,83 +133,45 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .ai-r b{color:var(--crit)}.ai-a b{color:var(--amber)}.ai-g b{color:var(--ok)}.ai-b b{color:var(--blue)}
 .ai span{color:var(--text3)}
 
-/* ── CHART AREA ── */
-.chart-wrap{position:relative;height:280px}
-.ovl-metrics{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border2)}
-.ovm{padding:10px 14px;border-right:1px solid var(--border2)}
-.ovm:last-child{border:none}
-.ovml{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:2px}
-.ovmv{font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace;letter-spacing:-.02em;margin-bottom:1px}
-.ovms{font-size:10px;color:var(--text3)}
-.chart-hint{background:var(--bg2);border-top:1px solid var(--border2);padding:5px 14px;font-size:10px;color:var(--text4)}
-
-/* ── FOPDT STRIP ── */
-.fopdt-strip{background:var(--navy);color:#fff;border-radius:var(--r);padding:9px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:12px;font-family:'IBM Plex Mono',monospace}
-.fv{font-weight:700;color:#7fd3ff}
-
-/* ── CONFIDENCE CARDS ── */
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}}
-.conf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;box-shadow:var(--shadow)}
-.cc-lbl{font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;margin-bottom:4px;display:flex;align-items:center;gap:6px}
-.pill{display:inline-flex;align-items:center;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid}
-.pl-hi{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border)}
-.pl-mid{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-border)}
-.pl-lo{background:var(--crit-bg);color:var(--crit);border-color:var(--crit-border)}
-.ct-bg{background:var(--border2);border-radius:10px;height:5px;overflow:hidden;margin:6px 0}
-.ct-fill{height:100%;border-radius:10px}
-.ct-ev{font-size:10px;color:var(--text3);line-height:1.55}
-.ct-gap{font-size:10px;margin-top:6px;padding:4px 8px;border-radius:5px;font-weight:600}
-.cg-ok{background:var(--ok-bg);color:var(--ok)}
-.cg-warn{background:var(--warn-bg);color:var(--warn)}
-
 /* ── HOLD-OUT ── */
-.ho-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--shadow)}
-.ho-verdict{border-radius:7px;padding:10px 13px;font-size:11px;line-height:1.6;margin-top:8px}
+.ho-run-btn{padding:6px 14px;background:var(--blue);color:#fff;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:background .2s}
+.ho-run-btn:hover{background:var(--navy)}
 .ho-bar-wrap{display:flex;align-items:center;gap:8px;margin:8px 0}
 .ho-bar-bg{flex:1;height:6px;background:var(--border2);border-radius:4px;overflow:hidden}
 .ho-bar-fill{height:100%;border-radius:4px;transition:width .5s}
-.ho-run-btn{padding:6px 14px;background:var(--blue);color:#fff;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:background .2s}
-.ho-run-btn:hover{background:var(--navy)}
+.ho-verdict{border-radius:7px;padding:10px 13px;font-size:11px;line-height:1.6;margin-top:8px}
 
-/* ── EVIDENCE TABLE ── */
-.ev-tbl{width:100%;border-collapse:collapse;font-size:11px}
-.ev-tbl th{padding:8px 12px;text-align:left;font-size:9px;letter-spacing:.6px;text-transform:uppercase;font-weight:700;color:var(--text3);border-bottom:1px solid var(--border2);background:var(--bg2)}
-.ev-tbl td{padding:9px 12px;border-bottom:1px solid var(--border2);color:var(--text2);vertical-align:middle}
-.ev-tbl tr:last-child td{border-bottom:none}
-.ev-tbl tr:hover td{background:var(--blue-pale)}
-.ev-tag{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--navy);font-size:11px}
-.ev-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;border:1px solid}
-.ev-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border)}
-.ev-warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-border)}
-.ev-lo{background:var(--crit-bg);color:var(--crit);border-color:var(--crit-border)}
+/* ── CHART ── */
+.chart-legend{display:flex;gap:12px;flex-wrap:wrap;padding:8px 14px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border2)}
+.chart-legend-item{display:flex;align-items:center;gap:5px}
+.chart-hint{padding:5px 14px;font-size:10px;color:var(--text4);border-top:1px solid var(--border2)}
 
-/* ── NOTES BOX ── */
+/* ── NOTES + SAVE ── */
 .notes-wrap{display:flex;flex-direction:column;gap:6px}
 .notes-wrap label{font-size:11px;font-weight:600;color:var(--text2)}
 .notes-ta{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;resize:vertical;min-height:60px;outline:none;background:var(--bg2)}
 .notes-ta:focus{border-color:var(--blue)}
-
-/* ── SAVE PANEL ── */
-.save-panel{background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:var(--rl);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.sp-left{flex:1}
-.sp-title{font-size:13px;font-weight:700;color:var(--ok);margin-bottom:4px}
+.save-panel{background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:var(--rl);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.sp-title{font-size:13px;font-weight:700;color:var(--ok);margin-bottom:3px}
 .sp-sub{font-size:11px;color:#0f6e56}
 .sp-saved{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--ok);margin-top:4px;display:none}
 
-/* ── SAVED OVERLAY (already tuned) ── */
+/* ── TUNED NOTICE ── */
 .tuned-notice{background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--ok);display:none;align-items:center;gap:8px}
 .tuned-notice.show{display:flex}
 
-/* ── SECTION HEADER ── */
-.sec-hdr{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text4);padding-bottom:6px;border-bottom:1px solid var(--border2);margin-bottom:2px}
+/* ── INFO BUTTON ── */
+.ibt{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:var(--border2);color:var(--text3);font-size:8px;font-weight:400;cursor:pointer;flex-shrink:0;border:1px solid var(--border);font-style:italic;line-height:1;position:relative}
+#ibtTip{display:none;position:fixed;background:#0f2744;color:#e8f3fd;font-size:11px;padding:8px 12px;border-radius:7px;z-index:99999;font-family:'IBM Plex Sans',sans-serif;line-height:1.5;max-width:220px;white-space:normal;pointer-events:none;font-weight:400;box-shadow:0 4px 16px rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.1)}
 
-@media(max-width:700px){.kpi-strip{grid-template-columns:repeat(2,1fr)}.cmp-row{grid-template-columns:1fr 1fr}}
+/* ── SEC HEADER ── */
+.sec-hdr{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text4);padding-bottom:5px;border-bottom:1px solid var(--border2);margin-bottom:8px}
+
+@media(max-width:900px){.stat-row{grid-template-columns:repeat(2,1fr)}.body-cols{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- Loading overlay -->
 <div class="load-overlay" id="lov">
   <div class="spin"></div>
   <div class="ltxt" id="ltxt">Loading loop data…</div>
@@ -212,6 +184,14 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
       Dashboard
     </a>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:32px;height:32px;background:#3b82f6;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 18 18" fill="none"><path d="M9 1L2 5v8l7 4 7-4V5L9 1z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 6v5M6.5 7.5L9 6l2.5 1.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+      <div class="logo-brand-tune">
+        <div class="logo-brand-tune-main">Ingenero<span> 360 AI</span></div>
+        <div class="logo-brand-tune-sub">Control Valve Diagnostics</div>
+      </div>
+    </div>
+    <div style="width:1px;height:24px;background:#e2e8f0;flex-shrink:0"></div>
     <span class="tb-tag" id="tbTag">{{ loop_name }}</span>
     <span class="tb-title">Controller Tuning</span>
     <span class="tb-type-badge tb-type-unknown" id="typeChip">—</span>
@@ -225,20 +205,13 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
   </div>
 </div>
 
-<!-- TAB BAR -->
-<div class="tabbar">
-  <button class="tab on"  onclick="showTab('summary',this)">📊 Summary</button>
-  <button class="tab"     onclick="showTab('overlay',this)">📈 Overlay</button>
-  <button class="tab"     onclick="showTab('technical',this)">🔬 Technical</button>
-</div>
-
-<!-- ═══ TAB 1: SUMMARY ════════════════════════════════════════════════════ -->
-<div class="page on" id="tab-summary">
+<!-- SINGLE PAGE CONTENT -->
+<div class="page-wrap" id="mainPage" style="display:none">
 
   <!-- Already-tuned notice -->
   <div class="tuned-notice" id="tunedNotice">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
-    <span>This loop has a previously accepted tuning recommendation saved on <b id="tunedAt">—</b>. You can review and re-save below.</span>
+    <span>This loop has a previously accepted tuning recommendation saved on <b id="tunedAt">—</b>.</span>
   </div>
 
   <!-- Loop-type warning -->
@@ -247,578 +220,393 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
     <div id="ltWarnTxt"></div>
   </div>
 
-  <!-- KPI + Confidence SIDE BY SIDE 2-row tables -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+  <!-- ── BODY TWO COLUMNS ── -->
+  <div class="body-cols">
 
-    <div class="card">
-      <table style="width:100%;border-collapse:collapse;font-size:12px">
-        <tbody>
-          <tr style="border-bottom:1px solid var(--border2)">
-            <td style="padding:10px 14px;border-right:1px solid var(--border2);border-top:3px solid var(--blue)">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px;display:flex;align-items:center;gap:4px">Process Gain K <span class="ibt" data-tip="How much the PV changes for a 1% change in OP. Higher K = more sensitive process.">i</span></div>
-              <div style="font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy);line-height:1;margin-bottom:2px" id="kpi-K">—</div>
-              <div style="font-size:10px;color:var(--text4)">OP→PV sensitivity</div>
-            </td>
-            <td style="padding:10px 14px;border-right:1px solid var(--border2);border-top:3px solid #7c3aed">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px;display:flex;align-items:center;gap:4px">Time Const τ <span class="ibt" data-tip="Time for the process to reach 63% of its final value after a step change. Physics estimate only.">i</span></div>
-              <div style="font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy);line-height:1;margin-bottom:2px" id="kpi-tau">—</div>
-              <div style="font-size:10px;color:var(--text4)">min (estimated)</div>
-            </td>
-            <td style="padding:10px 14px;border-top:3px solid var(--ok)">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px;display:flex;align-items:center;gap:4px">New Kp <span class="ibt" data-tip="Recommended proportional gain = τ / (K × (λ+θ)). Based on IMC method.">i</span></div>
-              <div style="font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy);line-height:1;margin-bottom:2px" id="kpi-Kpn">—</div>
-              <div style="font-size:10px;color:var(--text4)">IMC-tuned</div>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:10px 14px;border-right:1px solid var(--border2);border-top:3px solid #0891b2">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px;display:flex;align-items:center;gap:4px">Dead Time θ <span class="ibt" data-tip="Time delay before the process responds to a controller output change.">i</span></div>
-              <div style="font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy);line-height:1;margin-bottom:2px" id="kpi-theta">—</div>
-              <div style="font-size:10px;color:var(--text4)">min</div>
-            </td>
-            <td style="padding:10px 14px;border-right:1px solid var(--border2);border-top:3px solid var(--warn)">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px;display:flex;align-items:center;gap:4px">Osc Period Tu <span class="ibt" data-tip="Oscillation period estimated from autocorrelation. Used to set lambda in IMC tuning.">i</span></div>
-              <div style="font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy);line-height:1;margin-bottom:2px" id="kpi-Tu">—</div>
-              <div style="font-size:10px;color:var(--text4)">min</div>
-            </td>
-            <td style="padding:10px 14px;border-top:3px solid var(--crit)">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text4);margin-bottom:4px;display:flex;align-items:center;gap:4px">IAE Improvement <span class="ibt" data-tip="Integral Absolute Error reduction estimated by simulation.">i</span></div>
-              <div style="font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy);line-height:1;margin-bottom:2px" id="kpi-iae">—</div>
-              <div style="font-size:10px;color:var(--text4)">vs current tuning</div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- ══ LEFT COLUMN ══ -->
+    <div style="display:flex;flex-direction:column;gap:14px">
 
-    <div class="card">
-      <div class="ch"><span class="cht">Overall Confidence</span></div>
-      <table style="width:100%;border-collapse:collapse;font-size:12px">
-        <tbody>
-          <tr style="border-bottom:1px solid var(--border2)">
-            <td rowspan="2" style="padding:14px;border-right:1px solid var(--border2);text-align:center;vertical-align:middle;width:110px">
-              <div style="position:relative;width:72px;height:72px;margin:0 auto">
-                <svg width="72" height="72" viewBox="0 0 72 72">
-                  <circle cx="36" cy="36" r="28" fill="none" stroke="var(--border2)" stroke-width="6"/>
-                  <circle cx="36" cy="36" r="28" fill="none" stroke="var(--blue)" stroke-width="6"
-                    stroke-linecap="round" stroke-dasharray="175.93" id="overallRing"
-                    stroke-dashoffset="175.93" transform="rotate(-90 36 36)"
-                    style="transition:stroke-dashoffset .6s ease"/>
-                </svg>
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-                  <span style="font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)" id="overallConf">—</span>
-                </div>
-              </div>
-            </td>
-            <td style="padding:10px 14px;border-right:1px solid var(--border2)">
-              <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">K <span class="ibt" data-tip="Process gain confidence — estimated from windowed regression of OP vs SP.">i</span></div>
-              <div style="display:flex;align-items:center;gap:6px"><div style="flex:1;background:var(--border2);border-radius:10px;height:6px;overflow:hidden"><div class="cs-fill" id="csf-K" style="background:var(--blue)"></div></div><span style="font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:32px" id="csp-K">—</span></div>
-            </td>
-            <td style="padding:10px 14px">
-              <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">τ <span class="ibt" data-tip="Time constant confidence — physics estimate only, not measured. Run a step test to confirm.">i</span></div>
-              <div style="display:flex;align-items:center;gap:6px"><div style="flex:1;background:var(--border2);border-radius:10px;height:6px;overflow:hidden"><div class="cs-fill" style="width:52%;background:var(--warn)"></div></div><span style="font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:32px">52%</span></div>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:10px 14px;border-right:1px solid var(--border2)">
-              <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">θ <span class="ibt" data-tip="Dead time confidence — measured from cross-correlation peak. Usually reliable.">i</span></div>
-              <div style="display:flex;align-items:center;gap:6px"><div style="flex:1;background:var(--border2);border-radius:10px;height:6px;overflow:hidden"><div class="cs-fill" style="width:88%;background:var(--ok)"></div></div><span style="font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:32px">88%</span></div>
-            </td>
-            <td style="padding:10px 14px">
-              <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Tu <span class="ibt" data-tip="Oscillation period confidence — estimated from ACF. Run relay test for higher precision.">i</span></div>
-              <div style="display:flex;align-items:center;gap:6px"><div style="flex:1;background:var(--border2);border-radius:10px;height:6px;overflow:hidden"><div class="cs-fill" id="csf-Tu" style="background:var(--warn)"></div></div><span style="font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:32px" id="csp-Tu">—</span></div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </div>
-
-  <!-- Overlay chart embedded in summary -->
-  <div class="card">
-    <div class="ch">
-      <span class="cht">📈 Actual vs Optimised — PV &amp; OP overlay</span>
-      <button onclick="if(summaryOvlChart)summaryOvlChart.resetZoom()" style="margin-left:auto;font-size:10px;padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">⟳ Reset zoom</button>
-    </div>
-    <div style="display:flex;gap:14px;flex-wrap:wrap;padding:8px 14px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border2)">
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:18px;height:2.5px;background:#e24b4a;border-radius:1px"></div>PV Actual</div>
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:18px;height:2.5px;background:#1a9e5a;border-radius:1px"></div>PV Optimised</div>
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:18px;border-top:2px dashed #9ab0c4;height:0"></div>SP</div>
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:18px;border-top:2px dashed #f5b84a;height:0"></div>OP Actual</div>
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:18px;height:2px;background:#0891b2;border-radius:1px"></div>OP Optimised</div>
-    </div>
-    <div style="padding:10px 14px 0;height:260px;position:relative"><canvas id="sum-ovl-cv" style="width:100%;height:100%"></canvas></div>
-    <div class="chart-hint">⬚ Drag to zoom · Scroll · Ctrl+drag to pan</div>
-  </div>
-
-  <!-- Parameter comparison + Expected outcomes SIDE BY SIDE -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-
-    <div class="card">
-      <div class="ch"><span class="cht">⚙️ Parameter comparison</span></div>
-      <table style="width:100%;border-collapse:collapse;font-size:12px">
-        <thead>
-          <tr style="background:var(--bg2)">
-            <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2)">Parameter</th>
-            <th style="padding:8px 12px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2)">Current</th>
-            <th style="padding:8px 12px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2)">Recommended</th>
-            <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2)">Change</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom:1px solid var(--border2)">
-            <td style="padding:9px 12px"><span class="cmp-name">Kp</span><span class="cmp-desc" style="display:block">Proportional gain</span></td>
-            <td style="padding:9px 12px;text-align:center"><span class="oval" id="cmp-kp-old">—</span></td>
-            <td style="padding:9px 12px;text-align:center"><span class="nval" id="cmp-kp-new">—</span></td>
-            <td style="padding:9px 12px"><div class="why-pct" id="cmp-kp-pct">—</div><div class="why-txt" id="cmp-kp-why">—</div></td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border2)">
-            <td style="padding:9px 12px"><span class="cmp-name">Ti</span><span class="cmp-desc" style="display:block">Integral time (min)</span></td>
-            <td style="padding:9px 12px;text-align:center"><span class="oval" id="cmp-ti-old">—</span></td>
-            <td style="padding:9px 12px;text-align:center"><span class="nval" id="cmp-ti-new">—</span></td>
-            <td style="padding:9px 12px"><div class="why-pct" id="cmp-ti-pct">—</div><div class="why-txt" id="cmp-ti-why">—</div></td>
-          </tr>
-          <tr>
-            <td style="padding:9px 12px"><span class="cmp-name">λ</span><span class="cmp-desc" style="display:block">IMC speed target</span></td>
-            <td style="padding:9px 12px;text-align:center"><span style="font-size:11px;color:var(--text4)">—</span></td>
-            <td style="padding:9px 12px;text-align:center"><span class="nval" id="cmp-lam-new">—</span></td>
-            <td style="padding:9px 12px"><div class="why-txt">max(2θ, 0.6·Tu, 3)</div></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="card">
-      <div class="ch"><span class="cht">📉 Expected outcomes</span></div>
-      <table style="width:100%;border-collapse:collapse;font-size:12px">
-        <thead>
-          <tr style="background:var(--bg2)">
-            <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2)">Metric</th>
-            <th style="padding:8px 12px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2)">Before</th>
-            <th style="padding:8px 12px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2)">After</th>
-            <th style="padding:8px 12px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2)">Improvement</th>
-          </tr>
-        </thead>
-        <tbody id="outcome-rows"></tbody>
-      </table>
-    </div>
-
-  </div>
-
-  <!-- Action items -->
-  <div class="card">
-    <div class="ch"><span class="cht">✅ Action plan</span></div>
-    <div class="cb" id="actions-list"></div>
-  </div>
-
-  <!-- Notes + save panel -->
-  <div class="notes-wrap">
-    <label for="notesTA">Engineer notes (optional)</label>
-    <textarea class="notes-ta" id="notesTA" placeholder="Add any observations, site conditions, or approvals here…" rows="3"></textarea>
-  </div>
-
-  <div class="save-panel" id="savePanel">
-    <div class="sp-left">
-      <div class="sp-title">✓ Ready to accept this tuning recommendation</div>
-      <div class="sp-sub">Clicking "Accept &amp; Save" records Kp_new and Ti_new against this loop. The dashboard will show a "Tuned" badge.</div>
-      <div class="sp-saved" id="spSaved"></div>
-    </div>
-    <button class="save-btn" onclick="saveRec()" id="savePanelBtn">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      Accept &amp; Save
-    </button>
-  </div>
-</div>
-
-<!-- ═══ TAB 2: OVERLAY ════════════════════════════════════════════════════ -->
-<div class="page" id="tab-overlay">
-  <div class="card">
-    <div class="ch">
-      <span class="cht">Actual vs Optimised — PV &amp; OP overlay</span>
-      <div style="display:flex;gap:4px;margin-left:auto">
-        <button onclick="if(ovlChart)ovlChart.resetZoom()" style="font-size:10px;padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">⟳ Reset zoom</button>
+      <!-- Parameter Comparison -->
+      <div class="card">
+        <div class="ch"><span class="cht">PARAMETER COMPARISON</span></div>
+        <table class="param-tbl">
+          <thead>
+            <tr><th>Parameter</th><th>Current</th><th>Recommended</th><th>Change</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">Kp<div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">Proportional gain</div></div></td>
+              <td style="text-align:center"><span class="oval" id="cmp-kp-old">—</span></td>
+              <td style="text-align:center"><span class="nval" id="cmp-kp-new">—</span></td>
+              <td><div class="why-pct" id="cmp-kp-pct">—</div><div class="why-txt" id="cmp-kp-why">—</div></td>
+            </tr>
+            <tr>
+              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">Ti<div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">Integral time (min)</div></div></td>
+              <td style="text-align:center"><span class="oval" id="cmp-ti-old">—</span></td>
+              <td style="text-align:center"><span class="nval" id="cmp-ti-new">—</span></td>
+              <td><div class="why-pct" id="cmp-ti-pct">—</div><div class="why-txt" id="cmp-ti-why">—</div></td>
+            </tr>
+            <tr>
+              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">λ<div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">IMC speed target</div></div></td>
+              <td style="text-align:center"><span style="font-size:11px;color:var(--text4)">—</span></td>
+              <td style="text-align:center"><span class="nval" id="cmp-lam-new">—</span></td>
+              <td><div class="why-txt">max(2θ, 0.6·Tu, 3)</div></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
-    <!-- Legend -->
-    <div style="display:flex;gap:14px;flex-wrap:wrap;padding:8px 14px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border2)">
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:18px;height:2.5px;background:#e24b4a;border-radius:1px"></div>PV Actual</div>
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:18px;height:2.5px;background:#1a9e5a;border-radius:1px"></div>PV Optimised</div>
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:18px;border-top:2px dashed #9ab0c4;height:0"></div>SP</div>
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:18px;border-top:2px dashed #f5b84a;height:0"></div>OP Actual</div>
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:18px;height:2px;background:#0891b2;border-radius:1px"></div>OP Optimised</div>
-    </div>
-    <div style="padding:10px 14px 0;height:300px;position:relative"><canvas id="ovl-cv" style="width:100%;height:100%"></canvas></div>
-    <div class="ovl-metrics">
-      <div class="ovm"><div class="ovml">PV actual σ</div><div class="ovmv" style="color:var(--crit)" id="ov-pvs">—</div><div class="ovms">Plant noise level</div></div>
-      <div class="ovm"><div class="ovml">PV opt σ</div><div class="ovmv" style="color:var(--ok)" id="ov-pvso">~est</div><div class="ovms">Noise floor limit</div></div>
-      <div class="ovm"><div class="ovml">OP actual σ</div><div class="ovmv" style="color:var(--warn)" id="ov-ops">—</div><div class="ovms">Valve wear proxy</div></div>
-      <div class="ovm" style="border:none"><div class="ovml">OP opt σ</div><div class="ovmv" style="color:var(--blue)" id="ov-opso">—</div><div class="ovms" id="ov-wear-txt">—</div></div>
-    </div>
-    <div class="chart-hint">⬚ Drag to zoom · Scroll · Ctrl+drag to pan</div>
-  </div>
-</div>
 
-<!-- ═══ TAB 3: TECHNICAL ══════════════════════════════════════════════════ -->
-<div class="page" id="tab-technical">
-
-  <!-- FOPDT model strip -->
-  <div class="fopdt-strip">
-    <span>FOPDT model</span>
-    <span>K = <span class="fv" id="fp-k">—</span></span>
-    <span>τ = <span class="fv" id="fp-tau">—</span> min</span>
-    <span>θ = <span class="fv" id="fp-theta">—</span> min</span>
-    <span>τ/θ = <span class="fv" id="fp-ratio">—</span></span>
-    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#a8c8f0">G(s)=K·e⁻ˢ/(τs+1)</span>
-    <span>Tu = <span class="fv" id="fp-tu">—</span> min</span>
-    <span>λ = <span class="fv" id="fp-lam">—</span> min</span>
-    <span>R² = <span class="fv" id="fp-r2">—</span></span>
-  </div>
-
-  <!-- Confidence cards -->
-  <div>
-    <div class="sec-hdr">🛡 Model parameter confidence</div>
-    <div class="g4">
-      <div class="conf-card"><div class="cc-lbl" style="color:var(--blue)">K = <span id="ct-k">—</span><span class="pill pl-hi" id="ct-kpill">—%</span></div><div class="ct-bg"><div class="ct-fill" id="ctf-k" style="background:var(--blue)"></div></div><div class="ct-ev">Windowed regression SP vs OP. R²=<span id="ct-r2">—</span><br><span style="font-size:9px;color:var(--text4)">Estimated from closed-loop data.</span></div><div class="ct-gap cg-ok">✓ Measured from data.</div></div>
-      <div class="conf-card"><div class="cc-lbl" style="color:var(--ok)">θ = <span id="ct-th">—</span> min<span class="pill pl-hi">88%</span></div><div class="ct-bg"><div class="ct-fill" style="width:88%;background:var(--ok)"></div></div><div class="ct-ev">Cross-correlation peak at lag=<span id="ct-th2">—</span> min. Unambiguous from data.</div><div class="ct-gap cg-ok">✓ Measured from data.</div></div>
-      <div class="conf-card"><div class="cc-lbl" style="color:var(--warn)">τ = <span id="ct-tau">—</span> min ⚠<span class="pill pl-mid">52%</span></div><div class="ct-bg"><div class="ct-fill" style="width:52%;background:var(--warn)"></div></div><div class="ct-ev"><b>Physics estimate only — not measured in plant test.</b> Could be 0.5–3× this value depending on loop type.</div><div class="ct-gap cg-warn">⚠ Run SP step test to confirm.</div></div>
-      <div class="conf-card"><div class="cc-lbl" style="color:#7c3aed">Tu = <span id="ct-tu">—</span> min<span class="pill pl-mid" id="ct-tupill">—%</span></div><div class="ct-bg"><div class="ct-fill" id="ctf-tu" style="background:#7c3aed"></div></div><div class="ct-ev">ACF first positive recovery. Oscillation period estimate.</div><div class="ct-gap cg-warn">⚠ ACF-derived. Run relay test for precision.</div></div>
-    </div>
-  </div>
-
-  <!-- Hold-out validation -->
-  <div>
-    <div class="sec-hdr">🧪 Hold-out cross-validation</div>
-    <div class="ho-card">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Splits data 50/50 and recalculates K on each half. Checks that K is consistent across the dataset — a key test of model reliability.</div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <button class="ho-run-btn" onclick="runHoldout()">▶ Run validation</button>
-        <select id="hvMethod" style="font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg2);color:var(--text)">
-          <option value="linear">Linear split (first 50% / last 50%)</option>
-          <option value="random">Random split</option>
-        </select>
+      <!-- Expected Outcomes -->
+      <div class="card">
+        <div class="ch"><span class="cht">EXPECTED OUTCOMES</span></div>
+        <table class="out-tbl">
+          <thead>
+            <tr><th>Metric</th><th>Before</th><th>After</th><th>Improvement</th></tr>
+          </thead>
+          <tbody id="outcome-rows"></tbody>
+        </table>
       </div>
-      <div id="ho-results" style="display:none;margin-top:12px">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
-          <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)"><div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">K_train</div><div style="font-size:16px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)" id="ho-ktrain">—</div></div>
-          <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)"><div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">K_validate</div><div style="font-size:16px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)" id="ho-kval">—</div></div>
-          <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)"><div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Difference</div><div style="font-size:16px;font-weight:700;font-family:'IBM Plex Mono',monospace" id="ho-diff">—</div></div>
+
+      <!-- Action Plan -->
+      <div class="card">
+        <div class="ch"><span class="cht">ACTION PLAN</span></div>
+        <div class="cb" id="actions-list"></div>
+      </div>
+
+      <!-- Notes + Save -->
+      <div class="notes-wrap">
+        <label for="notesTA">Engineer notes (optional)</label>
+        <textarea class="notes-ta" id="notesTA" placeholder="Add observations, site conditions, or approvals…" rows="3"></textarea>
+      </div>
+      <div class="save-panel">
+        <div>
+          <div class="sp-title">✓ Ready to accept this tuning recommendation</div>
+          <div class="sp-sub">Clicking "Accept &amp; Save" records Kp_new and Ti_new against this loop.</div>
+          <div class="sp-saved" id="spSaved"></div>
         </div>
-        <div class="ho-bar-wrap"><div class="ho-bar-bg"><div class="ho-bar-fill" id="ho-bar" style="width:0%"></div></div><span style="font-size:9px;font-family:'IBM Plex Mono',monospace;width:28px;text-align:right;flex-shrink:0" id="ho-diff-pct">—</span></div>
-        <div class="ho-verdict" id="ho-verdict"></div>
+        <button class="save-btn" onclick="saveRec()" id="savePanelBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Accept &amp; Save
+        </button>
       </div>
-    </div>
-  </div>
 
-  <!-- Evidence table -->
-  <div>
-    <div class="sec-hdr">📋 Evidence sufficiency</div>
-    <div class="card" style="overflow:hidden">
-      <table class="ev-tbl">
-        <thead><tr><th>Parameter</th><th>Value</th><th>Confidence</th><th>Source</th><th>Recommendation</th></tr></thead>
-        <tbody>
-          <tr><td><span class="ev-tag">K</span></td><td id="ev-k">—</td><td id="ev-k-conf">—</td><td>Windowed regression (OP→SP)</td><td>Use as-is for flow/pressure. Verify for temperature loops.</td></tr>
-          <tr><td><span class="ev-tag">θ</span></td><td id="ev-th">—</td><td><span class="ev-badge ev-ok">88%</span></td><td>Cross-correlation peak</td><td>Reliable. No action needed.</td></tr>
-          <tr><td><span class="ev-tag">τ</span></td><td id="ev-tau">—</td><td><span class="ev-badge ev-warn">52%</span></td><td>Physics estimate</td><td>Run 20–30 min SP step test to confirm.</td></tr>
-          <tr><td><span class="ev-tag">Tu</span></td><td id="ev-tu">—</td><td id="ev-tu-conf">—</td><td>ACF zero-crossing</td><td>Run relay test for precision.</td></tr>
-          <tr><td><span class="ev-tag">λ</span></td><td id="ev-lam">—</td><td><span class="ev-badge ev-ok">Auto</span></td><td>IMC rule: max(2θ, 0.6Tu, 3)</td><td>Adjust for more/less aggressive response.</td></tr>
-          <tr><td><span class="ev-tag" style="color:var(--ok)">Kp_new</span></td><td id="ev-kpn">—</td><td>—</td><td>τ / (K·(λ+θ))</td><td>Apply to controller after review.</td></tr>
-          <tr><td><span class="ev-tag" style="color:var(--ok)">Ti_new</span></td><td id="ev-tin">—</td><td>—</td><td>min(τ, 4·(λ+θ))</td><td>Apply to controller after review.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+    </div><!-- /left col -->
 
-</div><!-- end tab-technical -->
+    <!-- ══ RIGHT COLUMN ══ -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- Model Parameters + Split Comparison (side by side) -->
+      <div class="card">
+        <div class="ch"><span class="cht">FOPDT MODEL PARAMETERS</span><span style="font-size:10px;color:var(--text4);margin-left:8px">| K/θ/τ/Tu vs split comparison →</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;border-top:none">
+
+          <!-- Left half: model params -->
+          <div style="border-right:1px solid var(--border2)">
+            <table class="mp-tbl">
+              <thead><tr><th>Param</th><th>Value</th><th>Confidence</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="mp-param" style="color:var(--blue)">K</span> <span class="ibt" data-tip="Process gain: how much PV changes per 1% OP change.">i</span><div class="mp-sub">Process Gain</div></td>
+                  <td><span class="mp-val" id="kpi-K">—</span><div class="mp-sub">OP→PV</div></td>
+                  <td>
+                    <div class="mp-conf-wrap">
+                      <div class="mp-conf-track"><div class="mp-conf-fill" id="kconf-fill" style="background:var(--blue)"></div></div>
+                      <span class="mp-conf-pct" id="kconf-pct">—</span>
+                      <span class="mp-badge" id="k-badge">—</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="mp-param" style="color:#0891b2">θ</span> <span class="ibt" data-tip="Dead time: delay before process responds to OP change.">i</span><div class="mp-sub">Dead Time</div></td>
+                  <td><span class="mp-val" id="kpi-theta">—</span><div class="mp-sub">min</div></td>
+                  <td>
+                    <div class="mp-conf-wrap">
+                      <div class="mp-conf-track"><div class="mp-conf-fill" style="width:88%;background:#0891b2"></div></div>
+                      <span class="mp-conf-pct">88%</span>
+                      <span class="mp-badge sb-ok">High</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="mp-param" style="color:#7c3aed">τ</span> <span class="ibt" data-tip="Time constant: physics estimate only, not measured.">i</span><div class="mp-sub">Time Const</div></td>
+                  <td><span class="mp-val" id="kpi-tau">—</span><div class="mp-sub">min est.</div></td>
+                  <td>
+                    <div class="mp-conf-wrap">
+                      <div class="mp-conf-track"><div class="mp-conf-fill" style="width:52%;background:#7c3aed"></div></div>
+                      <span class="mp-conf-pct">52%</span>
+                      <span class="mp-badge sb-warn">Med</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="mp-param" style="color:var(--warn)">Tu</span> <span class="ibt" data-tip="Oscillation period from ACF. Used to set lambda.">i</span><div class="mp-sub">Osc Period</div></td>
+                  <td><span class="mp-val" id="kpi-Tu">—</span><div class="mp-sub">min ACF</div></td>
+                  <td>
+                    <div class="mp-conf-wrap">
+                      <div class="mp-conf-track"><div class="mp-conf-fill" id="tuconf-fill" style="background:var(--warn)"></div></div>
+                      <span class="mp-conf-pct" id="tuconf-pct">—</span>
+                      <span class="mp-badge" id="tu-badge">—</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Right half: split comparison table -->
+          <div>
+            <table class="sc-tbl">
+              <thead>
+                <tr>
+                  <th>Param</th>
+                  <th style="color:var(--blue)">Original K</th>
+                  <th style="color:var(--ok)" id="sc-th-train">K_train</th>
+                  <th style="color:#7c3aed" id="sc-th-validate">K_validate</th>
+                </tr>
+              </thead>
+              <tbody id="sc-tbody">
+                <tr><td colspan="4" class="sc-empty">Run validation to see split comparison</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Hold-out Cross Validation -->
+      <div class="card">
+        <div class="ch"><span class="cht">HOLD-OUT CROSS-VALIDATION</span></div>
+        <div class="cb" style="padding-bottom:10px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.6">Recalculates K on two halves of the data. Checks that K is consistent — a key test of model reliability. <b style="color:var(--text2)">Linear</b> splits by time order. <b style="color:var(--text2)">Random</b> shuffles first, so both halves contain data from throughout the timeline.</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="ho-run-btn" onclick="runHoldout()">&#9654; Run validation</button>
+            <select id="hvMethod" onchange="toggleSplitInput()" style="font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg2);color:var(--text)">
+              <option value="linear">Linear split</option>
+              <option value="random">Random split</option>
+            </select>
+            <div id="splitInputWrap" style="display:none;align-items:center;gap:6px;font-size:11px;color:var(--text2)">
+              Train % <input id="hvSplitPct" type="number" oninput="document.getElementById('hvValPct').textContent=100-(+this.value||50)" min="20" max="80" value="60" step="5" style="width:50px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg2);color:var(--text);font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600"/>
+              / <span id="hvValPct">40</span>% validate
+            </div>
+          </div>
+
+          <div id="ho-results" style="display:none;margin-top:12px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+              <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)">
+                <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">K_train</div>
+                <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)" id="ho-ktrain">—</div>
+              </div>
+              <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)">
+                <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">K_validate</div>
+                <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)" id="ho-kval">—</div>
+              </div>
+              <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)">
+                <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Difference</div>
+                <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace" id="ho-diff">—</div>
+              </div>
+            </div>
+            <div class="ho-bar-wrap">
+              <div class="ho-bar-bg"><div class="ho-bar-fill" id="ho-bar" style="width:0%"></div></div>
+              <span style="font-size:9px;font-family:'IBM Plex Mono',monospace;width:28px;text-align:right;flex-shrink:0" id="ho-diff-pct">—</span>
+            </div>
+            <div class="ho-verdict" id="ho-verdict"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actual vs Optimised Chart -->
+      <div class="card">
+        <div class="ch">
+          <span class="cht">ACTUAL VS OPTIMISED &mdash; PV &amp; OP OVERLAY</span>
+          <button onclick="if(ovlChart)ovlChart.resetZoom()" style="margin-left:auto;font-size:10px;padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">&#8635; Reset zoom</button>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div style="width:18px;height:2.5px;background:#e24b4a;border-radius:1px"></div>PV Actual</div>
+          <div class="chart-legend-item"><div style="width:18px;height:2.5px;background:#1a9e5a;border-radius:1px"></div>PV Optimised</div>
+          <div class="chart-legend-item"><div style="width:18px;border-top:2px dashed #9ab0c4;height:0"></div>SP</div>
+          <div class="chart-legend-item"><div style="width:18px;border-top:2px dashed #f5b84a;height:0"></div>OP Actual</div>
+          <div class="chart-legend-item"><div style="width:18px;height:2px;background:#0891b2;border-radius:1px"></div>OP Optimised</div>
+        </div>
+        <div style="padding:10px 14px 0;height:280px;position:relative"><canvas id="ovl-cv" style="width:100%;height:100%"></canvas></div>
+        <div class="chart-hint">Drag to zoom &middot; Scroll &middot; Ctrl+drag to pan</div>
+      </div>
+
+    </div><!-- /right col -->
+  </div><!-- /body-cols -->
+</div><!-- /page-wrap -->
 
 <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f2744;color:#e8f3fd;font-size:12px;padding:10px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.12);box-shadow:0 4px 16px rgba(15,39,68,.3);opacity:0;transition:opacity .4s,transform .4s;pointer-events:none;z-index:9999;white-space:nowrap"></div>
+<div id="ibtTip"></div>
 
 <script>
-// ── State ──────────────────────────────────────────────────────────────────
 const LOOP = {{ loop_name|tojson }};
-let D = null;   // raw data from API
-let M = null;   // computed model
-let ovlChart = null;
-let summaryOvlChart = null;
+let D = null, M = null, ovlChart = null;
 
-// ── Tabs ────────────────────────────────────────────────────────────────────
-function showTab(id, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  const pg = document.getElementById('tab-' + id);
-  if (pg) pg.classList.add('on');
-  if (el) el.classList.add('on');
-  if (id === 'overlay' && !ovlChart && M) buildOvl();
+function toast(msg, dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';},dur);
 }
+const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+const mn=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const std=a=>{const m=mn(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/a.length);};
+const med=a=>{const ss=[...a].sort((a,b)=>a-b);const n=ss.length;return n%2?ss[Math.floor(n/2)]:(ss[n/2-1]+ss[n/2])/2;};
+const rnd=(v,d=2)=>Math.round(v*10**d)/10**d;
 
-// ── Toast ───────────────────────────────────────────────────────────────────
-function toast(msg, dur = 3000) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)';
-  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(20px)'; }, dur);
-}
-
-// ── Helpers ─────────────────────────────────────────────────────────────────
-const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-const mn = a => a.reduce((x, y) => x + y, 0) / a.length;
-const std = a => { const m = mn(a); return Math.sqrt(a.reduce((s, x) => s + (x - m) ** 2, 0) / a.length); };
-const med = a => { const ss = [...a].sort((a, b) => a - b); const n = ss.length; return n % 2 ? ss[Math.floor(n/2)] : (ss[n/2-1]+ss[n/2])/2; };
-const rnd = (v, d=2) => Math.round(v * 10**d) / 10**d;
-
-// ── Loop-type warning text ───────────────────────────────────────────────────
-const LT_WARN = {
-  pressure: 'Pressure loop detected. The FOPDT model is applicable but τ may differ from the estimate — verify with a step test before applying tuning changes.',
-  temperature: '⚠ Temperature loop detected. τ is typically much larger and highly uncertain for thermal processes. The FOPDT τ estimate here is unreliable — <b>run a step test before applying any tuning</b>.',
-  level: '⚠ Level loop detected. Level processes are integrating (not self-regulating) — FOPDT does not apply. Tuning recommendations shown here are NOT valid for this loop type. Use an integrating process tuning method instead.',
-  unknown: 'Loop type could not be determined from tag name. Review the model parameters carefully before applying any tuning changes.',
+const LT_WARN={
+  pressure:'Pressure loop detected. tau may differ from estimate — verify with a step test before applying tuning.',
+  temperature:'Temperature loop detected. tau is highly uncertain for thermal processes — run a step test before applying any tuning.',
+  level:'Level loop detected. Level processes are integrating — FOPDT does not apply. These tuning recommendations are NOT valid. Use an integrating process tuning method.',
+  unknown:'Loop type could not be determined. Review model parameters carefully before applying changes.',
 };
 
-// ── FOPDT identification ────────────────────────────────────────────────────
-function identify(pv, op, sp) {
-  const N = pv.length;
-  // K — windowed regression SP vs OP
-  const win = Math.min(120, Math.floor(N / 8));
-  const xs = [], ys = [];
-  for (let i = 0; i < N - win; i += Math.floor(win / 2)) {
-    xs.push(mn(op.slice(i, i + win)));
-    ys.push(mn(sp.slice(i, i + win)));
+function identify(pv, op, sp){
+  const N=pv.length;
+  const win=Math.min(120,Math.floor(N/8));
+  const xs=[],ys=[];
+  for(let i=0;i<N-win;i+=Math.floor(win/2)){xs.push(mn(op.slice(i,i+win)));ys.push(mn(sp.slice(i,i+win)));}
+  const xm=mn(xs),ym=mn(ys);
+  const num=xs.reduce((s,x,i)=>s+(x-xm)*(ys[i]-ym),0);
+  const den=xs.reduce((s,x)=>s+(x-xm)**2,0);
+  const slope=Math.abs(den)>1e-6?num/den:5.0;
+  const K=Math.max(0.5,Math.abs(slope));
+  const ss_r=xs.reduce((s,x,i)=>s+(ys[i]-(slope*x+ym-slope*xm))**2,0);
+  const ss_t=ys.reduce((s,y)=>s+(y-ym)**2,0);
+  const r2_K=ss_t>0?rnd(1-ss_r/ss_t):0;
+  const conf_K=Math.max(0.4,Math.min(0.97,0.3+r2_K*0.7));
+  const m_op=mn(op),m_pv=mn(pv);
+  const denom=Math.sqrt(op.reduce((s,x)=>s+(x-m_op)**2,0)*pv.reduce((s,x)=>s+(x-m_pv)**2,0))||1;
+  const xcorr=[];
+  for(let lag=0;lag<Math.min(15,Math.floor(N/4));lag++){
+    let cc=0;for(let i=0;i<N-lag;i++)cc+=(op[i]-m_op)*(pv[i+lag]-m_pv);xcorr.push(cc/denom);
   }
-  const xm = mn(xs), ym = mn(ys);
-  const num = xs.reduce((s, x, i) => s + (x - xm) * (ys[i] - ym), 0);
-  const den = xs.reduce((s, x) => s + (x - xm) ** 2, 0);
-  const slope = Math.abs(den) > 1e-6 ? num / den : 5.0;
-  const K = Math.max(0.5, Math.abs(slope));
-  const ss_r = xs.reduce((s, x, i) => s + (ys[i] - (slope * x + ym - slope * xm)) ** 2, 0);
-  const ss_t = ys.reduce((s, y) => s + (y - ym) ** 2, 0);
-  const r2_K = ss_t > 0 ? rnd(1 - ss_r / ss_t) : 0;
-  const conf_K = Math.max(0.4, Math.min(0.97, 0.3 + r2_K * 0.7));
-
-  // θ — cross-correlation
-  const m_op = mn(op), m_pv = mn(pv);
-  const denom = Math.sqrt(op.reduce((s, x) => s + (x - m_op) ** 2, 0) * pv.reduce((s, x) => s + (x - m_pv) ** 2, 0)) || 1;
-  const xcorr = [];
-  for (let lag = 0; lag < Math.min(15, Math.floor(N / 4)); lag++) {
-    let cc = 0;
-    for (let i = 0; i < N - lag; i++) cc += (op[i] - m_op) * (pv[i + lag] - m_pv);
-    xcorr.push(cc / denom);
+  const theta=Math.max(0.5,xcorr.indexOf(Math.max(...xcorr)));
+  const err=pv.map((v,i)=>v-sp[i]);
+  const me=mn(err),ve=err.reduce((s,x)=>s+(x-me)**2,0)||1;
+  const acf=[];
+  for(let lag=1;lag<Math.min(30,Math.floor(N/4));lag++){
+    let ac=0;for(let i=0;i<N-lag;i++)ac+=(err[i]-me)*(err[i+lag]-me);acf.push(ac/ve);
   }
-  const theta = Math.max(0.5, xcorr.indexOf(Math.max(...xcorr)));
-
-  // Tu — ACF of error
-  const err = pv.map((v, i) => v - sp[i]);
-  const me = mn(err), ve = err.reduce((s, x) => s + (x - me) ** 2, 0) || 1;
-  const acf = [];
-  for (let lag = 1; lag < Math.min(30, Math.floor(N / 4)); lag++) {
-    let ac = 0;
-    for (let i = 0; i < N - lag; i++) ac += (err[i] - me) * (err[i + lag] - me);
-    acf.push(ac / ve);
-  }
-  let Tu = 7, firstMin = null;
-  for (let i = 1; i < acf.length - 1; i++) {
-    if (firstMin === null && acf[i] < acf[i - 1] && acf[i] <= acf[i + 1]) { firstMin = i + 1; break; }
-  }
-  if (firstMin) {
-    for (let i = firstMin; i < acf.length - 1; i++) {
-      if (acf[i] > acf[i - 1] && acf[i] >= acf[i + 1]) { Tu = Math.min(25, Math.max(3, (i + 1) * 2)); break; }
+  let Tu=7,firstMin=null;
+  for(let i=1;i<acf.length-1;i++){if(firstMin===null&&acf[i]<acf[i-1]&&acf[i]<=acf[i+1]){firstMin=i+1;break;}}
+  if(firstMin){for(let i=firstMin;i<acf.length-1;i++){if(acf[i]>acf[i-1]&&acf[i]>=acf[i+1]){Tu=Math.min(25,Math.max(3,(i+1)*2));break;}}}
+  const conf_Tu=firstMin?0.65:0.45;
+  const tau=1.0;
+  const lam=Math.max(2*theta,0.6*Tu,3.0);
+  const Kp_new=rnd(tau/(K*(lam+theta)),4);
+  const Ti_new=rnd(Math.max(2.0,Math.min(tau,4*(lam+theta))),2);
+  const kps=[];
+  for(let i=5;i<N-1;i++){const de=err[i]-err[i-1];const dop=op[i]-op[i-1];if(Math.abs(de)>1){const k=dop/de;if(Math.abs(k)>0.005&&Math.abs(k)<5)kps.push(Math.abs(k));}}
+  const Kp_old=kps.length?rnd(med(kps),4):rnd(Kp_new*1.6,4);
+  const Ti_old=rnd(Tu/1.2,2);
+  const opRef=mn(op.slice(0,30)),spRef=mn(sp.slice(0,30));
+  function sim(Kp,Ti,aw){
+    let seed=42;
+    const rng=()=>{seed^=seed<<13;seed^=seed>>17;seed^=seed<<5;return(seed>>>0)/4294967296;};
+    const delay=Math.max(1,Math.round(theta));
+    const buf=new Array(delay+4).fill(0);
+    let x=0,integ=0;
+    const pvs=[],ops=[];
+    const pvStd=std(pv.slice(0,30))||1;
+    for(let k=0;k<N;k++){
+      const dopd=buf[0];x=x+(1/tau)*(K*dopd-x);
+      const pvk=spRef+x+pvStd*(rng()-0.5)*2;
+      const ek=sp[k]-pvk;integ+=ek;
+      const dopR=Kp*ek+(Kp/Ti)*integ;
+      const opA=Math.max(0,Math.min(100,opRef+dopR));
+      const dopS=opA-opRef;
+      if(aw&&Math.abs(dopS-dopR)>0.01)integ+=0.8*(dopS-dopR)*Ti/Kp;
+      buf.push(dopS);buf.shift();pvs.push(pvk);ops.push(opA);
     }
+    return{pvs,ops};
   }
-  const conf_Tu = firstMin ? 0.65 : 0.45;
-
-  const tau = 1.0;
-  const lam = Math.max(2 * theta, 0.6 * Tu, 3.0);
-  const Kp_new = rnd(tau / (K * (lam + theta)), 4);
-  const Ti_new = rnd(Math.max(2.0, Math.min(tau, 4 * (lam + theta))), 2);
-
-  // Kp_old — estimate from controller output response to error changes
-  const kps = [];
-  for (let i = 5; i < N - 1; i++) {
-    const de = err[i] - err[i - 1];
-    const dop = op[i] - op[i - 1];
-    if (Math.abs(de) > 1) {
-      const k = dop / de;
-      if (Math.abs(k) > 0.005 && Math.abs(k) < 5) kps.push(Math.abs(k));
-    }
-  }
-  const Kp_old = kps.length ? rnd(med(kps), 4) : rnd(Kp_new * 1.6, 4);
-  const Ti_old = rnd(Tu / 1.2, 2);
-
-  // Simulations
-  const opRef = mn(op.slice(0, 30)), spRef = mn(sp.slice(0, 30));
-  function sim(Kp, Ti, aw) {
-    let seed = 42;
-    const rng = () => { seed ^= seed << 13; seed ^= seed >> 17; seed ^= seed << 5; return (seed >>> 0) / 4294967296; };
-    const delay = Math.max(1, Math.round(theta));
-    const buf = new Array(delay + 4).fill(0);
-    let x = 0, integ = 0;
-    const pvs = [], ops = [];
-    const pvStd = std(pv.slice(0, 30)) || 1;
-    for (let k = 0; k < N; k++) {
-      const dopd = buf[0];
-      x = x + (1 / tau) * (K * dopd - x);
-      const pvk = spRef + x + pvStd * (rng() - 0.5) * 2;
-      const ek = sp[k] - pvk;
-      integ += ek;
-      const dopR = Kp * ek + (Kp / Ti) * integ;
-      const opA = Math.max(0, Math.min(100, opRef + dopR));
-      const dopS = opA - opRef;
-      if (aw && Math.abs(dopS - dopR) > 0.01) integ += 0.8 * (dopS - dopR) * Ti / Kp;
-      buf.push(dopS); buf.shift();
-      pvs.push(pvk); ops.push(opA);
-    }
-    return { pvs, ops };
-  }
-  const B = sim(Kp_old, Ti_old, false);
-  const A = sim(Kp_new, Ti_new, true);
-  const iae_b = B.pvs.reduce((s, v, i) => s + Math.abs(v - sp[i]), 0);
-  const iae_a = A.pvs.reduce((s, v, i) => s + Math.abs(v - sp[i]), 0);
-  const iae_pct = Math.max(0, rnd((1 - iae_a / iae_b) * 100, 1));
-  const op_std_b = rnd(std(B.ops), 4);
-  const op_std_a = rnd(std(A.ops), 4);
-  const op_wear_pct = rnd((1 - op_std_a / op_std_b) * 100, 1);
-  const pv_std = rnd(std(pv), 3);
-  const snr = rnd(std(sp) / (pv_std || 1), 2);
-
-  return {
-    K: rnd(K, 2), r2_K, conf_K: rnd(conf_K, 2),
-    theta: rnd(theta, 1), tau, Tu, conf_Tu,
-    lambda: rnd(lam, 2),
-    Kp_old, Ti_old, Kp_new, Ti_new,
-    pv_b: B.pvs, op_b: B.ops, pv_a: A.pvs, op_a: A.ops,
-    iae_b: Math.round(iae_b), iae_a: Math.round(iae_a),
-    iae_pct, op_std_b, op_std_a, op_wear_pct,
-    pv_std, snr,
-  };
+  const B=sim(Kp_old,Ti_old,false);
+  const A=sim(Kp_new,Ti_new,true);
+  const iae_b=B.pvs.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
+  const iae_a=A.pvs.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
+  const iae_pct=Math.max(0,rnd((1-iae_a/iae_b)*100,1));
+  const op_std_b=rnd(std(B.ops),4);
+  const op_std_a=rnd(std(A.ops),4);
+  const op_wear_pct=rnd((1-op_std_a/op_std_b)*100,1);
+  const pv_std=rnd(std(pv),3);
+  return{K:rnd(K,2),r2_K,conf_K:rnd(conf_K,2),theta:rnd(theta,1),tau,Tu,conf_Tu,lambda:rnd(lam,2),Kp_old,Ti_old,Kp_new,Ti_new,pv_b:B.pvs,op_b:B.ops,pv_a:A.pvs,op_a:A.ops,iae_b:Math.round(iae_b),iae_a:Math.round(iae_a),iae_pct,op_std_b,op_std_a,op_wear_pct,pv_std};
 }
 
-// ── Populate all UI ──────────────────────────────────────────────────────────
-function populate() {
-  const lt = D.loop_type;
-
-  // Type chip
-  const chip = document.getElementById('typeChip');
-  chip.textContent = lt.charAt(0).toUpperCase() + lt.slice(1);
-  chip.className = 'tb-type-badge tb-type-' + lt;
-
-  // Show loop-type warning if needed
-  if (LT_WARN[lt] && lt !== 'flow') {
-    const wb = document.getElementById('ltWarn');
-    document.getElementById('ltWarnTxt').innerHTML = LT_WARN[lt];
-    wb.style.display = 'flex';
+function populate(){
+  const lt=D.loop_type;
+  const chip=document.getElementById('typeChip');
+  chip.textContent=lt.charAt(0).toUpperCase()+lt.slice(1);
+  chip.className='tb-type-badge tb-type-'+lt;
+  if(LT_WARN[lt]&&lt!=='flow'){
+    document.getElementById('ltWarnTxt').innerHTML=LT_WARN[lt];
+    document.getElementById('ltWarn').style.display='flex';
   }
-
-  // KPI tiles
-  s('kpi-K', M.K);
-  s('kpi-theta', M.theta + ' min');
-  s('kpi-tau', M.tau + ' min');
-  s('kpi-Tu', M.Tu + ' min');
-  s('kpi-Kpn', M.Kp_new);
-  s('kpi-iae', '−' + M.iae_pct + '%');
-
-  // Confidence strip
-  const confKPct = Math.round(M.conf_K * 100);
-  document.getElementById('csf-K').style.width = confKPct + '%';
-  document.getElementById('csp-K').textContent = confKPct + '%';
-  const confTuPct = Math.round(M.conf_Tu * 100);
-  document.getElementById('csf-Tu').style.width = confTuPct + '%';
-  document.getElementById('csp-Tu').textContent = confTuPct + '%';
-  const overall = Math.round((confKPct * 0.5 + 88 * 0.2 + 52 * 0.2 + confTuPct * 0.1));
-  document.getElementById('overallConf').textContent = overall + '%';
-  const ring=document.getElementById('overallRing');if(ring){ring.style.strokeDashoffset=175.93-(175.93*overall/100);}
-
-  // Comparison
-  s('cmp-kp-old', M.Kp_old);
-  s('cmp-kp-new', M.Kp_new);
-  const kpChg = rnd(Math.abs(M.Kp_new - M.Kp_old) / (M.Kp_old || 1) * 100, 0);
-  const kpDir = M.Kp_new < M.Kp_old ? '↓' : '↑';
-  s('cmp-kp-pct', kpDir + kpChg + '%');
-  s('cmp-kp-why', M.Kp_new < M.Kp_old ? 'Reduce gain — current tuning too aggressive' : 'Increase gain — more responsive loop needed');
-  s('cmp-ti-old', M.Ti_old + ' min');
-  s('cmp-ti-new', M.Ti_new + ' min');
-  const tiChg = rnd(Math.abs(M.Ti_new - M.Ti_old) / (M.Ti_old || 1) * 100, 0);
-  const tiDir = M.Ti_new > M.Ti_old ? '↑' : '↓';
-  s('cmp-ti-pct', tiDir + tiChg + '%');
-  s('cmp-ti-why', M.Ti_new > M.Ti_old ? 'Slower reset — reduces integral windup' : 'Faster reset — tighter SP tracking');
-  s('cmp-lam-new', M.lambda + ' min');
-
-  // Outcomes
-  const outcomes = [
-    ['IAE (total error)', M.iae_b.toLocaleString(), M.iae_a.toLocaleString(), '−' + M.iae_pct + '%', 'Less deviation from setpoint'],
-    ['OP activity σ', M.op_std_b + '%', M.op_std_a + '%', '−' + M.op_wear_pct + '%', 'Reduced valve wear'],
-    ['PV noise σ', M.pv_std, '~' + M.pv_std, 'Unchanged', 'Noise floor is a plant property'],
+  const confKPct=Math.round(M.conf_K*100);
+  const confTuPct=Math.round(M.conf_Tu*100);
+  s('kpi-K',M.K);s('kpi-theta',M.theta+' min');s('kpi-tau',M.tau+' min');s('kpi-Tu',M.Tu+' min');
+  // K confidence
+  document.getElementById('k-badge').textContent=M.conf_K>0.7?'High':M.conf_K>0.5?'Medium':'Low';
+  document.getElementById('k-badge').className='mp-badge '+(M.conf_K>0.7?'sb-ok':M.conf_K>0.5?'sb-warn':'sb-lo');
+  document.getElementById('kconf-fill').style.width=confKPct+'%';
+  document.getElementById('kconf-fill').style.background=M.conf_K>0.7?'var(--ok)':M.conf_K>0.5?'var(--warn)':'var(--crit)';
+  document.getElementById('kconf-pct').textContent=confKPct+'%';
+  // Tu confidence
+  document.getElementById('tu-badge').textContent=M.conf_Tu>0.6?'High':'Medium';
+  document.getElementById('tu-badge').className='mp-badge '+(M.conf_Tu>0.6?'sb-ok':'sb-warn');
+  document.getElementById('tuconf-fill').style.width=confTuPct+'%';
+  document.getElementById('tuconf-pct').textContent=confTuPct+'%';
+  s('cmp-kp-old',M.Kp_old);s('cmp-kp-new',M.Kp_new);
+  const kpChg=rnd(Math.abs(M.Kp_new-M.Kp_old)/(M.Kp_old||1)*100,0);
+  s('cmp-kp-pct',(M.Kp_new<M.Kp_old?'\u2193':'\u2191')+kpChg+'%');
+  s('cmp-kp-why',M.Kp_new<M.Kp_old?'Reduce gain \u2014 current tuning too aggressive':'Increase gain \u2014 more responsive loop needed');
+  s('cmp-ti-old',M.Ti_old+' min');s('cmp-ti-new',M.Ti_new+' min');
+  const tiChg=rnd(Math.abs(M.Ti_new-M.Ti_old)/(M.Ti_old||1)*100,0);
+  s('cmp-ti-pct',(M.Ti_new>M.Ti_old?'\u2191':'\u2193')+tiChg+'%');
+  s('cmp-ti-why',M.Ti_new>M.Ti_old?'Slower reset \u2014 reduces integral windup':'Faster reset \u2014 tighter SP tracking');
+  s('cmp-lam-new',M.lambda+' min');
+  const outcomes=[
+    ['IAE (total error)',M.iae_b.toLocaleString(),M.iae_a.toLocaleString(),'\u2212'+M.iae_pct+'%','Less deviation from setpoint'],
+    ['OP activity \u03c3',M.op_std_b+'%',M.op_std_a+'%','\u2212'+M.op_wear_pct+'%','Reduced valve wear'],
+    ['PV noise \u03c3',M.pv_std,'~'+M.pv_std,'Unchanged','Noise floor is a plant property'],
   ];
-  document.getElementById('outcome-rows').innerHTML = outcomes.map(([nm, bv, av, pct, why]) => `
-    <tr style="border-bottom:1px solid var(--border2)">
-      <td style="padding:9px 12px;font-size:11px;color:var(--text2);font-weight:600">${nm}<div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">${why}</div></td>
-      <td style="padding:9px 12px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--crit)">${bv}</td>
-      <td style="padding:9px 12px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--ok)">${av}</td>
-      <td style="padding:9px 12px;text-align:center"><span style="font-size:10px;font-weight:700;color:var(--ok);font-family:'IBM Plex Mono',monospace">${pct}</span></td>
+  document.getElementById('outcome-rows').innerHTML=outcomes.map(([nm,bv,av,pct,why])=>`
+    <tr>
+      <td style="font-size:11px;color:var(--text2);font-weight:600">${nm}<div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">${why}</div></td>
+      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--crit)">${bv}</td>
+      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--ok)">${av}</td>
+      <td style="text-align:center;font-size:11px;font-weight:700;color:var(--ok);font-family:'IBM Plex Mono',monospace">${pct}</td>
     </tr>`).join('');
-
-  // Action items
-  const actions = [
-    ['r', '⚠', `<b>Set Kp = ${M.Kp_new}</b>`, ` (current estimated: ${M.Kp_old}) — reduce proportional gain to eliminate oscillation`],
-    ['a', '⏱', `<b>Set Ti = ${M.Ti_new} min</b>`, ` (current estimated: ${M.Ti_old} min) — adjust integral time`],
-    ['b', '📋', `<b>Monitor for 2–4 hours</b>`, ` after change. PV σ should drop below ${rnd(M.pv_std * 0.85, 2)}`],
-    ['g', '✓', `<b>Confidence: ${Math.round(M.conf_K * 100)}% on K</b>`, ` — ${M.conf_K > 0.7 ? 'strong basis for tuning change' : 'moderate — consider step test before applying'}`],
+  const actions=[
+    ['r','\u26a0',`<b>Set Kp = ${M.Kp_new}</b>`,` (current estimated: ${M.Kp_old}) \u2014 reduce proportional gain to eliminate oscillation`],
+    ['a','\u23f1',`<b>Set Ti = ${M.Ti_new} min</b>`,` (current estimated: ${M.Ti_old} min) \u2014 adjust integral time`],
+    ['b','\ud83d\udccb',`<b>Monitor for 2\u20134 hours</b>`,` after change. PV \u03c3 should drop below ${rnd(M.pv_std*0.85,2)}`],
+    ['g','\u2713',`<b>Confidence: ${Math.round(M.conf_K*100)}% on K</b>`,` \u2014 ${M.conf_K>0.7?'strong basis for tuning change':'moderate \u2014 consider step test before applying'}`],
   ];
-  if (lt === 'temperature') actions.unshift(['r', '⚠', '<b>WARNING: Temperature loop</b>', ' — run a dedicated SP step test before applying any tuning. τ estimate is unreliable for thermal processes.']);
-  if (lt === 'level') actions.unshift(['r', '🚫', '<b>LEVEL LOOP: Do not apply these tuning values</b>', ' — integrating process requires a different tuning method (e.g. Skogestad IMC for integrators).']);
-  document.getElementById('actions-list').innerHTML = actions.map(([t, ic, b, sp]) =>
-    `<div class="ai ai-${t}"><span class="ic">${ic}</span><div>${b}<span>${sp}</span></div></div>`
-  ).join('');
-
-  // FOPDT strip + technical cards
-  s('fp-k', M.K); s('fp-tau', M.tau); s('fp-theta', M.theta);
-  s('fp-ratio', rnd(M.tau / M.theta, 2)); s('fp-tu', M.Tu); s('fp-lam', M.lambda); s('fp-r2', M.r2_K);
-  s('ct-k', M.K); s('ct-kpill', Math.round(M.conf_K * 100) + '%');
-  document.getElementById('ct-kpill').className = 'pill ' + (M.conf_K > 0.7 ? 'pl-hi' : M.conf_K > 0.5 ? 'pl-mid' : 'pl-lo');
-  document.getElementById('ctf-k').style.width = Math.round(M.conf_K * 100) + '%';
-  document.getElementById('ctf-k').style.background = M.conf_K > 0.7 ? 'var(--blue)' : M.conf_K > 0.5 ? 'var(--warn)' : 'var(--crit)';
-  s('ct-r2', M.r2_K); s('ct-th', M.theta); s('ct-th2', M.theta); s('ct-tau', M.tau); s('ct-tu', M.Tu);
-  s('ct-tupill', Math.round(M.conf_Tu * 100) + '%');
-  document.getElementById('ctf-tu').style.width = Math.round(M.conf_Tu * 100) + '%';
-
-  // Evidence table
-  s('ev-k', M.K); s('ev-th', M.theta); s('ev-tau', M.tau); s('ev-tu', M.Tu); s('ev-lam', M.lambda);
-  s('ev-kpn', M.Kp_new); s('ev-tin', M.Ti_new);
-  document.getElementById('ev-k-conf').innerHTML = `<span class="ev-badge ${M.conf_K > 0.7 ? 'ev-ok' : M.conf_K > 0.5 ? 'ev-warn' : 'ev-lo'}">${Math.round(M.conf_K * 100)}%</span>`;
-  document.getElementById('ev-tu-conf').innerHTML = `<span class="ev-badge ev-warn">${Math.round(M.conf_Tu * 100)}%</span>`;
-
-  // Overlay metrics
-  s('ov-pvs', M.pv_std);
-  s('ov-pvso', '~' + rnd(M.pv_std * 0.9, 3));
-  s('ov-ops', rnd(std(D.op) * 100, 2) + '%');
-  s('ov-opso', rnd(M.op_std_a, 4) + '%');
-  s('ov-wear-txt', '−' + M.op_wear_pct + '% valve wear');
-
-  // Build summary overlay chart
-  buildSummaryOvl();
-
-  // Build Overlay tab chart if already visible
-  if (document.getElementById('tab-overlay').classList.contains('on')) buildOvl();
-  document.getElementById('savePanelBtn').disabled = false;
-
-  // Enable save
-  document.getElementById('saveBtn').disabled = false;
+  if(lt==='temperature')actions.unshift(['r','\u26a0','<b>WARNING: Temperature loop</b>',' \u2014 run a dedicated SP step test before applying any tuning.']);
+  if(lt==='level')actions.unshift(['r','\ud83d\udeab','<b>LEVEL LOOP: Do not apply these values</b>',' \u2014 integrating process requires a different tuning method.']);
+  document.getElementById('actions-list').innerHTML=actions.map(([t,ic,b,sp])=>`<div class="ai ai-${t}"><span class="ic">${ic}</span><div>${b}<span>${sp}</span></div></div>`).join('');
+  buildOvl();
+  document.getElementById('saveBtn').disabled=false;
+  document.getElementById('savePanelBtn').disabled=false;
   fetch(`/api/tune/recommendation/${encodeURIComponent(LOOP)}`)
-    .then(r => r.json())
-    .then(body => {
-      if (body.recommendation) {
-        const rec = body.recommendation;
+    .then(r=>r.json())
+    .then(body=>{
+      if(body.recommendation){
+        const rec=body.recommendation;
         document.getElementById('tunedNotice').classList.add('show');
-        s('tunedAt', rec.saved_at || '—');
-        document.getElementById('statusBadge').style.display = '';
-        document.getElementById('notesTA').value = rec.notes || '';
+        s('tunedAt',rec.saved_at||'\u2014');
+        document.getElementById('statusBadge').style.display='';
+        document.getElementById('notesTA').value=rec.notes||'';
       }
     });
 }
 
-function buildSummaryOvl(){
+function buildOvl(){
   if(!D||!M)return;
-  if(summaryOvlChart){summaryOvlChart.destroy();summaryOvlChart=null;}
-  const ctx=document.getElementById('sum-ovl-cv').getContext('2d');
+  if(ovlChart){ovlChart.destroy();ovlChart=null;}
+  const ctx=document.getElementById('ovl-cv').getContext('2d');
   const gc='rgba(216,226,236,.5)',tc='rgba(107,130,153,.8)';
-  summaryOvlChart=new Chart(ctx,{
+  ovlChart=new Chart(ctx,{
     type:'line',
     data:{
       labels:D.labels,
@@ -847,165 +635,139 @@ function buildSummaryOvl(){
   });
 }
 
-// ── Build Overlay Chart ──────────────────────────────────────────────────────
-function buildOvl() {
-  if (!D || !M) return;
-  if (ovlChart) { ovlChart.destroy(); ovlChart = null; }
-  const ctx = document.getElementById('ovl-cv').getContext('2d');
-  const gc = 'rgba(216,226,236,.5)', tc = 'rgba(107,130,153,.8)';
-  ovlChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: D.labels,
-      datasets: [
-        { label: 'SP',          data: D.sp,    borderColor: '#9ab0c4', borderWidth: 1.5, borderDash: [7, 5], pointRadius: 0, tension: .15, yAxisID: 'y' },
-        { label: 'PV Actual',   data: D.pv,    borderColor: '#e24b4a', borderWidth: 2,   pointRadius: 0, tension: .15, yAxisID: 'y' },
-        { label: 'PV Opt',      data: M.pv_a,  borderColor: '#1a9e5a', borderWidth: 2,   pointRadius: 0, tension: .15, yAxisID: 'y' },
-        { label: 'OP Actual',   data: D.op,    borderColor: '#f5b84a', borderWidth: 1.5, borderDash: [4, 4], pointRadius: 0, tension: .15, yAxisID: 'y1' },
-        { label: 'OP Opt',      data: M.op_a,  borderColor: '#0891b2', borderWidth: 1.5, pointRadius: 0, tension: .15, yAxisID: 'y1' },
-      ]
-    },
-    options: {
-      animation: false, responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { position: 'top', align: 'start', labels: { color: tc, font: { size: 10 }, boxWidth: 16, boxHeight: 2, padding: 10 } },
-        tooltip: { backgroundColor: '#1a2035', titleColor: 'rgba(255,255,255,.5)', bodyColor: '#e2e8f0', borderColor: '#2d3555', borderWidth: 1, padding: 8 },
-        zoom: { pan: { enabled: true, mode: 'x', modifierKey: 'ctrl' }, zoom: { drag: { enabled: true, backgroundColor: 'rgba(46,134,222,.07)', borderColor: '#2e86de', borderWidth: 1 }, wheel: { enabled: true, speed: .08 }, mode: 'x' } }
-      },
-      scales: {
-        x: { ticks: { color: tc, font: { size: 9 }, maxTicksLimit: 12 }, grid: { color: gc }, title: { display: true, text: 'Time', color: tc, font: { size: 9 } } },
-        y: { position: 'left', ticks: { color: tc, font: { size: 9 } }, grid: { color: gc }, title: { display: true, text: 'PV / SP', color: tc, font: { size: 9 } } },
-        y1: { position: 'right', ticks: { color: 'rgba(180,120,23,.7)', font: { size: 9 }, callback: v => v.toFixed(1) }, grid: { display: false }, title: { display: true, text: 'OP (%)', color: 'rgba(180,120,23,.7)', font: { size: 9 } } }
-      }
-    }
-  });
+function calcK(pvS,opS,spS){
+  const wSize=Math.min(120,Math.floor(pvS.length/6));
+  const xs=[],ys=[];
+  for(let i=0;i<pvS.length-wSize;i+=Math.floor(wSize/2)){xs.push(mn(opS.slice(i,i+wSize)));ys.push(mn(spS.slice(i,i+wSize)));}
+  if(xs.length<3)return null;
+  const xm=mn(xs),ym=mn(ys);
+  const n=xs.reduce((s,x,i)=>s+(x-xm)*(ys[i]-ym),0);
+  const d=xs.reduce((s,x)=>s+(x-xm)**2,0);
+  if(Math.abs(d)<1e-6)return null;
+  const k=Math.abs(n/d);
+  const ss_r=xs.reduce((s,x,i)=>s+(ys[i]-(k*x+ym-k*xm))**2,0);
+  const ss_t=ys.reduce((s,y)=>s+(y-ym)**2,0);
+  return{K:rnd(k,2),r2:ss_t>0?rnd(1-ss_r/ss_t,2):0};
 }
-
-// ── Hold-out validation ──────────────────────────────────────────────────────
-function calcK(pvS, opS, spS) {
-  const wSize = Math.min(120, Math.floor(pvS.length / 6));
-  const xs = [], ys = [];
-  for (let i = 0; i < pvS.length - wSize; i += Math.floor(wSize / 2)) {
-    xs.push(mn(opS.slice(i, i + wSize)));
-    ys.push(mn(spS.slice(i, i + wSize)));
-  }
-  if (xs.length < 3) return null;
-  const xm = mn(xs), ym = mn(ys);
-  const n = xs.reduce((s, x, i) => s + (x - xm) * (ys[i] - ym), 0);
-  const d = xs.reduce((s, x) => s + (x - xm) ** 2, 0);
-  if (Math.abs(d) < 1e-6) return null;
-  const k = Math.abs(n / d);
-  const ss_r = xs.reduce((s, x, i) => s + (ys[i] - (k * x + ym - k * xm)) ** 2, 0);
-  const ss_t = ys.reduce((s, y) => s + (y - ym) ** 2, 0);
-  return { K: rnd(k, 2), r2: ss_t > 0 ? rnd(1 - ss_r / ss_t, 2) : 0 };
+function toggleSplitInput(){
+  document.getElementById('splitInputWrap').style.display=document.getElementById('hvMethod').value==='random'?'flex':'none';
 }
-
-function runHoldout() {
-  if (!D) return;
-  const pv = D.pv, op = D.op, sp = D.sp, N = pv.length;
-  const method = document.getElementById('hvMethod').value;
-  let trainIdx, valIdx;
-  if (method === 'linear') {
-    const cut = Math.floor(N / 2);
-    trainIdx = Array.from({ length: cut }, (_, i) => i);
-    valIdx   = Array.from({ length: N - cut }, (_, i) => i + cut);
-  } else {
-    let s = 123456789;
-    const rng = () => { s ^= s << 13; s ^= s >> 17; s ^= s << 5; return (s >>> 0) / 4294967296; };
-    const all = Array.from({ length: N }, (_, i) => i);
-    for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
-    const cut = Math.floor(N / 2);
-    trainIdx = all.slice(0, cut).sort((a, b) => a - b);
-    valIdx   = all.slice(cut).sort((a, b) => a - b);
+function runHoldout(){
+  if(!D)return;
+  const pv=D.pv,op=D.op,sp=D.sp,N=pv.length;
+  const method=document.getElementById('hvMethod').value;
+  let trainIdx,valIdx;
+  if(method==='linear'){
+    const cut=Math.floor(N/2);
+    trainIdx=Array.from({length:cut},(_,i)=>i);
+    valIdx=Array.from({length:N-cut},(_,i)=>i+cut);
+  }else{
+    const pctRaw=parseInt(document.getElementById('hvSplitPct').value,10);
+    const trainPct=Math.min(80,Math.max(20,isNaN(pctRaw)?60:pctRaw));
+    let seed=123456789;
+    const rng=()=>{seed^=seed<<13;seed^=seed>>17;seed^=seed<<5;return(seed>>>0)/4294967296;};
+    const all=Array.from({length:N},(_,i)=>i);
+    for(let i=all.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[all[i],all[j]]=[all[j],all[i]];}
+    const cut=Math.floor(N*trainPct/100);
+    trainIdx=all.slice(0,cut).sort((a,b)=>a-b);
+    valIdx=all.slice(cut).sort((a,b)=>a-b);
   }
-  const slc = (arr, idx) => idx.map(i => arr[Math.min(i, arr.length - 1)]);
-  const rT = calcK(slc(pv, trainIdx), slc(op, trainIdx), slc(sp, trainIdx));
-  const rV = calcK(slc(pv, valIdx),   slc(op, valIdx),   slc(sp, valIdx));
-  if (!rT || !rV) return;
-
-  document.getElementById('ho-results').style.display = 'block';
-  s('ho-ktrain', rT.K); s('ho-kval', rV.K);
-  const diff = Math.abs(rT.K - rV.K) / rT.K * 100;
-  const dr = Math.round(diff);
-  s('ho-diff', dr + '%');
-  document.getElementById('ho-diff').style.color = diff < 10 ? 'var(--ok)' : diff < 20 ? 'var(--warn)' : 'var(--crit)';
-  const bar = document.getElementById('ho-bar');
-  bar.style.width = Math.min(100, diff * 3) + '%';
-  bar.style.background = diff < 10 ? 'var(--ok)' : diff < 20 ? 'var(--warn)' : 'var(--crit)';
-  s('ho-diff-pct', dr + '%');
-  const v = document.getElementById('ho-verdict');
-  if (diff < 10) {
-    v.style.background = 'var(--ok-bg)'; v.style.color = '#085041';
-    v.innerHTML = `✓ <b>Excellent (${dr}%)</b> — K_train=${rT.K}, K_validate=${rV.K}. Model generalises well. Kp is reliable.`;
-  } else if (diff < 20) {
-    v.style.background = 'var(--warn-bg)'; v.style.color = '#78350f';
-    v.innerHTML = `✓ <b>Acceptable (${dr}%)</b> — K_train=${rT.K} vs K_validate=${rV.K}. Slight variation — normal for closed-loop data.`;
-  } else {
-    const avg = rnd((rT.K + rV.K) / 2, 2);
-    v.style.background = 'var(--crit-bg)'; v.style.color = 'var(--crit)';
-    v.innerHTML = `⚠ <b>Inconsistent (${dr}%)</b> — K_train=${rT.K} vs K_validate=${rV.K}. Try Linear vs Random to diagnose. Consider K=${avg}.`;
-  }
-}
-
-// ── Save recommendation ──────────────────────────────────────────────────────
-async function saveRec() {
-  if (!M) return;
-  const notes = document.getElementById('notesTA').value.trim();
-  const payload = {
-    loop_type: D.loop_type,
-    K: M.K, tau: M.tau, theta: M.theta, Tu: M.Tu, lambda: M.lambda,
-    Kp_old: M.Kp_old, Ti_old: M.Ti_old, Kp_new: M.Kp_new, Ti_new: M.Ti_new,
-    conf_K: M.conf_K, r2: M.r2_K, iae_pct: M.iae_pct,
-    status: 'accepted', notes,
+  const slc=(arr,idx)=>idx.map(i=>arr[Math.min(i,arr.length-1)]);
+  const rT=calcK(slc(pv,trainIdx),slc(op,trainIdx),slc(sp,trainIdx));
+  const rV=calcK(slc(pv,valIdx),slc(op,valIdx),slc(sp,valIdx));
+  if(!rT||!rV)return;
+  document.getElementById('ho-results').style.display='block';
+  s('ho-ktrain',rT.K);s('ho-kval',rV.K);
+  const diff=Math.abs(rT.K-rV.K)/rT.K*100;
+  const dr=Math.round(diff);
+  s('ho-diff',dr+'%');
+  document.getElementById('ho-diff').style.color=diff<10?'var(--ok)':diff<20?'var(--warn)':'var(--crit)';
+  const bar=document.getElementById('ho-bar');
+  bar.style.width=Math.min(100,diff*3)+'%';
+  bar.style.background=diff<10?'var(--ok)':diff<20?'var(--warn)':'var(--crit)';
+  s('ho-diff-pct',dr+'%');
+  const v=document.getElementById('ho-verdict');
+  if(diff<10){v.style.background='var(--ok-bg)';v.style.color='#085041';v.innerHTML=`<b>Excellent (${dr}%)</b> \u2014 K_train=${rT.K}, K_validate=${rV.K}. Model generalises well. Kp is reliable.`;}
+  else if(diff<20){v.style.background='var(--warn-bg)';v.style.color='#78350f';v.innerHTML=`<b>Acceptable (${dr}%)</b> \u2014 slight variation, normal for closed-loop data.`;}
+  else{v.style.background='var(--crit-bg)';v.style.color='var(--crit)';v.innerHTML=`<b>Inconsistent (${dr}%)</b> \u2014 K_train=${rT.K} vs K_validate=${rV.K}. Consider step test.`;}
+  // ── Update split comparison table at top of right column
+  const trainLabel=method==='linear'?'First half (linear)':'Train set (random)';
+  const valLabel=method==='linear'?'Second half (linear)':'Validate set (random)';
+  document.getElementById('sc-th-train').textContent=trainLabel;
+  document.getElementById('sc-th-validate').textContent=valLabel;
+  const rnd2=(v)=>rnd(v,4);
+  const origKp=rnd2(M.Kp_new);
+  const origTi=M.Ti_new;
+  const origLam=M.lambda;
+  const linKp=rnd2(M.tau/(rT.K*(M.lambda+M.theta)));
+  const linTi=rnd2(Math.max(2.0,Math.min(M.tau,4*(M.lambda+M.theta))));
+  const ranKp=rnd2(M.tau/(rV.K*(M.lambda+M.theta)));
+  const ranTi=rnd2(Math.max(2.0,Math.min(M.tau,4*(M.lambda+M.theta))));
+  const diffColor=(a,b)=>{
+    const pct=Math.abs(a-b)/(b||1)*100;
+    return pct<5?'var(--ok)':pct<15?'var(--warn)':'var(--crit)';
   };
-  try {
-    const r = await fetch(`/api/tune/save/${encodeURIComponent(LOOP)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!r.ok) throw new Error('Save failed');
-    const now = new Date().toISOString().slice(0, 19);
-    document.getElementById('statusBadge').style.display = '';
-    document.getElementById('statusBadge').textContent = 'Accepted';
-    document.getElementById('statusBadge').className = 'save-badge sb-accepted';
-    document.getElementById('tunedNotice').classList.add('show');
-    s('tunedAt', now);
-    const sp = document.getElementById('spSaved');
-    sp.style.display = 'block';
-    sp.textContent = `✓ Saved at ${now}`;
-    toast('✓ Tuning recommendation saved');
-  } catch (e) {
-    toast('✗ Save failed — ' + e.message);
-  }
+  document.getElementById('sc-tbody').innerHTML=`
+    <tr>
+      <td>K used<div style="font-size:8px;color:var(--text4);font-weight:400">Process gain</div></td>
+      <td style="color:var(--blue)">${M.K}</td>
+      <td style="color:${diffColor(rT.K,M.K)}">${rT.K}</td>
+      <td style="color:${diffColor(rV.K,M.K)}">${rV.K}</td>
+    </tr>
+    <tr>
+      <td>Kp<div style="font-size:8px;color:var(--text4);font-weight:400">Proportional gain</div></td>
+      <td style="color:var(--blue)">${origKp}</td>
+      <td style="color:${diffColor(linKp,origKp)}">${linKp}</td>
+      <td style="color:${diffColor(ranKp,origKp)}">${ranKp}</td>
+    </tr>
+    <tr>
+      <td>Ti<div style="font-size:8px;color:var(--text4);font-weight:400">Integral time (min)</div></td>
+      <td style="color:var(--blue)">${origTi}</td>
+      <td style="color:var(--text2)">${linTi}</td>
+      <td style="color:var(--text2)">${ranTi}</td>
+    </tr>
+    <tr>
+      <td>λ<div style="font-size:8px;color:var(--text4);font-weight:400">IMC speed (min)</div></td>
+      <td style="color:var(--blue)">${origLam}</td>
+      <td style="color:var(--text4)">${origLam}</td>
+      <td style="color:var(--text4)">${origLam}</td>
+    </tr>
+  `;
 }
 
-// ── Init ─────────────────────────────────────────────────────────────────────
-(async function init() {
-  try {
-    const r = await fetch(`/api/tune/timeseries/${encodeURIComponent(LOOP)}`);
-    if (!r.ok) {
-      const err = await r.json();
-      document.getElementById('ltxt').textContent = 'Error: ' + (err.detail || r.statusText);
-      return;
-    }
-    D = await r.json();
-    document.getElementById('ltxt').textContent = 'Identifying FOPDT model…';
-    // Slight delay so UI can show the message
-    await new Promise(res => setTimeout(res, 80));
-    M = identify(D.pv, D.op, D.sp);
+async function saveRec(){
+  if(!M)return;
+  const notes=document.getElementById('notesTA').value.trim();
+  const payload={loop_type:D.loop_type,K:M.K,tau:M.tau,theta:M.theta,Tu:M.Tu,lambda:M.lambda,Kp_old:M.Kp_old,Ti_old:M.Ti_old,Kp_new:M.Kp_new,Ti_new:M.Ti_new,conf_K:M.conf_K,r2:M.r2_K,iae_pct:M.iae_pct,status:'accepted',notes};
+  try{
+    const r=await fetch(`/api/tune/save/${encodeURIComponent(LOOP)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!r.ok)throw new Error('Save failed');
+    const now=new Date().toISOString().slice(0,19);
+    document.getElementById('statusBadge').style.display='';
+    document.getElementById('statusBadge').textContent='Accepted';
+    document.getElementById('statusBadge').className='save-badge sb-accepted';
+    document.getElementById('tunedNotice').classList.add('show');
+    s('tunedAt',now);
+    const sp=document.getElementById('spSaved');sp.style.display='block';sp.textContent='\u2713 Saved at '+now;
+    toast('\u2713 Tuning recommendation saved');
+  }catch(e){toast('\u2717 Save failed \u2014 '+e.message);}
+}
+
+(async function init(){
+  try{
+    const r=await fetch(`/api/tune/timeseries/${encodeURIComponent(LOOP)}`);
+    if(!r.ok){const err=await r.json();document.getElementById('ltxt').textContent='Error: '+(err.detail||r.statusText);return;}
+    D=await r.json();
+    document.getElementById('ltxt').textContent='Identifying FOPDT model\u2026';
+    await new Promise(res=>setTimeout(res,80));
+    M=identify(D.pv,D.op,D.sp);
     populate();
-    document.getElementById('lov').style.display = 'none';
-    document.getElementById('app').style.display = '';
-  } catch (e) {
-    document.getElementById('ltxt').textContent = 'Failed to load: ' + e.message;
-  }
+    document.getElementById('lov').style.display='none';
+    document.getElementById('mainPage').style.display='';
+  }catch(e){document.getElementById('ltxt').textContent='Failed to load: '+e.message;}
 })();
 </script>
 
-<div id="app" style="display:none"><!-- content already rendered above --></div>
-<div id="ibtTip"></div>
 <script>
 (function(){
   const tip=document.getElementById('ibtTip');
@@ -1015,16 +777,11 @@ async function saveRec() {
     tip.textContent=text;tip.style.display='block';
     const r=b.getBoundingClientRect();
     const tw=tip.offsetWidth||220,th=tip.offsetHeight||60;
-    let left=r.left+r.width/2-tw/2;
-    let top=r.top-th-10;
-    if(top<8)top=r.bottom+8;
-    if(left<8)left=8;
-    if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;
+    let left=r.left+r.width/2-tw/2,top=r.top-th-10;
+    if(top<8)top=r.bottom+8;if(left<8)left=8;if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;
     tip.style.left=left+'px';tip.style.top=top+'px';
   });
-  document.addEventListener('mouseout',function(e){
-    if(!e.target.closest('.ibt'))tip.style.display='none';
-  });
+  document.addEventListener('mouseout',function(e){if(!e.target.closest('.ibt'))tip.style.display='none';});
 })();
 </script>
 </body>

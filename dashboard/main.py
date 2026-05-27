@@ -35,7 +35,13 @@ from reader import (
 )
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-BASE_DIR      = Path(__file__).parent.parent   # …/Valve_Diagnostic_Tool_POC
+# When running as a PyInstaller .exe, VALVE_BASE_DIR is set by launcher.py
+# to the folder containing the .exe. In normal dev mode, use the old logic.
+if os.environ.get("VALVE_BASE_DIR"):
+    BASE_DIR = Path(os.environ["VALVE_BASE_DIR"])
+else:
+    BASE_DIR = Path(__file__).parent.parent   # …/Valve_Diagnostic_Tool_POC
+
 DASHBOARD_DIR = Path(__file__).parent
 UPLOADS_DIR   = BASE_DIR / "uploads"
 UPLOADS_DIR.mkdir(exist_ok=True)
@@ -54,6 +60,9 @@ jobs: dict[str, dict] = {}
 
 # { email: { "dest_path": ..., "results_folder": ..., "mode": ... } } — awaiting config confirmation
 pending_uploads: dict[str, dict] = {}
+
+# { email: bool } — True means user has explicitly re-run with custom settings this session
+user_custom_run: dict[str, bool] = {}
 
 # ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(title="Valve Diagnostics POC", version="2.0.0")
@@ -90,42 +99,74 @@ def _results_dir_for(email: str) -> str | None:
 def _run_engine_background(job_id: str, input_path: Path, results_folder: str, mode: str):
     """
     Runs in a background thread.
-    Calls valve_diagnostics_v3.py via subprocess exactly like the bat files do:
-      AUTO:   python valve_diagnostics_v3.py --input <file> --output-dir <dir>
-      MANUAL: python valve_diagnostics_v3.py --input <file> --output-dir <dir> --manual
-    cwd = BASE_DIR (same as 'cd /d %~dp0' in the bat file).
+    When frozen as .exe: calls run_v3() directly (no subprocess needed — engine is bundled).
+    In dev mode: calls valve_diagnostics_v3.py via subprocess like the bat files do.
     """
-    cmd = [
-        sys.executable,
-        str(BASE_DIR / "valve_diagnostics_v3.py"),
-        "--input", str(input_path),
-        "--output-dir", str(BASE_DIR / results_folder),
-    ]
-    if mode == "manual":
-        cmd.append("--manual")
+    output_dir = str(BASE_DIR / results_folder)
+    engine_mode = "MANUAL" if mode == "manual" else "AUTO"
 
-    try:
-        result = subprocess.run(
-            cmd,
-            cwd=str(BASE_DIR),          # critical — engine uses relative paths internally
-            capture_output=True,
-            encoding='utf-8',
-            errors='replace',
-        )
-        if result.returncode == 0:
-            jobs[job_id]["status"] = "done"
-        elif result.returncode == 2:
-            jobs[job_id]["status"] = "error"
-            jobs[job_id]["detail"] = "Health check failed — check your Excel file format."
-        else:
-            jobs[job_id]["status"] = "error"
-            jobs[job_id]["detail"] = (
-                f"Engine exited with code {result.returncode}. "
-                f"{result.stderr[-400:] if result.stderr else ''}"
+    if getattr(sys, 'frozen', False):
+        # ── Frozen .exe path: import and call run_v3 directly ─────────────────
+        # sys.executable is the .exe itself here, NOT Python, so subprocess
+        # won't work. But all engine code is bundled, so we can call it directly.
+        try:
+            import os as _os
+            _os.chdir(str(BASE_DIR))   # engine uses relative paths internally
+            # Ensure valve_diagnostics_v2 and column_normaliser are importable
+            if str(BASE_DIR) not in sys.path:
+                sys.path.insert(0, str(BASE_DIR))
+            from diagnostics import run_v3
+            exit_code = run_v3(
+                str(input_path),
+                output_dir,
+                mode=engine_mode,
+                verbose=True,
             )
-    except Exception as exc:
-        jobs[job_id]["status"] = "error"
-        jobs[job_id]["detail"] = str(exc)
+            if exit_code == 0:
+                jobs[job_id]["status"] = "done"
+            elif exit_code == 2:
+                jobs[job_id]["status"] = "error"
+                jobs[job_id]["detail"] = "Health check failed — check your Excel file format."
+            else:
+                jobs[job_id]["status"] = "error"
+                jobs[job_id]["detail"] = f"Engine exited with code {exit_code}."
+        except Exception as exc:
+            import traceback
+            jobs[job_id]["status"] = "error"
+            jobs[job_id]["detail"] = f"{exc}\n{traceback.format_exc()[-600:]}"
+    else:
+        # ── Dev mode: subprocess call (same as the .bat files) ────────────────
+        cmd = [
+            sys.executable,
+            str(BASE_DIR / "valve_diagnostics_v3.py"),
+            "--input", str(input_path),
+            "--output-dir", output_dir,
+        ]
+        if mode == "manual":
+            cmd.append("--manual")
+
+        try:
+            result = subprocess.run(
+                cmd,
+                cwd=str(BASE_DIR),
+                capture_output=True,
+                encoding='utf-8',
+                errors='replace',
+            )
+            if result.returncode == 0:
+                jobs[job_id]["status"] = "done"
+            elif result.returncode == 2:
+                jobs[job_id]["status"] = "error"
+                jobs[job_id]["detail"] = "Health check failed — check your Excel file format."
+            else:
+                jobs[job_id]["status"] = "error"
+                jobs[job_id]["detail"] = (
+                    f"Engine exited with code {result.returncode}. "
+                    f"{result.stderr[-400:] if result.stderr else ''}"
+                )
+        except Exception as exc:
+            jobs[job_id]["status"] = "error"
+            jobs[job_id]["detail"] = str(exc)
 
 
 # ── Config helpers ────────────────────────────────────────────────────────────
@@ -145,6 +186,11 @@ def _load_config(email: str) -> dict:
         with open(DEFAULT_CONFIG_PATH, encoding="utf-8") as f:
             return json.load(f)
     return {"diagnostic_config": [], "diagnostic_selection": [], "mode_mapping": []}
+
+
+def _is_custom_config(email: str) -> bool:
+    """Return True only when the user has explicitly re-run with custom settings."""
+    return user_custom_run.get(email, False)
 
 
 def _save_config(email: str, config: dict):
@@ -289,6 +335,9 @@ async def upload_file(
         "original_name":  original_name,
     }
 
+    # ── Fresh upload always resets the custom-run flag (badge will show)
+    user_custom_run[current_user["sub"]] = False
+
     return JSONResponse({"status": "running", "job_id": job_id})
 
 
@@ -340,6 +389,9 @@ async def save_config_and_run(request: Request, current_user: dict = Depends(get
     # Save user config
     _save_config(current_user["sub"], config)
 
+    # Mark that this user has now run with custom settings
+    user_custom_run[current_user["sub"]] = True
+
     # Write config back into the Excel
     dest_path = Path(pending["dest_path"])
     try:
@@ -375,8 +427,38 @@ async def save_config_and_run(request: Request, current_user: dict = Depends(get
 @app.post("/api/config/rerun")
 async def rerun_with_config(request: Request, current_user: dict = Depends(get_current_user)):
     pending = pending_uploads.get(current_user["sub"])
+
+    # ── If pending is missing (e.g. server restarted), recover from results folder on disk
     if not pending:
-        raise HTTPException(status_code=400, detail="No uploaded file found for your session. Please upload a file first.")
+        rd = _results_dir_for(current_user["sub"])
+        if rd:
+            folder_name = os.path.basename(rd)
+            is_manual   = folder_name.endswith("_manual")
+            stem        = folder_name.removeprefix("results_").removesuffix("_manual")
+            mode        = "manual" if is_manual else "auto"
+            results_folder = folder_name
+            # Look for matching .xlsx in BASE_DIR
+            input_path = BASE_DIR / f"{stem}.xlsx"
+            if not input_path.exists():
+                # Try .xls
+                input_path = BASE_DIR / f"{stem}.xls"
+            if not input_path.exists():
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Source file '{stem}.xlsx' not found. Please upload your file again."
+                )
+            pending = {
+                "dest_path":      str(input_path),
+                "results_folder": results_folder,
+                "mode":           mode,
+                "original_name":  input_path.name,
+            }
+            pending_uploads[current_user["sub"]] = pending
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="No uploaded file found for your session. Please upload a file first."
+            )
 
     config = await request.json()
 
@@ -437,6 +519,7 @@ async def get_latest(current_user: dict = Depends(get_current_user)):
     rd = _get_user_results_dir(current_user)
     try:
         data = read_dashboard_data(rd)
+        data["is_custom_config"] = _is_custom_config(current_user["sub"])
         return JSONResponse(content=data)
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))

@@ -21,11 +21,12 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
 /* ── Card ── */
 .card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow-md);width:100%;max-width:420px;overflow:hidden}
 .card-header{background:var(--navy);padding:32px 36px 28px;text-align:center}
-.logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px}
-.logo-hex{width:40px;height:40px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-hex svg{width:22px;height:22px;fill:#fff}
-.logo-text{color:#fff;font-size:17px;font-weight:700;font-family:'IBM Plex Mono',monospace;letter-spacing:-.3px}
-.logo-text span{color:var(--blue-lt);font-weight:400}
+.logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px}
+.logo-hex{width:40px;height:40px;background:#fff;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-brand{display:flex;flex-direction:column;gap:2px;text-align:left}
+.logo-brand-main{color:#fff;font-size:16px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;letter-spacing:-.01em;line-height:1}
+.logo-brand-main span{color:#bfdbfe;font-weight:300}
+.logo-brand-sub{color:rgba(255,255,255,.5);font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
 .card-subtitle{color:#7aaccf;font-size:13px;letter-spacing:.3px}
 
 /* ── Form body ── */
@@ -66,12 +67,12 @@ input::placeholder{color:#b0c4d8}
     <div class="card-header">
       <div class="logo">
         <div class="logo-hex">
-          <!-- valve icon -->
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 3a1.5 1.5 0 1 1-1.5 1.5A1.5 1.5 0 0 1 12 5zm-5.5 6.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1 0-1zm1.5 4h8l-1.5 3.5h-5z"/>
-          </svg>
+          <svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M9 1L2 5v8l7 4 7-4V5L9 1z" stroke="#3b82f6" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 6v5M6.5 7.5L9 6l2.5 1.5" stroke="#3b82f6" stroke-width="1.4" stroke-linecap="round"/></svg>
         </div>
-        <div class="logo-text">VALVE<span>diagnostics</span></div>
+        <div class="logo-brand">
+          <div class="logo-brand-main">Ingenero<span> 360 AI</span></div>
+          <div class="logo-brand-sub">Control Valve Diagnostics</div>
+        </div>
       </div>
       <div class="card-subtitle">POC Client Portal — Sign In</div>
     </div>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Upload Data — Valve Diagnostics</title>
+<title>Upload Data — Ingenero 360 AI</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -18,16 +18,17 @@
   --r:8px;--shadow-md:0 4px 24px rgba(15,39,68,.12);
 }
 html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text)}
-.topbar{background:var(--navy);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100}
+.topbar{background:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;border-bottom:3px solid #3b82f6;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-hex{width:32px;height:32px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center}
-.logo-hex svg{width:18px;height:18px;fill:#fff}
-.logo-text{color:#fff;font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace}
-.logo-text span{color:var(--blue-lt);font-weight:400}
-.topbar-right{display:flex;align-items:center;gap:16px}
-.user-pill{background:rgba(255,255,255,.1);color:#a8c8f0;font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.12)}
-.btn-logout{color:#7aaccf;font-size:12px;background:none;border:none;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;padding:4px 8px;border-radius:6px;transition:background .2s}
-.btn-logout:hover{background:rgba(255,255,255,.1);color:#fff}
+.logo-hex{width:36px;height:36px;background:#3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-brand{display:flex;flex-direction:column;gap:1px}
+.logo-brand-main{color:#1e3a5f;font-size:15px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;letter-spacing:-.01em;line-height:1}
+.logo-brand-main span{color:#3b82f6;font-weight:300}
+.logo-brand-sub{color:#64748b;font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.user-pill{background:#f1f5f9;color:#475569;font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid #e2e8f0}
+.btn-logout{color:#94a3b8;font-size:12px;background:none;border:none;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;padding:4px 8px;border-radius:6px;transition:background .2s}
+.btn-logout:hover{background:#f1f5f9;color:#1e293b}
 .page{min-height:calc(100vh - 54px);display:flex;align-items:center;justify-content:center;padding:40px 24px}
 .card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow-md);width:100%;max-width:580px;padding:40px 44px}
 .card-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px}
@@ -92,9 +93,12 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
 <div class="topbar">
   <a class="logo" href="/">
     <div class="logo-hex">
-      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 3a1.5 1.5 0 1 1-1.5 1.5A1.5 1.5 0 0 1 12 5zm-5.5 6.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1 0-1zm1.5 4h8l-1.5 3.5h-5z"/></svg>
+      <svg width="20" height="20" viewBox="0 0 18 18" fill="none"><path d="M9 1L2 5v8l7 4 7-4V5L9 1z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 6v5M6.5 7.5L9 6l2.5 1.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>
     </div>
-    <div class="logo-text">VALVE<span>diagnostics</span></div>
+    <div class="logo-brand">
+      <div class="logo-brand-main">Ingenero<span> 360 AI</span></div>
+      <div class="logo-brand-sub">Control Valve Diagnostics</div>
+    </div>
   </a>
   <div class="topbar-right">
     <span class="user-pill">{{ user.name }}</span>
