@@ -1375,18 +1375,34 @@ async def get_tune_timeseries(loop_name: str, current_user: dict = Depends(get_c
         sp  = sp[::step][:1440]
         lbl = lbl[::step][:1440]
 
-    # Detect loop type from tag name prefix
+    # Detect loop type from tag name — handles codes embedded anywhere
+    # e.g. YN.ETH1.16FC336 → FC → flow
+    #      UN.UO.71PI1021C → PI → pressure
+    import re as _re
     tag_up = loop_name.upper()
-    if   tag_up.startswith("FI") or tag_up.startswith("FC") or tag_up.startswith("FF"):
-        loop_type = "flow"
-    elif tag_up.startswith("PI") or tag_up.startswith("PC") or tag_up.startswith("PRC"):
-        loop_type = "pressure"
-    elif tag_up.startswith("TI") or tag_up.startswith("TC"):
-        loop_type = "temperature"
-    elif tag_up.startswith("LI") or tag_up.startswith("LC"):
-        loop_type = "level"
+
+    # Method 1: digits+letters+digits pattern (most common in plant tags)
+    _match = _re.search(r'\d+([A-Z]{1,3})\d+', tag_up)
+    _code = _match.group(1) if _match else ''
+
+    # Method 2: fallback — known codes as word/boundary match
+    if not _code:
+        for _c in ['FIC','FRC','FFC','PIC','PRC','TIC','TRC','LIC','LRC',
+                   'FC','FI','FF','FT','PC','PI','PT','TC','TI','TT','LC','LI','LT']:
+            if _re.search(r'(^|[^A-Z])' + _c + r'([^A-Z]|$)', tag_up):
+                _code = _c
+                break
+
+    if _code in ('FC','FI','FF','FT','FY','FR','FQ','FIC','FRC','FFC'):
+        loop_type = 'flow'
+    elif _code in ('PC','PI','PT','PY','PR','PIC','PRC'):
+        loop_type = 'pressure'
+    elif _code in ('TC','TI','TT','TY','TR','TIC','TRC'):
+        loop_type = 'temperature'
+    elif _code in ('LC','LI','LT','LY','LR','LIC','LRC'):
+        loop_type = 'level'
     else:
-        loop_type = "unknown"
+        loop_type = 'unknown'
 
     return JSONResponse(content={
         "loop": loop_name,

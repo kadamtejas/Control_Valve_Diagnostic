@@ -143,7 +143,8 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 
 /* ── CHART ── */
 .chart-legend{display:flex;gap:12px;flex-wrap:wrap;padding:8px 14px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border2)}
-.chart-legend-item{display:flex;align-items:center;gap:5px}
+.chart-legend-item{display:flex;align-items:center;gap:5px;transition:opacity .2s}
+.chart-legend-item.hidden{opacity:.35;text-decoration:line-through}
 .chart-hint{padding:5px 14px;font-size:10px;color:var(--text4);border-top:1px solid var(--border2)}
 
 /* ── NOTES + SAVE ── */
@@ -235,19 +236,19 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
           </thead>
           <tbody>
             <tr>
-              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">Kp<div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">Proportional gain</div></div></td>
+              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">Kp <span class="ibt" data-tip="Proportional gain: controller output change per unit error. Higher Kp = faster but more oscillatory response.">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">Proportional gain</div></div></td>
               <td style="text-align:center"><span class="oval" id="cmp-kp-old">—</span></td>
               <td style="text-align:center"><span class="nval" id="cmp-kp-new">—</span></td>
               <td><div class="why-pct" id="cmp-kp-pct">—</div><div class="why-txt" id="cmp-kp-why">—</div></td>
             </tr>
             <tr>
-              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">Ti<div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">Integral time (min)</div></div></td>
+              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">Ti <span class="ibt" data-tip="Integral time: how quickly accumulated error is corrected. Smaller Ti = faster integral action but risk of windup.">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">Integral time (min)</div></div></td>
               <td style="text-align:center"><span class="oval" id="cmp-ti-old">—</span></td>
               <td style="text-align:center"><span class="nval" id="cmp-ti-new">—</span></td>
               <td><div class="why-pct" id="cmp-ti-pct">—</div><div class="why-txt" id="cmp-ti-why">—</div></td>
             </tr>
             <tr>
-              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">λ<div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">IMC speed target</div></div></td>
+              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">λ <span class="ibt" data-tip="Lambda (IMC speed): desired closed-loop response time. Larger λ = slower, more conservative. Calculated as max(2θ, 0.6·Tu, 0.5·τ, 3).">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">IMC speed target</div></div></td>
               <td style="text-align:center"><span style="font-size:11px;color:var(--text4)">—</span></td>
               <td style="text-align:center"><span class="nval" id="cmp-lam-new">—</span></td>
               <td><div class="why-txt">max(2θ, 0.6·Tu, 3)</div></td>
@@ -258,10 +259,11 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 
       <!-- Expected Outcomes -->
       <div class="card">
-        <div class="ch"><span class="cht">EXPECTED OUTCOMES</span></div>
+        <div class="ch"><span class="cht">EXPECTED OUTCOMES</span> <span class="ibt" data-tip="Simulated comparison between current and recommended tuning. Based on a closed-loop model using identified K, τ, θ. Not a guarantee — verify on plant.">i</span></div>
         <table class="out-tbl">
           <thead>
-            <tr><th>Metric</th><th>Before</th><th>After</th><th>Improvement</th></tr>
+            <tr><th rowspan="2">Metric</th><th rowspan="2">Before</th><th rowspan="2">Auto Optimised (AO)</th><th rowspan="2">User Optimised (UO)</th><th colspan="2" style="text-align:center">Improvement</th></tr>
+            <tr><th style="text-align:center;font-size:9px;color:var(--ok)">AO</th><th style="text-align:center;font-size:9px;color:var(--blue)">UO</th></tr>
           </thead>
           <tbody id="outcome-rows"></tbody>
         </table>
@@ -306,7 +308,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
               <thead><tr><th>Param</th><th>Value</th><th>Confidence</th></tr></thead>
               <tbody>
                 <tr>
-                  <td><span class="mp-param" style="color:var(--blue)">K</span> <span class="ibt" data-tip="Process gain: how much PV changes per 1% OP change.">i</span><div class="mp-sub">Process Gain</div></td>
+                  <td><span class="mp-param" style="color:var(--blue)">K</span> <span class="ibt" data-tip="Process gain: steady-state PV change per 1% OP change. Estimated via step detection (ΔPV/ΔOP) or windowed OLS. Used to calculate Kp.">i</span><div class="mp-sub">Process Gain</div></td>
                   <td><span class="mp-val" id="kpi-K">—</span><div class="mp-sub">OP→PV</div></td>
                   <td>
                     <div class="mp-conf-wrap">
@@ -317,7 +319,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
                   </td>
                 </tr>
                 <tr>
-                  <td><span class="mp-param" style="color:#0891b2">θ</span> <span class="ibt" data-tip="Dead time: delay before process responds to OP change.">i</span><div class="mp-sub">Dead Time</div></td>
+                  <td><span class="mp-param" style="color:#0891b2">θ</span> <span class="ibt" data-tip="Dead time: samples of delay before PV responds to an OP change. Estimated from the peak of the OP→PV cross-correlation. In sample units — multiply by sampling interval for real time.">i</span><div class="mp-sub">Dead Time</div></td>
                   <td><span class="mp-val" id="kpi-theta">—</span><div class="mp-sub">min</div></td>
                   <td>
                     <div class="mp-conf-wrap">
@@ -328,18 +330,18 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
                   </td>
                 </tr>
                 <tr>
-                  <td><span class="mp-param" style="color:#7c3aed">τ</span> <span class="ibt" data-tip="Time constant: physics estimate only, not measured.">i</span><div class="mp-sub">Time Const</div></td>
+                  <td><span class="mp-param" style="color:#7c3aed">τ</span> <span class="ibt" data-tip="Time constant: time for PV to reach 63.2% of its final value after a step. Estimated via step 63% method, ACF decay, or variance ratio depending on loop type and data available.">i</span><div class="mp-sub">Time Const</div></td>
                   <td><span class="mp-val" id="kpi-tau">—</span><div class="mp-sub">min est.</div></td>
                   <td>
                     <div class="mp-conf-wrap">
-                      <div class="mp-conf-track"><div class="mp-conf-fill" style="width:52%;background:#7c3aed"></div></div>
-                      <span class="mp-conf-pct">52%</span>
-                      <span class="mp-badge sb-warn">Med</span>
+                      <div class="mp-conf-track"><div class="mp-conf-fill" id="tauconf-fill" style="background:#7c3aed"></div></div>
+                      <span class="mp-conf-pct" id="tauconf-pct">—</span>
+                      <span class="mp-badge" id="tau-badge">—</span>
                     </div>
                   </td>
                 </tr>
                 <tr>
-                  <td><span class="mp-param" style="color:var(--warn)">Tu</span> <span class="ibt" data-tip="Oscillation period from ACF. Used to set lambda.">i</span><div class="mp-sub">Osc Period</div></td>
+                  <td><span class="mp-param" style="color:var(--warn)">Tu</span> <span class="ibt" data-tip="Ultimate/oscillation period: estimated from first peak of error ACF. Used to set λ. Only reliable when the loop is oscillating. Defaults to 7 samples for stable loops.">i</span><div class="mp-sub">Osc Period</div></td>
                   <td><span class="mp-val" id="kpi-Tu">—</span><div class="mp-sub">min ACF</div></td>
                   <td>
                     <div class="mp-conf-wrap">
@@ -375,7 +377,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 
       <!-- Hold-out Cross Validation -->
       <div class="card">
-        <div class="ch"><span class="cht">HOLD-OUT CROSS-VALIDATION</span></div>
+        <div class="ch"><span class="cht">HOLD-OUT CROSS-VALIDATION</span> <span class="ibt" data-tip="Splits data into two sets and estimates K on each. If K_train and K_validate agree within 10%, the model is reliable. Large difference means the process is non-stationary — run a step test.">i</span></div>
         <div class="cb" style="padding-bottom:10px">
           <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.6">Recalculates K on two halves of the data. Checks that K is consistent — a key test of model reliability. <b style="color:var(--text2)">Linear</b> splits by time order. <b style="color:var(--text2)">Random</b> shuffles first, so both halves contain data from throughout the timeline.</div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -393,15 +395,15 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
           <div id="ho-results" style="display:none;margin-top:12px">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
               <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)">
-                <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">K_train</div>
+                <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">K_train <span class="ibt" data-tip="Process gain estimated on the training set. Should match K_validate within 10% for a reliable model.">i</span></div>
                 <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)" id="ho-ktrain">—</div>
               </div>
               <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)">
-                <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">K_validate</div>
+                <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">K_validate <span class="ibt" data-tip="Process gain estimated on the validation set. If far from K_train, the gain is non-stationary — consider a dedicated step test.">i</span></div>
                 <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)" id="ho-kval">—</div>
               </div>
               <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)">
-                <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Difference</div>
+                <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Difference <span class="ibt" data-tip="% difference between K_train and K_validate. &lt;10% = Excellent. 10–20% = Acceptable. &gt;20% = Inconsistent.">i</span></div>
                 <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace" id="ho-diff">—</div>
               </div>
             </div>
@@ -418,14 +420,19 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
       <div class="card">
         <div class="ch">
           <span class="cht">ACTUAL VS OPTIMISED &mdash; PV &amp; OP OVERLAY</span>
+          <span class="ibt" data-tip="Simulated overlay comparing current tuning (red/orange) vs recommended tuning (green/teal). Uses the identified FOPDT model. Not real plant data — use as a directional guide only.">i</span>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:12px">
+            <button id="btn-auto-opt" onclick="switchOvlMode('auto')" style="font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--blue);background:#dbeafe;color:#1d4ed8;font-weight:700;cursor:pointer">Auto Optimised</button>
+            <button id="btn-user-opt" onclick="switchOvlMode('user')" style="font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);font-weight:600;cursor:pointer" title="Run validation first">User Optimised</button>
+          </div>
           <button onclick="if(ovlChart)ovlChart.resetZoom()" style="margin-left:auto;font-size:10px;padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">&#8635; Reset zoom</button>
         </div>
-        <div class="chart-legend">
-          <div class="chart-legend-item"><div style="width:18px;height:2.5px;background:#e24b4a;border-radius:1px"></div>PV Actual</div>
-          <div class="chart-legend-item"><div style="width:18px;height:2.5px;background:#1a9e5a;border-radius:1px"></div>PV Optimised</div>
-          <div class="chart-legend-item"><div style="width:18px;border-top:2px dashed #9ab0c4;height:0"></div>SP</div>
-          <div class="chart-legend-item"><div style="width:18px;border-top:2px dashed #f5b84a;height:0"></div>OP Actual</div>
-          <div class="chart-legend-item"><div style="width:18px;height:2px;background:#0891b2;border-radius:1px"></div>OP Optimised</div>
+        <div class="chart-legend" id="ovl-legend">
+          <div class="chart-legend-item" data-idx="0" onclick="toggleOvlSeries(0)" style="cursor:pointer"><div style="width:18px;height:2.5px;background:#e24b4a;border-radius:1px"></div>PV Actual</div>
+          <div class="chart-legend-item" data-idx="1" onclick="toggleOvlSeries(1)" style="cursor:pointer"><div style="width:18px;height:2.5px;background:#1a9e5a;border-radius:1px"></div>PV Optimised</div>
+          <div class="chart-legend-item" data-idx="2" onclick="toggleOvlSeries(2)" style="cursor:pointer"><div style="width:18px;border-top:2px dashed #9ab0c4;height:0"></div>SP</div>
+          <div class="chart-legend-item" data-idx="3" onclick="toggleOvlSeries(3)" style="cursor:pointer"><div style="width:18px;border-top:2px dashed #f5b84a;height:0"></div>OP Actual</div>
+          <div class="chart-legend-item" data-idx="4" onclick="toggleOvlSeries(4)" style="cursor:pointer"><div style="width:18px;height:2px;background:#0891b2;border-radius:1px"></div>OP Optimised</div>
         </div>
         <div style="padding:10px 14px 0;height:280px;position:relative"><canvas id="ovl-cv" style="width:100%;height:100%"></canvas></div>
         <div class="chart-hint">Drag to zoom &middot; Scroll &middot; Ctrl+drag to pan</div>
@@ -462,74 +469,243 @@ const LT_WARN={
 
 function identify(pv, op, sp){
   const N=pv.length;
-  const win=Math.min(120,Math.floor(N/8));
-  const xs=[],ys=[];
-  for(let i=0;i<N-win;i+=Math.floor(win/2)){xs.push(mn(op.slice(i,i+win)));ys.push(mn(sp.slice(i,i+win)));}
-  const xm=mn(xs),ym=mn(ys);
-  const num=xs.reduce((s,x,i)=>s+(x-xm)*(ys[i]-ym),0);
-  const den=xs.reduce((s,x)=>s+(x-xm)**2,0);
-  const slope=Math.abs(den)>1e-6?num/den:5.0;
-  const K=Math.max(0.5,Math.abs(slope));
-  const ss_r=xs.reduce((s,x,i)=>s+(ys[i]-(slope*x+ym-slope*xm))**2,0);
-  const ss_t=ys.reduce((s,y)=>s+(y-ym)**2,0);
-  const r2_K=ss_t>0?rnd(1-ss_r/ss_t):0;
-  const conf_K=Math.max(0.4,Math.min(0.97,0.3+r2_K*0.7));
+  const lt=D?D.loop_type:'unknown';
+
+  // ── UTILITIES ────────────────────────────────────────────────────────────
+  function computeACF1(signal){
+    const m=mn(signal);
+    const v=signal.reduce((s,x)=>s+(x-m)**2,0)||1;
+    let ac=0;
+    for(let i=0;i<signal.length-1;i++) ac+=(signal[i]-m)*(signal[i+1]-m);
+    return ac/v;
+  }
+
+  // ── 1. θ — dead time via cross-correlation peak ────────────────────────
   const m_op=mn(op),m_pv=mn(pv);
   const denom=Math.sqrt(op.reduce((s,x)=>s+(x-m_op)**2,0)*pv.reduce((s,x)=>s+(x-m_pv)**2,0))||1;
   const xcorr=[];
-  for(let lag=0;lag<Math.min(15,Math.floor(N/4));lag++){
+  for(let lag=0;lag<Math.min(30,Math.floor(N/4));lag++){
     let cc=0;for(let i=0;i<N-lag;i++)cc+=(op[i]-m_op)*(pv[i+lag]-m_pv);xcorr.push(cc/denom);
   }
-  const theta=Math.max(0.5,xcorr.indexOf(Math.max(...xcorr)));
+  const theta=Math.max(0.5, xcorr.indexOf(Math.max(...xcorr)));
+
+  // ── 2. Tu — oscillation period from error ACF ─────────────────────────
   const err=pv.map((v,i)=>v-sp[i]);
   const me=mn(err),ve=err.reduce((s,x)=>s+(x-me)**2,0)||1;
-  const acf=[];
+  const acfErr=[];
   for(let lag=1;lag<Math.min(30,Math.floor(N/4));lag++){
-    let ac=0;for(let i=0;i<N-lag;i++)ac+=(err[i]-me)*(err[i+lag]-me);acf.push(ac/ve);
+    let ac=0;for(let i=0;i<N-lag;i++)ac+=(err[i]-me)*(err[i+lag]-me);acfErr.push(ac/ve);
   }
   let Tu=7,firstMin=null;
-  for(let i=1;i<acf.length-1;i++){if(firstMin===null&&acf[i]<acf[i-1]&&acf[i]<=acf[i+1]){firstMin=i+1;break;}}
-  if(firstMin){for(let i=firstMin;i<acf.length-1;i++){if(acf[i]>acf[i-1]&&acf[i]>=acf[i+1]){Tu=Math.min(25,Math.max(3,(i+1)*2));break;}}}
+  for(let i=1;i<acfErr.length-1;i++){if(firstMin===null&&acfErr[i]<acfErr[i-1]&&acfErr[i]<=acfErr[i+1]){firstMin=i+1;break;}}
+  if(firstMin){for(let i=firstMin;i<acfErr.length-1;i++){if(acfErr[i]>acfErr[i-1]&&acfErr[i]>=acfErr[i+1]){Tu=Math.min(25,Math.max(3,(i+1)*2));break;}}}
   const conf_Tu=firstMin?0.65:0.45;
-  const tau=1.0;
-  const lam=Math.max(2*theta,0.6*Tu,3.0);
+
+  // ── 3. LEVEL — integrating process, separate tuning formula ───────────
+  if(lt==='level'){
+    // Ki = slope of dPV/dt vs OP deviation
+    const dpv=pv.slice(1).map((v,i)=>v-pv[i]);
+    const opDev=op.map(v=>v-mn(op));
+    const validPairs=dpv.map((d,i)=>({d,o:opDev[i]})).filter(({o})=>Math.abs(o)>2);
+    const Ki=validPairs.length>=10
+      ? Math.max(0.001, Math.abs(med(validPairs.map(({d,o})=>d/o))))
+      : 0.01;
+    const lam=Math.max(3*theta, 5.0);
+    const Kp_new=rnd(1/(Ki*lam**2),4);
+    const Ti_new=rnd(2*lam,2);
+    // reverse-engineer current Kp
+    const kps=[];
+    for(let i=5;i<N-1;i++){const de=err[i]-err[i-1];const dop=op[i]-op[i-1];if(Math.abs(de)>1){const k=dop/de;if(Math.abs(k)>0.005&&Math.abs(k)<5)kps.push(Math.abs(k));}}
+    const Kp_old=kps.length?rnd(med(kps),4):rnd(Kp_new*1.6,4);
+    const Ti_old=rnd(Tu/1.2,2);
+    // simulate with nominal tau for chart
+    const tau_sim=5.0;
+    const K_sim=Ki;
+    const {pvs:pvb,ops:opb}=simLoop(pv,op,sp,N,Kp_old,Ti_old,K_sim,theta,tau_sim,false);
+    const {pvs:pva,ops:opa}=simLoop(pv,op,sp,N,Kp_new,Ti_new,K_sim,theta,tau_sim,true);
+    const iae_b=pvb.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
+    const iae_a=pva.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
+    return{K:rnd(Ki,4),K_method:'integrating',tau:null,tau_method:'n/a',tau_conf:0,
+      theta:rnd(theta,1),Tu,conf_Tu,lambda:rnd(lam,2),
+      Kp_old,Ti_old,Kp_new,Ti_new,
+      Ki_old:rnd(Kp_old/Ti_old,4),Ki_new:rnd(Kp_new/Ti_new,4),
+      r2_K:0,conf_K:0.4,isIntegrating:true,
+      pv_b:pvb,op_b:opb,pv_a:pva,op_a:opa,
+      iae_b:Math.round(iae_b),iae_a:Math.round(iae_a),
+      iae_pct:Math.max(0,rnd((1-iae_a/iae_b)*100,1)),
+      op_std_b:rnd(std(opb),4),op_std_a:rnd(std(opa),4),
+      op_wear_pct:rnd((1-std(opa)/std(opb))*100,1),
+      pv_std:rnd(std(pv),3)};
+  }
+
+  // ── 4. K — process gain ───────────────────────────────────────────────
+  // Method A: step-based ΔPV/ΔOP (most accurate)
+  let K=null, K_method='ols';
+  const steps=[];
+  for(let i=2;i<op.length-2;i++){
+    const dop=op[i]-op[i-1];
+    if(Math.abs(dop)>=3){
+      const prevStd=std(op.slice(Math.max(0,i-5),i));
+      if(prevStd<1.5) steps.push({idx:i,dop});
+    }
+  }
+  if(steps.length>=2){
+    const gains=[];
+    steps.forEach(({idx,dop})=>{
+      const delay=Math.max(1,Math.round(theta));
+      const pvBefore=mn(pv.slice(Math.max(0,idx-5),idx));
+      const endIdx=Math.min(N-1,idx+delay+Math.min(60,Math.floor(N/8)));
+      if(endIdx<=idx+delay) return;
+      const pvAfter=mn(pv.slice(endIdx-3,endIdx+1));
+      const dpv=pvAfter-pvBefore;
+      if(Math.abs(dop)>0.5) gains.push(Math.abs(dpv/dop));
+    });
+    if(gains.length>=2){K=rnd(med(gains),3);K_method='step_dPVdOP';}
+  }
+  // Method B: windowed OLS of PV~OP (fallback)
+  if(!K||K<0.05){
+    const win=Math.min(120,Math.floor(N/8));
+    const xs=[],ys=[];
+    for(let i=0;i<N-win;i+=Math.floor(win/2)){xs.push(mn(op.slice(i,i+win)));ys.push(mn(pv.slice(i,i+win)));}
+    const xm2=mn(xs),ym2=mn(ys);
+    const num=xs.reduce((s,x,i)=>s+(x-xm2)*(ys[i]-ym2),0);
+    const den=xs.reduce((s,x)=>s+(x-xm2)**2,0);
+    K=Math.max(0.1, Math.abs(Math.abs(den)>1e-6?num/den:1.0));
+    K_method='windowed_ols';
+  }
+
+  // R² confidence for K
+  const win2=Math.min(120,Math.floor(N/8));
+  const xs2=[],ys2=[];
+  for(let i=0;i<N-win2;i+=Math.floor(win2/2)){xs2.push(mn(op.slice(i,i+win2)));ys2.push(mn(pv.slice(i,i+win2)));}
+  const xm3=mn(xs2),ym3=mn(ys2);
+  const ss_r=xs2.reduce((s,x,i)=>s+(ys2[i]-(K*(x-xm3)+ym3))**2,0);
+  const ss_t=ys2.reduce((s,y)=>s+(y-ym3)**2,0);
+  const r2_K=ss_t>0?rnd(1-ss_r/ss_t,2):0;
+  const conf_K=rnd(Math.max(0.4,Math.min(0.97,0.3+r2_K*0.7)),2);
+
+  // ── 5. τ — time constant, per loop type ──────────────────────────────
+  let tau=null, tau_method='fallback', tau_conf=0.35;
+
+  // Try step-based 63.2% method first (works for all self-regulating types)
+  if(steps.length>=1){
+    const taus=[];
+    steps.forEach(({idx,dop})=>{
+      const delay=Math.max(1,Math.round(theta));
+      const startIdx=idx+delay;
+      const pvBefore=mn(pv.slice(Math.max(0,idx-5),idx));
+      const endIdx=Math.min(N-1,startIdx+Math.min(120,Math.floor(N/6)));
+      if(endIdx<=startIdx) return;
+      const pvFinal=mn(pv.slice(endIdx-3,endIdx+1));
+      const deltaPV=pvFinal-pvBefore;
+      if(Math.abs(deltaPV)<0.1) return;
+      const target=pvBefore+0.632*deltaPV;
+      for(let j=startIdx;j<endIdx;j++){
+        if((dop>0&&pv[j]>=target)||(dop<0&&pv[j]<=target)){
+          const t=j-startIdx;
+          if(t>0) taus.push(t);
+          break;
+        }
+      }
+    });
+    if(taus.length>=1){
+      tau=rnd(Math.max(0.5,med(taus)),1);
+      tau_method='step_63pct';
+      tau_conf=lt==='temperature'?0.65:0.80;
+    }
+  }
+
+  // ACF decay fallback — reliable for fast loops (flow/pressure)
+  if(!tau&&(lt==='flow'||lt==='pressure')){
+    const acf1=computeACF1(pv);
+    if(acf1>0.05&&acf1<0.999){
+      tau=rnd(Math.max(0.5,-1/Math.log(acf1)),1);
+      tau_method='acf_decay';
+      tau_conf=0.60;
+    }
+  }
+
+  // Variance ratio fallback — last resort
+  if(!tau){
+    const dpv=pv.slice(1).map((v,i)=>v-pv[i]);
+    const s_dpv=std(dpv)||1;
+    tau=rnd(Math.max(0.5,std(pv)/s_dpv),1);
+    tau_method='variance_ratio';
+    tau_conf=0.35;
+  }
+
+  // Apply loop-type sanity bounds
+  if(lt==='temperature') tau=rnd(Math.max(tau,5),1);
+  else if(lt==='flow')    tau=rnd(Math.min(tau,20),1);
+  else if(lt==='pressure')tau=rnd(Math.min(tau,30),1);
+
+  // ── 6. λ — IMC filter time constant ──────────────────────────────────
+  const lam=rnd(Math.max(2*theta, 0.6*Tu, tau*0.5, 3.0),2);
+
+  // ── 7. Kp_new and Ti_new — IMC-PI formula ─────────────────────────────
+  // Kp = τ / (K × (λ + θ))
+  // Ti = clamp(τ, 0.5τ, 4(λ+θ))
   const Kp_new=rnd(tau/(K*(lam+theta)),4);
-  const Ti_new=rnd(Math.max(2.0,Math.min(tau,4*(lam+theta))),2);
+  const Ti_new=rnd(Math.max(0.5*tau, Math.min(tau, 4*(lam+theta))),2);
+
+  // ── 8. Kp_old — reverse-engineer from ΔOP/Δerror ─────────────────────
   const kps=[];
-  for(let i=5;i<N-1;i++){const de=err[i]-err[i-1];const dop=op[i]-op[i-1];if(Math.abs(de)>1){const k=dop/de;if(Math.abs(k)>0.005&&Math.abs(k)<5)kps.push(Math.abs(k));}}
+  for(let i=5;i<N-1;i++){
+    const de=err[i]-err[i-1];
+    const dop=op[i]-op[i-1];
+    if(Math.abs(de)>1){const k=dop/de;if(Math.abs(k)>0.005&&Math.abs(k)<5)kps.push(Math.abs(k));}
+  }
   const Kp_old=kps.length?rnd(med(kps),4):rnd(Kp_new*1.6,4);
   const Ti_old=rnd(Tu/1.2,2);
+
+  // ── 9. Simulate for IAE/chart comparison ─────────────────────────────
+  const {pvs:pvb,ops:opb}=simLoop(pv,op,sp,N,Kp_old,Ti_old,K,theta,tau,false);
+  const {pvs:pva,ops:opa}=simLoop(pv,op,sp,N,Kp_new,Ti_new,K,theta,tau,true);
+  const iae_b=pvb.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
+  const iae_a=pva.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
+
+  return{
+    K:rnd(K,3), K_method,
+    tau, tau_method, tau_conf,
+    theta:rnd(theta,1),
+    Tu, conf_Tu,
+    lambda:rnd(lam,2),
+    Kp_old, Ti_old, Kp_new, Ti_new,
+    Ki_old:rnd(Kp_old/(Ti_old||1),4),
+    Ki_new:rnd(Kp_new/(Ti_new||1),4),
+    r2_K, conf_K,
+    isIntegrating:false,
+    pv_b:pvb, op_b:opb, pv_a:pva, op_a:opa,
+    iae_b:Math.round(iae_b), iae_a:Math.round(iae_a),
+    iae_pct:Math.max(0,rnd((1-iae_a/iae_b)*100,1)),
+    op_std_b:rnd(std(opb),4), op_std_a:rnd(std(opa),4),
+    op_wear_pct:rnd((1-std(opa)/(std(opb)||1))*100,1),
+    pv_std:rnd(std(pv),3)
+  };
+}
+
+// ── Shared simulation function ────────────────────────────────────────────────
+function simLoop(pv,op,sp,N,Kp,Ti,K,theta,tau,antiWindup){
   const opRef=mn(op.slice(0,30)),spRef=mn(sp.slice(0,30));
-  function sim(Kp,Ti,aw){
-    let seed=42;
-    const rng=()=>{seed^=seed<<13;seed^=seed>>17;seed^=seed<<5;return(seed>>>0)/4294967296;};
-    const delay=Math.max(1,Math.round(theta));
-    const buf=new Array(delay+4).fill(0);
-    let x=0,integ=0;
-    const pvs=[],ops=[];
-    const pvStd=std(pv.slice(0,30))||1;
-    for(let k=0;k<N;k++){
-      const dopd=buf[0];x=x+(1/tau)*(K*dopd-x);
-      const pvk=spRef+x+pvStd*(rng()-0.5)*2;
-      const ek=sp[k]-pvk;integ+=ek;
-      const dopR=Kp*ek+(Kp/Ti)*integ;
-      const opA=Math.max(0,Math.min(100,opRef+dopR));
-      const dopS=opA-opRef;
-      if(aw&&Math.abs(dopS-dopR)>0.01)integ+=0.8*(dopS-dopR)*Ti/Kp;
-      buf.push(dopS);buf.shift();pvs.push(pvk);ops.push(opA);
-    }
-    return{pvs,ops};
+  let seed=42;
+  const rng=()=>{seed^=seed<<13;seed^=seed>>17;seed^=seed<<5;return(seed>>>0)/4294967296;};
+  const delay=Math.max(1,Math.round(theta));
+  const buf=new Array(delay+4).fill(0);
+  let x=0,integ=0;
+  const pvs=[],ops=[];
+  const pvStd=std(pv.slice(0,30))||1;
+  const tauEff=Math.max(0.1,tau);
+  for(let k=0;k<N;k++){
+    const dopd=buf[0];x=x+(1/tauEff)*(K*dopd-x);
+    const pvk=spRef+x+pvStd*(rng()-0.5)*2;
+    const ek=sp[k]-pvk;integ+=ek;
+    const dopR=Kp*ek+(Kp/Ti)*integ;
+    const opA=Math.max(0,Math.min(100,opRef+dopR));
+    const dopS=opA-opRef;
+    if(antiWindup&&Math.abs(dopS-dopR)>0.01)integ+=0.8*(dopS-dopR)*Ti/Kp;
+    buf.push(dopS);buf.shift();pvs.push(pvk);ops.push(opA);
   }
-  const B=sim(Kp_old,Ti_old,false);
-  const A=sim(Kp_new,Ti_new,true);
-  const iae_b=B.pvs.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
-  const iae_a=A.pvs.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
-  const iae_pct=Math.max(0,rnd((1-iae_a/iae_b)*100,1));
-  const op_std_b=rnd(std(B.ops),4);
-  const op_std_a=rnd(std(A.ops),4);
-  const op_wear_pct=rnd((1-op_std_a/op_std_b)*100,1);
-  const pv_std=rnd(std(pv),3);
-  return{K:rnd(K,2),r2_K,conf_K:rnd(conf_K,2),theta:rnd(theta,1),tau,Tu,conf_Tu,lambda:rnd(lam,2),Kp_old,Ti_old,Kp_new,Ti_new,pv_b:B.pvs,op_b:B.ops,pv_a:A.pvs,op_a:A.ops,iae_b:Math.round(iae_b),iae_a:Math.round(iae_a),iae_pct,op_std_b,op_std_a,op_wear_pct,pv_std};
+  return{pvs,ops};
 }
 
 function populate(){
@@ -543,13 +719,21 @@ function populate(){
   }
   const confKPct=Math.round(M.conf_K*100);
   const confTuPct=Math.round(M.conf_Tu*100);
-  s('kpi-K',M.K);s('kpi-theta',M.theta+' min');s('kpi-tau',M.tau+' min');s('kpi-Tu',M.Tu+' min');
+  s('kpi-K',M.K);s('kpi-theta',M.theta+' min');
+  s('kpi-tau', M.tau!==null ? M.tau+' min ('+M.tau_method+')' : 'N/A — integrating');
+  s('kpi-Tu',M.Tu+' min');
   // K confidence
   document.getElementById('k-badge').textContent=M.conf_K>0.7?'High':M.conf_K>0.5?'Medium':'Low';
   document.getElementById('k-badge').className='mp-badge '+(M.conf_K>0.7?'sb-ok':M.conf_K>0.5?'sb-warn':'sb-lo');
   document.getElementById('kconf-fill').style.width=confKPct+'%';
   document.getElementById('kconf-fill').style.background=M.conf_K>0.7?'var(--ok)':M.conf_K>0.5?'var(--warn)':'var(--crit)';
   document.getElementById('kconf-pct').textContent=confKPct+'%';
+  // τ confidence
+  const confTauPct=Math.round((M.tau_conf||0)*100);
+  document.getElementById('tau-badge').textContent=M.tau_conf>0.7?'High':M.tau_conf>0.5?'Med':'Low';
+  document.getElementById('tau-badge').className='mp-badge '+(M.tau_conf>0.7?'sb-ok':M.tau_conf>0.5?'sb-warn':'sb-lo');
+  document.getElementById('tauconf-fill').style.width=confTauPct+'%';
+  document.getElementById('tauconf-pct').textContent=confTauPct+'%';
   // Tu confidence
   document.getElementById('tu-badge').textContent=M.conf_Tu>0.6?'High':'Medium';
   document.getElementById('tu-badge').className='mp-badge '+(M.conf_Tu>0.6?'sb-ok':'sb-warn');
@@ -565,16 +749,18 @@ function populate(){
   s('cmp-ti-why',M.Ti_new>M.Ti_old?'Slower reset \u2014 reduces integral windup':'Faster reset \u2014 tighter SP tracking');
   s('cmp-lam-new',M.lambda+' min');
   const outcomes=[
-    ['IAE (total error)',M.iae_b.toLocaleString(),M.iae_a.toLocaleString(),'\u2212'+M.iae_pct+'%','Less deviation from setpoint'],
-    ['OP activity \u03c3',M.op_std_b+'%',M.op_std_a+'%','\u2212'+M.op_wear_pct+'%','Reduced valve wear'],
-    ['PV noise \u03c3',M.pv_std,'~'+M.pv_std,'Unchanged','Noise floor is a plant property'],
+    ['IAE (total error)','Integrated Absolute Error: total area between PV and SP over time. Lower = better setpoint tracking.',M.iae_b.toLocaleString(),M.iae_a.toLocaleString(),'\u2212'+M.iae_pct+'%','Less deviation from setpoint'],
+    ['OP activity \u03c3','Standard deviation of controller output. Lower = less valve movement = reduced mechanical wear.',M.op_std_b+'%',M.op_std_a+'%','\u2212'+M.op_wear_pct+'%','Reduced valve wear'],
+    ['PV noise \u03c3','Standard deviation of process variable. This is a plant/sensor property — tuning cannot reduce it.',M.pv_std,'~'+M.pv_std,'Unchanged','Noise floor is a plant property'],
   ];
-  document.getElementById('outcome-rows').innerHTML=outcomes.map(([nm,bv,av,pct,why])=>`
+  document.getElementById('outcome-rows').innerHTML=outcomes.map(([nm,tip,bv,av,pct,why])=>`
     <tr>
-      <td style="font-size:11px;color:var(--text2);font-weight:600">${nm}<div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">${why}</div></td>
+      <td style="font-size:11px;color:var(--text2);font-weight:600">${nm} <span class="ibt" data-tip="${tip}">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">${why}</div></td>
       <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--crit)">${bv}</td>
       <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--ok)">${av}</td>
+      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text4)" class="user-opt-col">—</td>
       <td style="text-align:center;font-size:11px;font-weight:700;color:var(--ok);font-family:'IBM Plex Mono',monospace">${pct}</td>
+      <td style="text-align:center;font-size:11px;font-weight:700;color:var(--text4);font-family:'IBM Plex Mono',monospace" class="user-diff-col">—</td>
     </tr>`).join('');
   const actions=[
     ['r','\u26a0',`<b>Set Kp = ${M.Kp_new}</b>`,` (current estimated: ${M.Kp_old}) \u2014 reduce proportional gain to eliminate oscillation`],
@@ -601,9 +787,30 @@ function populate(){
     });
 }
 
+let USER_OPT=null;
+function switchOvlMode(mode){
+  if(mode==='user'&&!USER_OPT){showToast('Run validation first to get User Optimised values.');return;}
+  const isAuto=mode==='auto';
+  document.getElementById('btn-auto-opt').style.background=isAuto?'#dbeafe':'var(--bg2)';
+  document.getElementById('btn-auto-opt').style.color=isAuto?'#1d4ed8':'var(--text3)';
+  document.getElementById('btn-auto-opt').style.borderColor=isAuto?'var(--blue)':'var(--border)';
+  document.getElementById('btn-user-opt').style.background=!isAuto?'#dbeafe':'var(--bg2)';
+  document.getElementById('btn-user-opt').style.color=!isAuto?'#1d4ed8':'var(--text3)';
+  document.getElementById('btn-user-opt').style.borderColor=!isAuto?'var(--blue)':'var(--border)';
+  if(ovlChart){
+    ovlChart.data.datasets[2].data=isAuto?M.pv_a:USER_OPT.pv_a;
+    ovlChart.data.datasets[2].label=isAuto?'PV Optimised':'PV Optimised (User)';
+    ovlChart.data.datasets[4].data=isAuto?M.op_a:USER_OPT.op_a;
+    ovlChart.data.datasets[4].label=isAuto?'OP Optimised':'OP Optimised (User)';
+    ovlChart.update();
+  }
+}
+
 function buildOvl(){
   if(!D||!M)return;
   if(ovlChart){ovlChart.destroy();ovlChart=null;}
+  // reset legend state when rebuilding
+  document.querySelectorAll('#ovl-legend .chart-legend-item').forEach(el=>el.classList.remove('hidden'));
   const ctx=document.getElementById('ovl-cv').getContext('2d');
   const gc='rgba(216,226,236,.5)',tc='rgba(107,130,153,.8)';
   ovlChart=new Chart(ctx,{
@@ -622,9 +829,9 @@ function buildOvl(){
       animation:false,responsive:true,maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       plugins:{
-        legend:{display:false},
-        tooltip:{backgroundColor:'#1a2035',titleColor:'rgba(255,255,255,.5)',bodyColor:'#e2e8f0',borderColor:'#2d3555',borderWidth:1,padding:8},
-        zoom:{pan:{enabled:true,mode:'x',modifierKey:'ctrl'},zoom:{drag:{enabled:true,backgroundColor:'rgba(46,134,222,.07)',borderColor:'#2e86de',borderWidth:1},wheel:{enabled:true,speed:.08},mode:'x'}}
+      legend:{display:false},
+      tooltip:{backgroundColor:'#1a2035',titleColor:'rgba(255,255,255,.5)',bodyColor:'#e2e8f0',borderColor:'#2d3555',borderWidth:1,padding:8},
+      zoom:{pan:{enabled:true,mode:'x',modifierKey:'ctrl'},zoom:{drag:{enabled:true,backgroundColor:'rgba(46,134,222,.07)',borderColor:'#2e86de',borderWidth:1},wheel:{enabled:true,speed:.08},mode:'x'}}
       },
       scales:{
         x:{ticks:{color:tc,font:{size:9},maxTicksLimit:12},grid:{color:gc}},
@@ -633,6 +840,20 @@ function buildOvl(){
       }
     }
   });
+}
+
+// Legend click toggle — maps legend data-idx to chart dataset index
+// Legend order: 0=PV Actual, 1=PV Optimised, 2=SP, 3=OP Actual, 4=OP Optimised
+// Chart dataset order: 0=SP, 1=PV Actual, 2=PV Opt, 3=OP Actual, 4=OP Opt
+const OVL_IDX_MAP=[1,2,0,3,4];
+function toggleOvlSeries(legendIdx){
+  if(!ovlChart)return;
+  const dsIdx=OVL_IDX_MAP[legendIdx];
+  const meta=ovlChart.getDatasetMeta(dsIdx);
+  meta.hidden=!meta.hidden;
+  ovlChart.update();
+  const item=document.querySelector('#ovl-legend .chart-legend-item[data-idx="'+legendIdx+'"]');
+  if(item)item.classList.toggle('hidden',meta.hidden);
 }
 
 function calcK(pvS,opS,spS){
@@ -733,6 +954,29 @@ function runHoldout(){
       <td style="color:var(--text4)">${origLam}</td>
     </tr>
   `;
+  // ── Re-simulate OVL chart using validation K (full IMC formula)
+  const valK=rV.K;
+  const valKp=rnd(M.tau/(valK*(M.lambda+M.theta)),4);
+  const valTi=rnd(Math.max(0.5*M.tau,Math.min(M.tau,4*(M.lambda+M.theta))),2);
+  const {pvs:pva_val,ops:opa_val}=simLoop(D.pv,D.op,D.sp,D.pv.length,valKp,valTi,valK,M.theta,M.tau,true);
+  const iae_user=Math.round(pva_val.reduce((s,v,i)=>s+Math.abs(v-D.sp[i]),0));
+  const op_std_user=rnd(std(opa_val),2);
+  USER_OPT={pv_a:pva_val,op_a:opa_val,Kp:valKp,Ti:valTi,K:valK,iae:iae_user,op_std:op_std_user};
+  // populate User Optimised column in outcome table
+  const userVals=[iae_user.toLocaleString(), op_std_user+'%', '~'+M.pv_std];
+  const userDiffs=[
+    '\u2212'+Math.max(0,rnd((1-iae_user/M.iae_b)*100,1))+'%',
+    '\u2212'+Math.max(0,rnd((1-op_std_user/(parseFloat(M.op_std_b)||1))*100,1))+'%',
+    'Unchanged'
+  ];
+  document.querySelectorAll('#outcome-rows tr').forEach((tr,i)=>{
+    const valCell=tr.querySelector('.user-opt-col');
+    if(valCell&&userVals[i]!==undefined){valCell.textContent=userVals[i];valCell.style.color='var(--blue)';}
+    const diffCell=tr.querySelector('.user-diff-col');
+    if(diffCell&&userDiffs[i]!==undefined){diffCell.textContent=userDiffs[i];diffCell.style.color='var(--blue)';}
+  });
+  // switch chart to user optimised and highlight button
+  switchOvlMode('user');
 }
 
 async function saveRec(){
