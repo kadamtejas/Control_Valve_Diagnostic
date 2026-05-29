@@ -84,6 +84,17 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .overlay-sub{font-size:12px;color:var(--text3)}
 .err-box{background:var(--crit-bg);border:1px solid var(--crit-border);border-radius:8px;padding:12px 16px;color:var(--crit);font-size:13px;font-weight:500;margin-top:14px;display:none}
 .err-box.show{display:block}
+/* ── EXCLUSION TAB ── */
+.excl-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;font-weight:600;cursor:grab;user-select:none;transition:all .15s;white-space:nowrap}
+.excl-chip:hover{background:#dbeafe;box-shadow:0 2px 6px rgba(46,134,222,.2)}
+.excl-chip.dragging{opacity:.4;cursor:grabbing}
+.excl-remove{font-size:13px;line-height:1;color:#93c5fd;cursor:pointer;margin-left:2px}
+.excl-remove:hover{color:#1d4ed8}
+.excl-problem{border:1px solid var(--border2);border-radius:8px;background:var(--surface);overflow:hidden;margin-bottom:2px}
+.excl-problem-hdr{padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--navy)}
+.excl-drop-zone{min-height:38px;padding:7px 10px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;transition:background .15s}
+.excl-drop-zone.drag-over{background:#eff6ff;outline:2px dashed #93c5fd;outline-offset:-2px;border-radius:0 0 8px 8px}
+.excl-placeholder{font-size:10px;color:var(--text4);font-style:italic}
 </style>
 </head>
 <body>
@@ -105,6 +116,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
   <div class="snav-tab active" onclick="switchTab('thresholds',this)">📊 Thresholds <span class="changed-count" id="changedCount"></span></div>
   <div class="snav-tab" onclick="switchTab('methods',this)">🔬 Diagnostic Methods</div>
   <div class="snav-tab" onclick="switchTab('modes',this)">🔀 Mode Mapping</div>
+  <div class="snav-tab" onclick="switchTab('exclusions',this)">🚫 Detection Exclusions</div>
   <div class="snav-sep"></div>
   <div style="display:flex;align-items:center;gap:8px;padding:0 4px">
     <button class="btn-reset" onclick="resetToDefaults()">↺ Reset</button>
@@ -148,6 +160,24 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
     </div>
   </div>
 
+
+  <div class="tab-pane" id="pane-exclusions">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#fef3e2">🚫</div>
+        <div><div class="card-title">Detection Exclusions</div><div class="card-sub">Drag loop names onto a problem to exclude those loops from that specific detection. Changes take effect on re-run.</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:220px 1fr;min-height:420px">
+        <div style="border-right:1px solid var(--border2);padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--bg2)">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);margin-bottom:4px">Available Loops</div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:6px">Drag loops to problems →</div>
+          <div id="excl-loop-pool" style="display:flex;flex-direction:column;gap:5px"></div>
+        </div>
+        <div style="padding:14px;display:flex;flex-direction:column;gap:10px" id="excl-problems"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="err-box" id="errBox"></div>
 
 </div>
@@ -162,21 +192,41 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 
 <script>
 let CONFIG=null,DEFAULTS=null;
+let EXCL={};
+let ALL_LOOPS=[];
+
+const PROBLEMS=[
+  {id:'stiction',label:'Stiction',icon:'🔧'},
+  {id:'aggressive_tuning',label:'Aggressive Tuning',icon:'⚡'},
+  {id:'sluggish_tuning',label:'Sluggish Tuning',icon:'🐢'},
+  {id:'external_oscillation',label:'External Oscillation',icon:'〰️'},
+  {id:'cross_loop_propagation',label:'Cross-loop Propagation',icon:'🔗'},
+  {id:'sensor_noise',label:'Sensor Noise',icon:'📡'},
+  {id:'manual_mode',label:'Manual Mode',icon:'🖐️'},
+  {id:'valve_wear',label:'Valve Wear',icon:'⚙️'},
+];
 
 function switchTab(id,el){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.snav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('pane-'+id).classList.add('active');
   el.classList.add('active');
+  if(id==='exclusions') renderExclusions();
 }
 
 async function loadConfig(){
   const res=await fetch('/api/config');
   CONFIG=await res.json();
   DEFAULTS=JSON.parse(JSON.stringify(CONFIG));
+  if(CONFIG.detection_exclusions) EXCL=CONFIG.detection_exclusions;
   renderDiagConfig();
   renderDiagSelection();
   renderModeMapping();
+  try{
+    const r=await fetch('/api/latest');
+    const data=await r.json();
+    ALL_LOOPS=(data.loops||[]).map(l=>l.loop||l.loop_tag||l.name||l).filter(x=>typeof x==='string');
+  }catch(e){ALL_LOOPS=[];}
 }
 
 function renderDiagConfig(){
@@ -220,11 +270,82 @@ function renderModeMapping(){
     </div>`).join('');
 }
 
+function renderExclusions(){
+  const excluded=new Set(Object.values(EXCL).flat());
+  const pool=document.getElementById('excl-loop-pool');
+  const available=ALL_LOOPS.filter(l=>!excluded.has(l));
+  pool.innerHTML=available.length
+    ? available.map(l=>chipHTML(l,'pool','')).join('')
+    : '<span style="font-size:10px;color:var(--text4);font-style:italic">All loops assigned</span>';
+  document.getElementById('excl-problems').innerHTML=PROBLEMS.map(p=>`
+    <div class="excl-problem">
+      <div class="excl-problem-hdr">${p.icon} ${p.label}
+        <span style="font-size:9px;color:var(--text4);font-weight:400;margin-left:4px">drag loops here to exclude</span>
+      </div>
+      <div class="excl-drop-zone" id="dz-${p.id}" data-problem="${p.id}">
+        ${(EXCL[p.id]||[]).length
+          ? (EXCL[p.id]).map(l=>chipHTML(l,'zone',p.id)).join('')
+          : '<span class="excl-placeholder">No exclusions — all loops analysed</span>'}
+      </div>
+    </div>`).join('');
+  attachDragEvents();
+  document.querySelectorAll('.excl-drop-zone').forEach(attachDropZone);
+  const poolEl=document.getElementById('excl-loop-pool');
+  poolEl.addEventListener('dragover',e=>{e.preventDefault();poolEl.style.outline='2px dashed #93c5fd';});
+  poolEl.addEventListener('dragleave',()=>poolEl.style.outline='');
+  poolEl.addEventListener('drop',e=>{
+    e.preventDefault();poolEl.style.outline='';
+    const loop=e.dataTransfer.getData('loop');
+    const from=e.dataTransfer.getData('fromProblem');
+    if(from&&EXCL[from]) EXCL[from]=EXCL[from].filter(l=>l!==loop);
+    renderExclusions();
+  });
+}
+
+function chipHTML(loop,source,problemId){
+  return `<span class="excl-chip" draggable="true" data-loop="${loop}" data-source="${source}" data-problem="${problemId}">${loop}${source==='zone'?`<span class="excl-remove" onclick="removeExcl('${problemId}','${loop}',event)">×</span>`:''}</span>`;
+}
+
+function attachDragEvents(){
+  document.querySelectorAll('.excl-chip').forEach(chip=>{
+    chip.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('loop',chip.dataset.loop);
+      e.dataTransfer.setData('fromProblem',chip.dataset.problem||'');
+      setTimeout(()=>chip.classList.add('dragging'),0);
+    });
+    chip.addEventListener('dragend',()=>chip.classList.remove('dragging'));
+  });
+}
+
+function attachDropZone(zone){
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+  zone.addEventListener('drop',e=>{
+    e.preventDefault();zone.classList.remove('drag-over');
+    const loop=e.dataTransfer.getData('loop');
+    const from=e.dataTransfer.getData('fromProblem');
+    const to=zone.dataset.problem;
+    if(!loop||!to) return;
+    if(from&&from!==to&&EXCL[from]) EXCL[from]=EXCL[from].filter(l=>l!==loop);
+    if(!EXCL[to]) EXCL[to]=[];
+    if(!EXCL[to].includes(loop)) EXCL[to].push(loop);
+    renderExclusions();
+  });
+}
+
+function removeExcl(problemId,loop,e){
+  e.stopPropagation();
+  if(EXCL[problemId]) EXCL[problemId]=EXCL[problemId].filter(l=>l!==loop);
+  renderExclusions();
+}
+
 function resetToDefaults(){
   CONFIG=JSON.parse(JSON.stringify(DEFAULTS));
+  EXCL={};
   renderDiagConfig();
   renderDiagSelection();
   document.getElementById('changedCount').classList.remove('show');
+  if(document.getElementById('pane-exclusions').classList.contains('active')) renderExclusions();
 }
 
 async function runDiagnostics(){
@@ -232,6 +353,7 @@ async function runDiagnostics(){
   const err=document.getElementById('errBox');
   const overlay=document.getElementById('overlay');
   btn.disabled=true;err.classList.remove('show');overlay.classList.add('show');
+  CONFIG.detection_exclusions=EXCL;
   try{
     const res=await fetch('/api/config/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(CONFIG)});
     const data=await res.json();

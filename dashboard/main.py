@@ -232,6 +232,38 @@ def _write_config_to_excel(input_path: Path, config: dict):
             ws.cell(i, 1, row["category"])
             ws.cell(i, 2, row["value"])
 
+    # DETECTION_EXCLUSIONS — write {problem_id: [loop1, loop2, ...]} as a flat table
+    excl = config.get("detection_exclusions", {})
+    sheet_name = "DETECTION_EXCLUSIONS"
+    if sheet_name in wb.sheetnames:
+        del wb[sheet_name]
+    if excl:
+        ws = wb.create_sheet(sheet_name)
+        ws.cell(1, 1, "Problem");  ws.cell(1, 2, "Loop")
+        row_idx = 2
+        for problem_id, loops in excl.items():
+            for loop in loops:
+                ws.cell(row_idx, 1, problem_id)
+                ws.cell(row_idx, 2, loop)
+                row_idx += 1
+
+    # UNIT_MAPPING — write {tag: unit} + {tag: uom} to sheet
+    unit_mapping = config.get("unit_mapping", {})
+    uom_mapping  = config.get("uom_mapping", {})
+    if unit_mapping:
+        sheet_name = "UNIT_MAPPING"
+        if sheet_name in wb.sheetnames:
+            ws = wb[sheet_name]
+            for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+                for cell in row: cell.value = None
+        else:
+            ws = wb.create_sheet(sheet_name)
+            ws.cell(1, 1, "Tag"); ws.cell(1, 2, "Unit"); ws.cell(1, 3, "UOM")
+        for i, (tag, unit) in enumerate(unit_mapping.items(), start=2):
+            ws.cell(i, 1, str(tag).strip())
+            ws.cell(i, 2, str(unit).strip())
+            ws.cell(i, 3, str(uom_mapping.get(tag, '')).strip())
+
     wb.save(str(input_path))
 
 
@@ -307,6 +339,10 @@ async def upload_file(
 
     # ── Load default/user config and write it into the Excel
     config = _load_config(current_user["sub"])
+    # Clear unit/uom mapping so next GET re-seeds from the new file's Excel
+    config.pop("unit_mapping", None)
+    config.pop("uom_mapping", None)
+    _save_config(current_user["sub"], config)
     try:
         _write_config_to_excel(dest_path, config)
     except Exception:
@@ -518,7 +554,7 @@ def _get_user_results_dir(current_user: dict) -> str:
 async def get_latest(current_user: dict = Depends(get_current_user)):
     rd = _get_user_results_dir(current_user)
     try:
-        data = read_dashboard_data(rd)
+        data = read_dashboard_data(rd, base_dir=str(BASE_DIR))
         data["is_custom_config"] = _is_custom_config(current_user["sub"])
         return JSONResponse(content=data)
     except FileNotFoundError as e:
@@ -580,8 +616,30 @@ async def get_loop_names(current_user: dict = Depends(get_current_user)):
 @app.get("/api/unit-mapping")
 async def get_unit_mapping(current_user: dict = Depends(get_current_user)):
     rd = _get_user_results_dir(current_user)
-    data = read_unit_mapping(rd, str(BASE_DIR))
-    return JSONResponse(content=data)
+    config = _load_config(current_user["sub"])
+    needs_save = False
+
+    # If unit_mapping not in JSON yet, seed from Excel
+    if not config.get("unit_mapping"):
+        excel_data = read_unit_mapping(rd, str(BASE_DIR))
+        config["unit_mapping"] = excel_data.get("unit_map", {})
+        config["uom_mapping"]  = excel_data.get("uom_map", {})
+        needs_save = True
+
+    # If uom_mapping not in JSON yet, seed from Excel
+    if "uom_mapping" not in config:
+        excel_data = read_unit_mapping(rd, str(BASE_DIR))
+        config["uom_mapping"] = excel_data.get("uom_map", {})
+        needs_save = True
+
+    if needs_save:
+        _save_config(current_user["sub"], config)
+
+    return JSONResponse(content={
+        "unit_map": config.get("unit_mapping", {}),
+        "units":    sorted(set(config.get("unit_mapping", {}).values())),
+        "uom_map":  config.get("uom_mapping", {}),
+    })
 
 
 @app.post("/api/unit-mapping/save")
@@ -594,6 +652,7 @@ async def save_unit_mapping(request: Request, current_user: dict = Depends(get_c
     """
     body = await request.json()
     unit_mapping: dict = body.get("unit_mapping", {})
+    uom_mapping: dict = body.get("uom_mapping", {})
     if not isinstance(unit_mapping, dict):
         raise HTTPException(status_code=400, detail="unit_mapping must be an object.")
 
@@ -629,6 +688,7 @@ async def save_unit_mapping(request: Request, current_user: dict = Depends(get_c
         for i, (tag, unit) in enumerate(unit_mapping.items(), start=2):
             ws.cell(i, 1, str(tag).strip())
             ws.cell(i, 2, str(unit).strip())
+            ws.cell(i, 3, str(uom_mapping.get(tag, '')).strip())
 
         wb.save(str(input_path))
     except Exception as exc:

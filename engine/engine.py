@@ -15,7 +15,7 @@ from .input_loading import (
     load_clean_dataframe, detect_loops,
     load_config, load_unit_mapping,
     load_mode_mapping, _reset_mode_warnings,
-    load_diagnostic_selection,
+    load_diagnostic_selection, load_detection_exclusions,
 )
 from .time_context import detect_time_context
 from .data_quality import assess_data_quality, apply_mode_filter
@@ -54,6 +54,9 @@ def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True) -> d
         logger.warning(f"Diagnostic '{k}' DISABLED: {v}")
 
     selection = load_diagnostic_selection(input_path)
+    detection_exclusions = load_detection_exclusions(input_path)
+    if detection_exclusions:
+        logger.info(f"Detection exclusions loaded: { {k: list(v) for k, v in detection_exclusions.items()} }")
     mode_mapping = load_mode_mapping(input_path)
     _reset_mode_warnings()
 
@@ -112,7 +115,8 @@ def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True) -> d
                 sr = StictionResult()
 
             diag = diagnose_loop(metrics, sr, hi, osc_reg, osc_period, dq, sf,
-                                 capabilities, config, tc, selection)
+                                 capabilities, config, tc, selection,
+                                 detection_exclusions=detection_exclusions.get(name, set()))
             # Per-loop plot
             plot_path = os.path.join(plot_dir, f"{name}.png")
             try:

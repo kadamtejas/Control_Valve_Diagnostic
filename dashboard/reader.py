@@ -18,23 +18,26 @@ def read_unit_mapping(results_dir: str, base_dir: str) -> dict:
     stem = folder_name.removeprefix("results_").removesuffix("_manual")
     input_path = os.path.join(base_dir, f"{stem}.xlsx")
     if not os.path.exists(input_path):
-        return {"unit_map": {}, "units": []}
+        return {"unit_map": {}, "units": [], "uom_map": {}}
     try:
         wb = openpyxl.load_workbook(input_path, read_only=True, data_only=True)
         if "UNIT_MAPPING" not in wb.sheetnames:
             wb.close()
-            return {"unit_map": {}, "units": []}
+            return {"unit_map": {}, "units": [], "uom_map": {}}
         ws = wb["UNIT_MAPPING"]
         rows = list(ws.iter_rows(values_only=True))
         wb.close()
         unit_map = {}
+        uom_map = {}
         for row in rows[1:]:
             if row[0] and row[1]:
                 unit_map[str(row[0]).strip()] = str(row[1]).strip()
+            if row[0] and len(row) > 2 and row[2]:
+                uom_map[str(row[0]).strip()] = str(row[2]).strip()
         units = sorted(set(unit_map.values()))
-        return {"unit_map": unit_map, "units": units}
+        return {"unit_map": unit_map, "units": units, "uom_map": uom_map}
     except Exception:
-        return {"unit_map": {}, "units": []}
+        return {"unit_map": {}, "units": [], "uom_map": {}}
 
 
 def read_unit_mapping_as_list(results_dir: str, base_dir: str) -> list:
@@ -58,7 +61,100 @@ def find_latest_results_dir(base_dir: str) -> Optional[str]:
     return folders[0]
 
 
-def read_dashboard_data(results_dir: str) -> dict:
+def _read_detection_exclusions(base_dir: str, results_dir: str) -> dict:
+    """
+    Read DETECTION_EXCLUSIONS sheet from the original input Excel.
+    Returns {problem_id: set(loop_names)} e.g. {'stiction': {'LOOP_A', 'LOOP_B'}}
+    """
+    folder_name = os.path.basename(results_dir)
+    stem = folder_name.removeprefix("results_").removesuffix("_manual")
+    input_path = os.path.join(base_dir, f"{stem}.xlsx")
+    if not os.path.exists(input_path):
+        return {}
+    try:
+        wb = openpyxl.load_workbook(input_path, read_only=True, data_only=True)
+        if "DETECTION_EXCLUSIONS" not in wb.sheetnames:
+            wb.close()
+            return {}
+        ws = wb["DETECTION_EXCLUSIONS"]
+        rows = list(ws.iter_rows(values_only=True))
+        wb.close()
+        excl = {}
+        for row in rows[1:]:
+            if row[0] and row[1]:
+                pid = str(row[0]).strip()
+                loop = str(row[1]).strip()
+                if pid not in excl:
+                    excl[pid] = set()
+                excl[pid].add(loop)
+        return excl
+    except Exception:
+        return {}
+
+
+def _apply_detection_exclusions(loops: list, excl: dict) -> list:
+    """
+    For each loop, if its diagnosis matches an excluded problem for that loop,
+    suppress that diagnosis (set to 'Normal' or next non-excluded diagnosis).
+    excl = {problem_id: set(loop_names)}
+    Problem IDs use underscores: 'stiction', 'aggressive_tuning', etc.
+    """
+    if not excl:
+        return loops
+
+    # Map diagnosis string fragments to problem IDs
+    # Fragments are matched as substrings (case-insensitive) against the diagnosis field
+    DIAG_TO_PROBLEM = {
+        'stiction':                  'stiction',
+        'aggressive tuning':         'aggressive_tuning',
+        'aggressive_tuning':         'aggressive_tuning',
+        'sluggish tuning':           'sluggish_tuning',
+        'sluggish_tuning':           'sluggish_tuning',
+        'external oscillation':      'external_oscillation',
+        'external_oscillation':      'external_oscillation',
+        'cross-loop propagation':    'cross_loop_propagation',
+        'cross_loop_propagation':    'cross_loop_propagation',
+        'sensor noise':              'sensor_noise',
+        'sensor_noise':              'sensor_noise',
+        'sensor issue':              'sensor_noise',
+        'manual mode':               'manual_mode',
+        'manual_mode':               'manual_mode',
+        'loop in man':               'manual_mode',
+        'valve wear':                'valve_wear',
+        'valve_wear':                'valve_wear',
+        'saturation':                'saturation',
+        'unresponsive controller':   'unresponsive_controller',
+        'unresponsive':              'unresponsive_controller',
+        'oscillation':               'aggressive_tuning',
+    }
+
+    result = []
+    for loop in loops:
+        loop = dict(loop)  # copy so we don't mutate original
+        loop_name = loop.get('loop', '')
+        diag = loop.get('diagnosis', '')
+        diag_lower = diag.lower().strip()
+
+        # Find which problem_id this diagnosis maps to
+        matched_pid = None
+        for fragment, pid in DIAG_TO_PROBLEM.items():
+            if fragment in diag_lower:
+                matched_pid = pid
+                break
+
+        # If this loop is excluded for its current diagnosis, clear it
+        if matched_pid and loop_name in excl.get(matched_pid, set()):
+            loop['diagnosis'] = 'Normal'
+            loop['severity'] = 'OK'
+            loop['health'] = 100.0
+            loop['recommended_action'] = ''
+            loop['rationale'] = ''
+
+        result.append(loop)
+    return result
+
+
+def read_dashboard_data(results_dir: str, base_dir: str = None) -> dict:
     xlsx_path = os.path.join(results_dir, "Loop_diagnostics_v2.xlsx")
     if not os.path.exists(xlsx_path):
         raise FileNotFoundError(f"No Loop_diagnostics_v2.xlsx in {results_dir}")
@@ -79,6 +175,11 @@ def read_dashboard_data(results_dir: str) -> dict:
             loop["stiction"] = stiction_map[name]
         if name in dq_map:
             loop["data_quality"] = dq_map[name]
+
+    # Apply detection exclusions if base_dir is available
+    if base_dir:
+        excl = _read_detection_exclusions(base_dir, results_dir)
+        loops = _apply_detection_exclusions(loops, excl)
 
     run_summary = _read_run_summary(results_dir)
     wb.close()

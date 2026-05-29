@@ -96,6 +96,25 @@ def detect_loops(df: pd.DataFrame) -> dict:
 
 
 # ─── Config loading ───────────────────────────────────────────────────
+def load_detection_exclusions(path: str) -> dict:
+    """
+    Load optional DETECTION_EXCLUSIONS sheet.
+    Returns {problem_id: set_of_loop_names}, e.g.
+    {'stiction': {'FIC-101', 'TIC-202'}, 'aggressive_tuning': {'FIC-101'}}
+    """
+    excl = {}
+    try:
+        df = pd.read_excel(path, sheet_name="DETECTION_EXCLUSIONS")
+        df = df.dropna(subset=["Problem", "Loop"])
+        for _, row in df.iterrows():
+            pid  = str(row["Problem"]).strip().lower()
+            loop = str(row["Loop"]).strip()
+            excl.setdefault(pid, set()).add(loop)
+    except Exception:
+        pass  # sheet missing or empty — no exclusions
+    return excl
+
+
 def load_config(path: str) -> dict:
     cfg = dict(DEFAULTS)
     try:

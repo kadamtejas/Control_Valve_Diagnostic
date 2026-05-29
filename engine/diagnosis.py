@@ -434,12 +434,17 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
                   osc_reg: float, osc_period: int, dq: DataQualityReport,
                   service_factor: float, capabilities: Capabilities,
                   config: dict, tc: TimeContext,
-                  selection=None) -> Diagnosis:
+                  selection=None,
+                  detection_exclusions: set = None) -> Diagnosis:
     """
     Multi-class diagnosis using priority-ordered checks. The first matching
     rule wins for `primary`, but other observed issues are listed as
     `secondary`. Health score is built up additively from all findings.
+
+    detection_exclusions: set of problem_ids (e.g. {'stiction', 'aggressive_tuning'})
+    that should be skipped for this loop.
     """
+    _excl = detection_exclusions or set()
     diag = Diagnosis()
     health = 100.0
     secondary = []
@@ -521,7 +526,7 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
 
     # ── Priority 5: stiction (only if data supports it AND user wants it) ─
     stiction_likely = False
-    stiction_enabled = (selection is None) or selection.stiction_detection
+    stiction_enabled = ((selection is None) or selection.stiction_detection) and "stiction" not in _excl
     if capabilities.can_stiction and stiction_enabled:
         if sr.consensus_label == "Confirmed":
             stiction_likely = True
@@ -571,9 +576,9 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
     )
 
     # User-selection gates for the diagnoses below
-    aggressive_enabled = (selection is None) or selection.aggressive_tuning
-    external_enabled = (selection is None) or selection.external_oscillation
-    sluggish_enabled = (selection is None) or selection.sluggish_tuning
+    aggressive_enabled = ((selection is None) or selection.aggressive_tuning) and "aggressive_tuning" not in _excl
+    external_enabled   = ((selection is None) or selection.external_oscillation) and "external_oscillation" not in _excl
+    sluggish_enabled   = ((selection is None) or selection.sluggish_tuning) and "sluggish_tuning" not in _excl
 
     # Aggressive tuning: regular oscillation + OP moving meaningfully (controller fighting).
     # Use a softer OP-activity threshold when oscillation regularity is high — a perfect

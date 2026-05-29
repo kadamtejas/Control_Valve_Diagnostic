@@ -198,6 +198,10 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
     <span class="tb-type-badge tb-type-unknown" id="typeChip">—</span>
   </div>
   <div class="tb-right">
+    <button onclick="openCfgDrawer()" style="display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#e8f0f8'" onmouseout="this.style.background='var(--bg2)'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Config
+    </button>
     <span class="save-badge sb-pending" id="statusBadge" style="display:none">Pending</span>
     <button class="save-btn" id="saveBtn" onclick="saveRec()" disabled>
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -448,6 +452,10 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 <script>
 const LOOP = {{ loop_name|tojson }};
 let D = null, M = null, ovlChart = null;
+const CFG_DEFAULTS={lambdaFloor:3.0,lambdaOverride:null,kpOverride:null,tiOverride:null,minDop:0.5,kMin:0.05,kMax:5.0,confHi:0.70,confMed:0.50,antiWindup:true};
+let CFG=Object.assign({},CFG_DEFAULTS);
+
+
 
 function toast(msg, dur=3000){
   const t=document.getElementById('toast');
@@ -515,14 +523,14 @@ function identify(pv, op, sp){
     const Ti_new=rnd(2*lam,2);
     // reverse-engineer current Kp
     const kps=[];
-    for(let i=5;i<N-1;i++){const de=err[i]-err[i-1];const dop=op[i]-op[i-1];if(Math.abs(de)>1){const k=dop/de;if(Math.abs(k)>0.005&&Math.abs(k)<5)kps.push(Math.abs(k));}}
+    for(let i=5;i<N-1;i++){const de=err[i]-err[i-1];const dop=op[i]-op[i-1];if(Math.abs(de)>1){const k=dop/de;if(Math.abs(k)>(typeof CFG!=='undefined'?CFG.kMin:0.05)&&Math.abs(k)<(typeof CFG!=='undefined'?CFG.kMax:5.0))kps.push(Math.abs(k));}}
     const Kp_old=kps.length?rnd(med(kps),4):rnd(Kp_new*1.6,4);
     const Ti_old=rnd(Tu/1.2,2);
     // simulate with nominal tau for chart
     const tau_sim=5.0;
     const K_sim=Ki;
     const {pvs:pvb,ops:opb}=simLoop(pv,op,sp,N,Kp_old,Ti_old,K_sim,theta,tau_sim,false);
-    const {pvs:pva,ops:opa}=simLoop(pv,op,sp,N,Kp_new,Ti_new,K_sim,theta,tau_sim,true);
+    const {pvs:pva,ops:opa}=simLoop(pv,op,sp,N,Kp_new,Ti_new,K_sim,theta,tau_sim,(typeof CFG!=='undefined'?CFG.antiWindup:true));
     const iae_b=pvb.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
     const iae_a=pva.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
     return{K:rnd(Ki,4),K_method:'integrating',tau:null,tau_method:'n/a',tau_conf:0,
@@ -558,7 +566,7 @@ function identify(pv, op, sp){
       if(endIdx<=idx+delay) return;
       const pvAfter=mn(pv.slice(endIdx-3,endIdx+1));
       const dpv=pvAfter-pvBefore;
-      if(Math.abs(dop)>0.5) gains.push(Math.abs(dpv/dop));
+      if(Math.abs(dop)>(typeof CFG!=='undefined'?CFG.minDop:0.5)) gains.push(Math.abs(dpv/dop));
     });
     if(gains.length>=2){K=rnd(med(gains),3);K_method='step_dPVdOP';}
   }
@@ -640,27 +648,28 @@ function identify(pv, op, sp){
   else if(lt==='pressure')tau=rnd(Math.min(tau,30),1);
 
   // ── 6. λ — IMC filter time constant ──────────────────────────────────
-  const lam=rnd(Math.max(2*theta, 0.6*Tu, tau*0.5, 3.0),2);
+  const _lamFloor=typeof CFG!=='undefined'?CFG.lambdaFloor:3.0;
+  const lam=rnd((typeof CFG!=='undefined'&&CFG.lambdaOverride)?CFG.lambdaOverride:Math.max(2*theta, 0.6*Tu, tau*0.5, _lamFloor),2);
 
   // ── 7. Kp_new and Ti_new — IMC-PI formula ─────────────────────────────
   // Kp = τ / (K × (λ + θ))
   // Ti = clamp(τ, 0.5τ, 4(λ+θ))
-  const Kp_new=rnd(tau/(K*(lam+theta)),4);
-  const Ti_new=rnd(Math.max(0.5*tau, Math.min(tau, 4*(lam+theta))),2);
+  const Kp_new=(typeof CFG!=='undefined'&&CFG.kpOverride)?rnd(CFG.kpOverride,4):rnd(tau/(K*(lam+theta)),4);
+  const Ti_new=(typeof CFG!=='undefined'&&CFG.tiOverride)?rnd(CFG.tiOverride,2):rnd(Math.max(0.5*tau, Math.min(tau, 4*(lam+theta))),2);
 
   // ── 8. Kp_old — reverse-engineer from ΔOP/Δerror ─────────────────────
   const kps=[];
   for(let i=5;i<N-1;i++){
     const de=err[i]-err[i-1];
     const dop=op[i]-op[i-1];
-    if(Math.abs(de)>1){const k=dop/de;if(Math.abs(k)>0.005&&Math.abs(k)<5)kps.push(Math.abs(k));}
+    if(Math.abs(de)>1){const k=dop/de;if(Math.abs(k)>(typeof CFG!=='undefined'?CFG.kMin:0.05)&&Math.abs(k)<(typeof CFG!=='undefined'?CFG.kMax:5.0))kps.push(Math.abs(k));}
   }
   const Kp_old=kps.length?rnd(med(kps),4):rnd(Kp_new*1.6,4);
   const Ti_old=rnd(Tu/1.2,2);
 
   // ── 9. Simulate for IAE/chart comparison ─────────────────────────────
   const {pvs:pvb,ops:opb}=simLoop(pv,op,sp,N,Kp_old,Ti_old,K,theta,tau,false);
-  const {pvs:pva,ops:opa}=simLoop(pv,op,sp,N,Kp_new,Ti_new,K,theta,tau,true);
+  const {pvs:pva,ops:opa}=simLoop(pv,op,sp,N,Kp_new,Ti_new,K,theta,tau,(typeof CFG!=='undefined'?CFG.antiWindup:true));
   const iae_b=pvb.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
   const iae_a=pva.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
 
@@ -723,15 +732,15 @@ function populate(){
   s('kpi-tau', M.tau!==null ? M.tau+' min ('+M.tau_method+')' : 'N/A — integrating');
   s('kpi-Tu',M.Tu+' min');
   // K confidence
-  document.getElementById('k-badge').textContent=M.conf_K>0.7?'High':M.conf_K>0.5?'Medium':'Low';
-  document.getElementById('k-badge').className='mp-badge '+(M.conf_K>0.7?'sb-ok':M.conf_K>0.5?'sb-warn':'sb-lo');
+  document.getElementById('k-badge').textContent=M.conf_K>(typeof CFG!=='undefined'?CFG.confHi:0.7)?'High':M.conf_K>(typeof CFG!=='undefined'?CFG.confMed:0.5)?'Medium':'Low';
+  document.getElementById('k-badge').className='mp-badge '+(M.conf_K>(typeof CFG!=='undefined'?CFG.confHi:0.7)?'sb-ok':M.conf_K>(typeof CFG!=='undefined'?CFG.confMed:0.5)?'sb-warn':'sb-lo');
   document.getElementById('kconf-fill').style.width=confKPct+'%';
-  document.getElementById('kconf-fill').style.background=M.conf_K>0.7?'var(--ok)':M.conf_K>0.5?'var(--warn)':'var(--crit)';
+  document.getElementById('kconf-fill').style.background=M.conf_K>(typeof CFG!=='undefined'?CFG.confHi:0.7)?'var(--ok)':M.conf_K>(typeof CFG!=='undefined'?CFG.confMed:0.5)?'var(--warn)':'var(--crit)';
   document.getElementById('kconf-pct').textContent=confKPct+'%';
   // τ confidence
   const confTauPct=Math.round((M.tau_conf||0)*100);
-  document.getElementById('tau-badge').textContent=M.tau_conf>0.7?'High':M.tau_conf>0.5?'Med':'Low';
-  document.getElementById('tau-badge').className='mp-badge '+(M.tau_conf>0.7?'sb-ok':M.tau_conf>0.5?'sb-warn':'sb-lo');
+  document.getElementById('tau-badge').textContent=M.tau_conf>(typeof CFG!=='undefined'?CFG.confHi:0.7)?'High':M.tau_conf>(typeof CFG!=='undefined'?CFG.confMed:0.5)?'Med':'Low';
+  document.getElementById('tau-badge').className='mp-badge '+(M.tau_conf>(typeof CFG!=='undefined'?CFG.confHi:0.7)?'sb-ok':M.tau_conf>(typeof CFG!=='undefined'?CFG.confMed:0.5)?'sb-warn':'sb-lo');
   document.getElementById('tauconf-fill').style.width=confTauPct+'%';
   document.getElementById('tauconf-pct').textContent=confTauPct+'%';
   // Tu confidence
@@ -1028,5 +1037,164 @@ async function saveRec(){
   document.addEventListener('mouseout',function(e){if(!e.target.closest('.ibt'))tip.style.display='none';});
 })();
 </script>
+
+<!-- ══ CONFIG DRAWER ══ -->
+<style>
+.cfg-overlay{display:none;position:fixed;inset:0;background:rgba(15,39,68,.45);z-index:400}
+.cfg-overlay.open{display:block}
+.cfg-drawer{position:fixed;top:0;right:-440px;width:440px;height:100vh;background:var(--surface);border-left:1px solid var(--border);box-shadow:-4px 0 24px rgba(15,39,68,.13);z-index:401;display:flex;flex-direction:column;transition:right .28s cubic-bezier(.4,0,.2,1)}
+.cfg-drawer.open{right:0}
+.cfg-drw-hdr{padding:16px 20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg2)}
+.cfg-drw-title{font-size:14px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px}
+.cfg-drw-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px;min-height:0}
+.cfg-drw-footer{padding:12px 20px;border-top:1px solid var(--border2);display:flex;gap:8px;flex-shrink:0;background:var(--bg2)}
+.cfg-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.cfg-sec-hdr{padding:11px 16px;background:var(--bg2);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px}
+.cfg-sec-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.cfg-sec-title{font-size:12px;font-weight:700;color:var(--navy)}
+.cfg-sec-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.cfg-row{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border2);gap:12px}
+.cfg-row:last-child{border-bottom:none}
+.cfg-row:hover{background:#f8fafc}
+.cfg-lbl{flex:1}
+.cfg-lbl-name{font-size:11px;font-weight:600;color:var(--navy);font-family:'IBM Plex Mono',monospace}
+.cfg-lbl-desc{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.4}
+.cfg-lbl-default{font-size:9px;color:var(--text4);font-family:'IBM Plex Mono',monospace;margin-top:3px}
+.cfg-inp{width:88px;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--navy);font-weight:600;background:var(--bg2);text-align:right;transition:border-color .15s}
+.cfg-inp:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,134,222,.1);background:#fff}
+.cfg-inp.cfg-changed{border-color:var(--warn);background:#fffdf5}
+.cfg-toggle{position:relative;width:38px;height:20px;flex-shrink:0}
+.cfg-toggle input{opacity:0;width:0;height:0;position:absolute}
+.cfg-toggle-track{position:absolute;inset:0;background:var(--border);border-radius:10px;cursor:pointer;transition:background .2s}
+.cfg-toggle input:checked + .cfg-toggle-track{background:var(--ok)}
+.cfg-toggle-thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);pointer-events:none}
+.cfg-toggle input:checked ~ .cfg-toggle-thumb{transform:translateX(18px)}
+.cfg-apply-btn{flex:1;padding:9px;background:linear-gradient(135deg,#2e86de,#1a5fa8);color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+.cfg-apply-btn:hover{opacity:.9}
+.cfg-reset-btn{padding:9px 16px;border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:13px;font-weight:500;background:var(--surface);cursor:pointer}
+.cfg-reset-btn:hover{background:var(--bg2)}
+.cfg-changed-badge{display:none;background:var(--warn-bg);color:var(--warn);border:1px solid #f5c87a;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px}
+.cfg-changed-badge.show{display:inline-flex}
+</style>
+
+<div class="cfg-overlay" id="cfgOverlay" onclick="closeCfgDrawer()"></div>
+<div class="cfg-drawer" id="cfgDrawer">
+  <div class="cfg-drw-hdr">
+    <div class="cfg-drw-title">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Tuning Configuration
+      <span class="cfg-changed-badge" id="cfgChangedBadge">0 changed</span>
+    </div>
+    <button onclick="closeCfgDrawer()" style="font-size:18px;color:var(--text3);line-height:1;padding:4px 6px;border-radius:5px;background:none;border:none;cursor:pointer">&times;</button>
+  </div>
+  <div class="cfg-drw-body" id="cfgDrawerBody">
+    <div class="cfg-section">
+      <div class="cfg-sec-hdr">
+        <div class="cfg-sec-icon" style="background:#eff6ff">&#955;</div>
+        <div><div class="cfg-sec-title">IMC Tuning Parameters</div><div class="cfg-sec-sub">Control how Kp and Ti are calculated from the identified model</div></div>
+      </div>
+      <div class="cfg-row">
+        <div class="cfg-lbl"><div class="cfg-lbl-name">&#955; Floor (Lambda min) <span class="ibt" data-tip="Minimum lambda value. Higher = more conservative. Lambda = max(2θ, 0.6·Tu, 0.5τ, floor).">i</span></div><div class="cfg-lbl-default">default: 3.0 min</div></div>
+        <input class="cfg-inp" id="cfg-lambda-floor" type="number" step="0.5" min="0.5" max="30" value="3.0" data-default="3.0" oninput="onCfgInputChange(this)"/>
+      </div>
+      <div class="cfg-row">
+        <div class="cfg-lbl"><div class="cfg-lbl-name">&#955; Override <span class="ibt" data-tip="Force a fixed lambda instead of auto-calculating. Leave blank to use auto.">i</span></div><div class="cfg-lbl-default">default: auto</div></div>
+        <input class="cfg-inp" id="cfg-lambda-override" type="number" step="0.5" min="0.5" max="60" placeholder="auto" data-default="" oninput="onCfgInputChange(this)"/>
+      </div>
+      <div class="cfg-row">
+        <div class="cfg-lbl"><div class="cfg-lbl-name">Kp override <span class="ibt" data-tip="Override auto-calculated proportional gain. Leave blank to use auto.">i</span></div><div class="cfg-lbl-default">default: auto</div></div>
+        <input class="cfg-inp" id="cfg-kp-override" type="number" step="0.001" min="0.001" placeholder="auto" data-default="" oninput="onCfgInputChange(this)"/>
+      </div>
+      <div class="cfg-row">
+        <div class="cfg-lbl"><div class="cfg-lbl-name">Ti override (min) <span class="ibt" data-tip="Override auto-calculated integral time. Leave blank to use auto.">i</span></div><div class="cfg-lbl-default">default: auto</div></div>
+        <input class="cfg-inp" id="cfg-ti-override" type="number" step="0.1" min="0.1" placeholder="auto" data-default="" oninput="onCfgInputChange(this)"/>
+      </div>
+    </div>
+    <div class="cfg-section">
+      <div class="cfg-sec-hdr">
+        <div class="cfg-sec-icon" style="background:#ecfdf5">&#128300;</div>
+        <div><div class="cfg-sec-title">Model Identification Settings</div><div class="cfg-sec-sub">Controls how K, &tau;, &theta; are estimated from your data</div></div>
+      </div>
+      <div class="cfg-row">
+        <div class="cfg-lbl"><div class="cfg-lbl-name">Min &Delta;OP threshold <span class="ibt" data-tip="Minimum OP change to count as a valid step for gain estimation. Lower = more sensitive but noisier.">i</span></div><div class="cfg-lbl-default">default: 0.5 %</div></div>
+        <input class="cfg-inp" id="cfg-min-dop" type="number" step="0.1" min="0.1" max="5" value="0.5" data-default="0.5" oninput="onCfgInputChange(this)"/>
+      </div>
+      <div class="cfg-row">
+        <div class="cfg-lbl"><div class="cfg-lbl-name">K min bound <span class="ibt" data-tip="Steps producing K below this are discarded as noise or sensor glitches.">i</span></div><div class="cfg-lbl-default">default: 0.05</div></div>
+        <input class="cfg-inp" id="cfg-k-min" type="number" step="0.01" min="0.001" max="1" value="0.05" data-default="0.05" oninput="onCfgInputChange(this)"/>
+      </div>
+      <div class="cfg-row">
+        <div class="cfg-lbl"><div class="cfg-lbl-name">K max bound <span class="ibt" data-tip="Steps producing K above this are discarded as outliers (e.g. large disturbances).">i</span></div><div class="cfg-lbl-default">default: 5.0</div></div>
+        <input class="cfg-inp" id="cfg-k-max" type="number" step="0.5" min="0.5" max="50" value="5.0" data-default="5.0" oninput="onCfgInputChange(this)"/>
+      </div>
+      <div class="cfg-row">
+        <div class="cfg-lbl"><div class="cfg-lbl-name">High confidence R&sup2; <span class="ibt" data-tip="R² above this = High confidence badge on K estimate.">i</span></div><div class="cfg-lbl-default">default: 0.70</div></div>
+        <input class="cfg-inp" id="cfg-conf-hi" type="number" step="0.05" min="0.5" max="0.99" value="0.70" data-default="0.70" oninput="onCfgInputChange(this)"/>
+      </div>
+      <div class="cfg-row">
+        <div class="cfg-lbl"><div class="cfg-lbl-name">Medium confidence R&sup2; <span class="ibt" data-tip="R² above this = Medium confidence. Below = Low.">i</span></div><div class="cfg-lbl-default">default: 0.50</div></div>
+        <input class="cfg-inp" id="cfg-conf-med" type="number" step="0.05" min="0.1" max="0.9" value="0.50" data-default="0.50" oninput="onCfgInputChange(this)"/>
+      </div>
+    </div>
+    <div class="cfg-section">
+      <div class="cfg-sec-hdr">
+        <div class="cfg-sec-icon" style="background:#fef3e2">&#9881;</div>
+        <div><div class="cfg-sec-title">Simulation Settings</div><div class="cfg-sec-sub">Controls how the Optimised PV/OP overlay is simulated</div></div>
+      </div>
+      <div class="cfg-row">
+        <div class="cfg-lbl"><div class="cfg-lbl-name">Anti-windup <span class="ibt" data-tip="Prevents integrator buildup when OP hits saturation limits. Recommended ON for most loops.">i</span></div><div class="cfg-lbl-default">default: ON</div></div>
+        <label class="cfg-toggle"><input type="checkbox" id="cfg-antiwindup" checked onchange="onCfgInputChange(this)"/><div class="cfg-toggle-track"></div><div class="cfg-toggle-thumb"></div></label>
+      </div>
+    </div>
+  </div>
+  <div class="cfg-drw-footer">
+    <button class="cfg-reset-btn" onclick="resetCfgDrawer()">&#8635; Reset defaults</button>
+    <button class="cfg-apply-btn" onclick="applyCfgDrawer()">&#10003; Apply &amp; Recalculate</button>
+  </div>
+</div>
+
+<script>
+function openCfgDrawer(){document.getElementById('cfgOverlay').classList.add('open');document.getElementById('cfgDrawer').classList.add('open');}
+function closeCfgDrawer(){document.getElementById('cfgOverlay').classList.remove('open');document.getElementById('cfgDrawer').classList.remove('open');}
+document.getElementById('cfgDrawer').addEventListener('wheel',function(e){const body=document.getElementById('cfgDrawerBody');body.scrollTop+=e.deltaY;e.preventDefault();},{passive:false});
+function onCfgInputChange(el){
+  const def=el.dataset.default,val=el.type==='checkbox'?el.checked:(el.value||'');
+  if(el.classList&&el.type!=='checkbox'){el.classList.toggle('cfg-changed',String(val)!==String(def)&&val!=='');}
+  const n=document.querySelectorAll('.cfg-inp.cfg-changed').length;
+  const aw=document.getElementById('cfg-antiwindup');
+  const total=n+(aw&&!aw.checked?1:0);
+  const b=document.getElementById('cfgChangedBadge');
+  if(total){b.textContent=total+' changed';b.classList.add('show');}else{b.classList.remove('show');}
+}
+function resetCfgDrawer(){
+  ['cfg-lambda-floor','cfg-min-dop','cfg-k-min','cfg-k-max','cfg-conf-hi','cfg-conf-med'].forEach((id,i)=>{
+    document.getElementById(id).value=['3.0','0.5','0.05','5.0','0.70','0.50'][i];
+  });
+  ['cfg-lambda-override','cfg-kp-override','cfg-ti-override'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('cfg-antiwindup').checked=true;
+  document.querySelectorAll('.cfg-inp').forEach(el=>el.classList.remove('cfg-changed'));
+  document.getElementById('cfgChangedBadge').classList.remove('show');
+  Object.assign(CFG,CFG_DEFAULTS);
+}
+function applyCfgDrawer(){
+  CFG.lambdaFloor=parseFloat(document.getElementById('cfg-lambda-floor').value)||3.0;
+  const lov=document.getElementById('cfg-lambda-override').value;CFG.lambdaOverride=lov?parseFloat(lov):null;
+  const kpv=document.getElementById('cfg-kp-override').value;CFG.kpOverride=kpv?parseFloat(kpv):null;
+  const tiv=document.getElementById('cfg-ti-override').value;CFG.tiOverride=tiv?parseFloat(tiv):null;
+  CFG.minDop=parseFloat(document.getElementById('cfg-min-dop').value)||0.5;
+  CFG.kMin=parseFloat(document.getElementById('cfg-k-min').value)||0.05;
+  CFG.kMax=parseFloat(document.getElementById('cfg-k-max').value)||5.0;
+  CFG.confHi=parseFloat(document.getElementById('cfg-conf-hi').value)||0.70;
+  CFG.confMed=parseFloat(document.getElementById('cfg-conf-med').value)||0.50;
+  CFG.antiWindup=document.getElementById('cfg-antiwindup').checked;
+  closeCfgDrawer();
+  if(D){M=identify(D.pv,D.op,D.sp);populate();buildOvl();USER_OPT=null;
+    const bu=document.getElementById('btn-user-opt');if(bu){bu.style.background='var(--bg2)';bu.style.color='var(--text3)';bu.style.borderColor='var(--border)';}
+    const ba=document.getElementById('btn-auto-opt');if(ba){ba.style.background='#dbeafe';ba.style.color='#1d4ed8';ba.style.borderColor='var(--blue)';}
+    toast('Configuration applied — chart updated.');
+  }
+}
+</script>
+
 </body>
 </html>
