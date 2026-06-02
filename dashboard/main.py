@@ -321,11 +321,22 @@ async def upload_file(
     if not file.filename.lower().endswith((".xlsx", ".xls")):
         raise HTTPException(status_code=400, detail="Only .xlsx / .xls files are accepted.")
 
-    # ── Read mode from form (auto | manual)
+    # ── Read mode and tag suffixes from form
     form = await request.form()
     mode = form.get("mode", "auto").lower()
     if mode not in ("auto", "manual"):
         mode = "auto"
+
+    # Tag suffixes — user-defined signal type names e.g. MV, SV, CV, AOUT
+    # Fall back to standard PV/SP/OP/MODE if not provided
+    raw_suffixes = [
+        str(form.get("suffix_pv",   "PV")  or "PV").strip().upper(),
+        str(form.get("suffix_sp",   "SP")  or "SP").strip().upper(),
+        str(form.get("suffix_op",   "OP")  or "OP").strip().upper(),
+        str(form.get("suffix_mode", "MODE") or "MODE").strip().upper(),
+    ]
+    # Validate: all 4 must be non-empty strings
+    tag_suffixes = raw_suffixes if all(raw_suffixes) else ["PV", "SP", "OP", "MODE"]
 
     # ── Save to POC root using ORIGINAL filename (engine derives results folder from it)
     original_name = Path(file.filename).name
@@ -369,6 +380,7 @@ async def upload_file(
         "results_folder": results_folder,
         "mode":           mode,
         "original_name":  original_name,
+        "tag_suffixes":   tag_suffixes,
     }
 
     # ── Fresh upload always resets the custom-run flag (badge will show)
@@ -596,7 +608,7 @@ async def serve_plot(file_path: str, request: Request, current_user: dict = Depe
 async def get_timeseries(loop_name: str, current_user: dict = Depends(get_current_user)):
     rd = _get_user_results_dir(current_user)
     try:
-        data = read_loop_timeseries(rd, loop_name)
+        data = read_loop_timeseries(rd, loop_name, base_dir=str(BASE_DIR))
         return JSONResponse(content=data)
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -609,7 +621,7 @@ async def get_timeseries(loop_name: str, current_user: dict = Depends(get_curren
 @app.get("/api/loops")
 async def get_loop_names(current_user: dict = Depends(get_current_user)):
     rd = _get_user_results_dir(current_user)
-    loops = read_all_loop_names(rd)
+    loops = read_all_loop_names(rd, base_dir=str(BASE_DIR))
     return JSONResponse(content={"loops": loops})
 
 

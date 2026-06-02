@@ -11,7 +11,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --navy:#0f2744;--blue:#2e86de;--blue-lt:#4ea8f8;--blue-pale:#e8f3fd;--blue-pale2:#d0e8f8;
-  --ok:#1a9e5a;--ok-bg:#e6f7ef;--ok-border:#a3d9bc;
+  --ok:#2563eb;--ok-bg:#eff6ff;--ok-border:#bfdbfe;
   --warn:#d97706;--warn-bg:#fef3e2;--warn-border:#f5c87a;
   --crit:#dc2626;--crit-bg:#fdf0ef;--crit-border:#f5aaaa;
   --bg:#f0f4f8;--bg2:#f8fafc;--surface:#fff;
@@ -167,7 +167,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .act-kpi.crit{background:none;color:var(--navy);border:none;text-transform:uppercase}
 .act-kpi.warn{background:none;color:var(--navy);border:none;text-transform:uppercase}
 .act-val{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--crit);font-weight:700;display:flex;flex-direction:column;gap:2px}
-.act-opt{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#059669;font-weight:600;display:flex;flex-direction:column;gap:2px}
+.act-opt{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2563eb;font-weight:600;display:flex;flex-direction:column;gap:2px}
 .act-cause{font-size:12px!important;color:#0f2744!important;font-weight:800!important}
 .act-suggestion{font-size:12px!important;color:#0f2744!important;font-weight:800!important;line-height:1.5}
 .act-table td:nth-child(3){width:130px;max-width:130px}
@@ -229,7 +229,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .ekpi-strip{display:flex;flex-wrap:wrap;background:var(--surface);border-bottom:1px solid var(--border)}
 .ekpi{padding:16px 20px;border-right:1px solid var(--border2);flex-shrink:0;min-width:140px;transition:background .2s;position:relative}.ekpi:hover{background:var(--bg2)}
 .ekpi-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:5px}
-.ekpi-val{font-size:24px;font-weight:700;font-family:'IBM Plex Mono',monospace}.ekpi-stiction{background:#faf8ff}.ekpi-stiction .ekpi-val{color:#7c3aed}.ekpi-stiction .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#7c3aed;margin-right:5px;flex-shrink:0}.ekpi-harris{background:#f0f7ff}.ekpi-harris .ekpi-val{color:#2563eb}.ekpi-harris .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#2563eb;margin-right:5px;flex-shrink:0}.ekpi-sf{background:#f0fdf7}.ekpi-sf .ekpi-val{color:#059669}.ekpi-sf .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#059669;margin-right:5px;flex-shrink:0}.ekpi-op{background:#fff5f5}.ekpi-op .ekpi-val{color:#dc2626}.ekpi-op .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#dc2626;margin-right:5px;flex-shrink:0}.ekpi-iae{background:#fffcf0}.ekpi-iae .ekpi-val{color:#b45309}.ekpi-iae .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#d97706;margin-right:5px;flex-shrink:0}.ekpi-osc{background:#f0faff}.ekpi-osc .ekpi-val{color:#0891b2}.ekpi-osc .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#0891b2;margin-right:5px;flex-shrink:0}
+.ekpi-val{font-size:24px;font-weight:700;font-family:'IBM Plex Mono',monospace}.ekpi-stiction{background:#faf8ff}.ekpi-stiction .ekpi-val{color:#7c3aed}.ekpi-stiction .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#7c3aed;margin-right:5px;flex-shrink:0}.ekpi-harris{background:#f0f7ff}.ekpi-harris .ekpi-val{color:#2563eb}.ekpi-harris .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#2563eb;margin-right:5px;flex-shrink:0}.ekpi-sf{background:#eff6ff}.ekpi-sf .ekpi-val{color:#2563eb}.ekpi-sf .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#2563eb;margin-right:5px;flex-shrink:0}.ekpi-op{background:#fff5f5}.ekpi-op .ekpi-val{color:#dc2626}.ekpi-op .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#dc2626;margin-right:5px;flex-shrink:0}.ekpi-iae{background:#fffcf0}.ekpi-iae .ekpi-val{color:#b45309}.ekpi-iae .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#d97706;margin-right:5px;flex-shrink:0}.ekpi-osc{background:#f0faff}.ekpi-osc .ekpi-val{color:#0891b2}.ekpi-osc .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#0891b2;margin-right:5px;flex-shrink:0}
 .ekpi-sub{font-size:10px;color:var(--text4);margin-top:3px}
 .ibt{width:14px;height:14px;border-radius:50%;background:var(--border);color:var(--text3);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:help;position:relative;flex-shrink:0}
 .ibt:hover::after{content:attr(data-t);position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:var(--navy);color:#e8f3fd;font-size:10px;padding:5px 9px;border-radius:5px;white-space:nowrap;z-index:50;font-family:'IBM Plex Mono',monospace;pointer-events:none}
@@ -253,11 +253,11 @@ table.et tr:last-child td{border-bottom:none}
 .mbf{height:100%;border-radius:3px}
 .nc{font-family:'IBM Plex Mono',monospace;font-size:11px}
 .rkb{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'IBM Plex Mono',monospace}
-.rk-c{background:var(--crit-bg);color:var(--crit)}.rk-w{background:var(--warn-bg);color:var(--warn)}.rk-g{background:var(--ok-bg);color:var(--ok)}
+.rk-c{background:var(--crit-bg);color:var(--crit)}.rk-w{background:var(--warn-bg);color:var(--warn)}.rk-g{background:transparent;color:var(--ok)}
 .severity-btn{position:relative;display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:16px;font-size:10px;font-weight:700;letter-spacing:.3px;border:1px solid;white-space:nowrap;cursor:pointer;transition:all .2s}
-.severity-btn.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border)}
-.severity-btn.warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-border)}
-.severity-btn.crit{background:var(--crit-bg);color:var(--crit);border-color:var(--crit-border)}
+.severity-btn.ok{background:transparent;color:var(--ok);border-color:transparent}
+.severity-btn.warn{background:transparent;color:var(--warn);border-color:transparent}
+.severity-btn.crit{background:transparent;color:var(--crit);border-color:transparent}
 .severity-btn:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.1)}
 .severity-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
 .tech-tbl td{overflow:visible!important}
@@ -318,7 +318,7 @@ table.et tr:last-child td{border-bottom:none}
 .cc-b{padding:8px}
 .pc{width:100%;height:200px}
 .sbadge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.4px;white-space:nowrap}
-.sb-ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border)}
+.sb-ok{background:transparent;color:var(--ok);border:1px solid transparent}
 .sb-warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
 .sb-crit{background:var(--crit-bg);color:var(--crit);border:1px solid var(--crit-border)}
 .hm-tbl{border-collapse:separate;border-spacing:3px;font-size:11px;table-layout:auto}
@@ -396,11 +396,9 @@ table.et tr:last-child td{border-bottom:none}
 .excl-tbl-hdr{padding:5px 3px;background:#1a7fd4;color:#fff;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;z-index:2;text-align:center;width:65px;max-width:65px;word-break:break-word;white-space:normal;line-height:1.3}
 .excl-tbl-loop{padding:5px 8px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:var(--navy);background:var(--bg2);border-bottom:1px solid var(--border2);white-space:nowrap;position:sticky;left:0;z-index:1;max-width:140px;overflow:hidden;text-overflow:ellipsis}
 .excl-tbl-cell{padding:3px 2px;text-align:center;border-bottom:1px solid var(--border2);border-left:1px solid var(--border2);width:65px}
-.excl-toggle{display:inline-flex;align-items:center;justify-content:center;width:34px;height:17px;border-radius:9px;font-size:9px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
-.excl-toggle.yes{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
-.excl-toggle.no{background:#fde8e8;color:var(--crit);border:1px solid #fca5a5}
-.excl-toggle.yes:hover{background:#dbeafe}
-.excl-toggle.no:hover{background:#fca5a5}
+.excl-toggle{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;transition:all .15s;color:transparent}
+.excl-toggle.ticked{background:#eff6ff;border-color:#3b82f6;color:#2563eb}
+.excl-toggle:hover{border-color:#3b82f6;background:#f0f7ff}
 </style>
 </head>
 <body>
@@ -487,9 +485,9 @@ table.et tr:last-child td{border-bottom:none}
       <div class="phi-right" onclick="event.stopPropagation()">
         <div class="phi-right-title">Loop Status</div>
         <div class="phi-status-row" onclick="openTileModal('good')">
-          <span class="phi-dot" style="background:#4ade80"></span>
+          <span class="phi-dot" style="background:#3b82f6"></span>
           <span class="phi-status-lbl">Healthy</span>
-          <span class="phi-status-num" style="color:#4ade80" id="tilOk">—</span>
+          <span class="phi-status-num" style="color:#3b82f6" id="tilOk">—</span>
         </div>
         <div class="phi-status-row" onclick="openTileModal('poor')">
           <span class="phi-dot" style="background:#fbbf24"></span>
@@ -771,10 +769,10 @@ table.et tr:last-child td{border-bottom:none}
     <div class="mbdy" style="padding:0">
       <div style="display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border2);background:var(--bg2);overflow-x:auto">
         <button class="mon-mode-btn active" id="stab-params" onclick="switchStab('params')" style="font-size:11px;padding:8px 14px">Parameters</button>
-        <button class="mon-mode-btn" id="stab-diag" onclick="switchStab('diag')" style="font-size:11px;padding:8px 14px">Diagnostics</button>
+        <button class="mon-mode-btn" id="stab-diag" onclick="switchStab('diag')" style="font-size:11px;padding:8px 14px">Detection Methods</button>
         <button class="mon-mode-btn" id="stab-mode" onclick="switchStab('mode')" style="font-size:11px;padding:8px 14px">Mode Mapping</button>
         <button class="mon-mode-btn" id="stab-unit" onclick="switchStab('unit')" style="font-size:11px;padding:8px 14px">🏭 Unit Mapping</button>
-        <button class="mon-mode-btn" id="stab-excl" onclick="switchStab('excl')" style="font-size:11px;padding:8px 14px">🎛️ Override Detections</button>
+        <button class="mon-mode-btn" id="stab-excl" onclick="switchStab('excl')" style="font-size:11px;padding:8px 14px">🎛️ Required Diagnostics</button>
       </div>
       <div style="padding:16px 20px;overflow-y:auto;max-height:calc(88vh - 140px)">
         <div id="spane-params"><p style="font-size:11px;color:var(--text3);margin-bottom:12px">Threshold values from DIAGNOSTIC_CONFIG sheet. Edit and click Re-run to apply.</p><table style="width:100%;border-collapse:collapse;font-size:12px" id="stbl-params"><thead><tr style="background:var(--bg2)"><th style="padding:8px 12px;text-align:left;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border2)">Parameter</th><th style="padding:8px 12px;text-align:left;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border2)">Value</th><th style="padding:8px 12px;text-align:left;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border2)">Description</th></tr></thead><tbody id="stbl-params-body"><tr><td colspan="3" style="padding:16px;text-align:center;color:var(--text4)">Loading…</td></tr></tbody></table></div>
@@ -793,7 +791,10 @@ table.et tr:last-child td{border-bottom:none}
             <span style="font-size:11px;color:var(--text3)">Set <b>No</b> to suppress a detection for that loop. Takes effect on re-run.</span>
             <button onclick="exclReset()" style="padding:5px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:600;color:var(--crit);cursor:pointer">↺ Reset All</button>
           </div>
-          <div style="overflow:auto;max-height:calc(88vh - 260px);border:1px solid var(--border2);border-radius:8px">
+          <div style="margin-bottom:8px">
+            <input id="excl-search" type="text" placeholder="🔍  Search loops…" oninput="renderExclDnD()" style="width:100%;box-sizing:border-box;padding:7px 12px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg2);color:var(--text);outline:none"/>
+          </div>
+          <div style="overflow:auto;max-height:calc(88vh - 295px);border:1px solid var(--border2);border-radius:8px">
             <table id="excl-table" style="width:100%;border-collapse:collapse;font-size:11px">
               <thead id="excl-thead"></thead>
               <tbody id="excl-tbody"></tbody>
@@ -1417,7 +1418,7 @@ async function openLD(nm){S.sel=nm;const l=S.loops.find(x=>x.loop===nm)||{};cons
   const tuneBtn=isTuning?`<a href="/tune/${encodeURIComponent(nm)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:700;padding:6px 13px;border-radius:7px;background:var(--warn-bg);color:#b45309;border:1px solid var(--warn-border);text-decoration:none;transition:all .2s" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='var(--warn-bg)'"><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.3'><circle cx='12' cy='12' r='3'/><path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z'/></svg>Tune Controller</a>`:""; 
   document.getElementById('dmGrid').innerHTML=`<div class="dmc ${sev==='critical'?'dc-crit':sev==='poor'?'dc-warn':'dc-ok'}"><div class="dmc-lbl">Health Score</div><div class="dmc-val">${hN!==null?hN+'%':'—'}</div><div class="dmc-sub">${badge(sev)}</div></div><div class="dmc"><div class="dmc-lbl">Service Factor</div><div class="dmc-val">${sfN!==null?sfN+'%':'—'}</div><div class="dmc-sub">% time active in AUTO</div></div><div class="dmc"><div class="dmc-lbl">Harris Index</div><div class="dmc-val">${l.harris_index!=null?Number(l.harris_index).toFixed(3):'—'}</div><div class="dmc-sub">min-variance benchmark</div></div><div class="dmc"><div class="dmc-lbl">Stiction</div><div class="dmc-val" style="font-size:16px;margin-top:6px">${l.stiction_label||'—'}</div><div class="dmc-sub">consensus detection</div></div>`;switchTab('ld');const d=await fetchTS(nm);if(d)drawCharts(d,'d_');}
 
-function renderTech(){const q=(document.getElementById('srchEng')?.value||'').toLowerCase();let rows=S.loops.filter(l=>{if(!l.loop)return false;if(q&&!l.loop.toLowerCase().includes(q))return false;return true;});const ng=(l,f)=>parseFloat(l[f])||0;rows.sort((a,b)=>{let va,vb;const c=S.techSC;if(c==='loop'){va=a.loop;vb=b.loop;}else if(c==='severity'){va=sc(a);vb=sc(b);}else if(c==='stiction_label'){va=a.stiction_label||'';vb=b.stiction_label||'';}else if(c==='data_quality_status'){va=a.data_quality_status||'';vb=b.data_quality_status||'';}else{va=ng(a,c);vb=ng(b,c);}return va<vb?-S.techSD:va>vb?S.techSD:0;});const tbody=document.getElementById('techBody');if(!rows.length){tbody.innerHTML='<tr><td colspan="15" style="text-align:center;padding:24px;color:var(--text4)">No loops match</td></tr>';return;}tbody.innerHTML=rows.map((l,i)=>{const sev=sc(l),rank=i+1;const rkCls=rank<=3?'rk-c':rank<=8?'rk-w':'rk-g';const h=parseFloat(l.health),hN=!isNaN(h)?Math.round(h):null;const hbar=hN!==null?`<div class="hbc"><div class="mb"><div class="mbf" style="width:${Math.min(hN,100)}%;background:${sev==='critical'?'var(--crit)':sev==='poor'?'var(--warn)':'var(--ok)'}"></div></div><span class="nc">${hN}</span></div>`:'—';const conf=l.confidence!=null?Math.round(parseFloat(l.confidence))+'%':'—';const sf=l.service_factor!=null?Math.round(parseFloat(l.service_factor))+'%':'—';const hag=l.hagglund_regularity!=null?fN(l.hagglund_regularity,3):'—';const action=l.recommended_action||'Call Maintenance';const sevCls=sev==='critical'?'crit':sev==='poor'?'warn':'ok';const severity=`<div class="severity-btn ${sevCls}" data-tip="${action.replace(/"/g,'&quot;')}"><span class="severity-dot"></span>${sev==='critical'?'Act Now':sev==='poor'?'Watch':'OK'}</div>`;const _u=S.uomMap[l.loop];return `<tr onclick="openLD('${l.loop.replace(/'/g,"\\'")}')"><td><span class="rkb ${rkCls}">${rank}</span></td><td class="lname" style="text-align:center">${l.loop}${_u?`<div style="font-size:9px;color:#94a3b8;font-family:'IBM Plex Mono',monospace;margin-top:1px">(${_u})</div>`:''}</td><td>${hbar}</td><td>${severity}</td><td class="pdiag">${l.diagnosis||'—'}</td><td style="font-size:11px">${l.stiction_label||'—'}</td><td class="nc">${sf}</td><td class="nc">${fN(l.iae_per_hour,3)}</td><td class="nc">${fN(l.harris_index,3)}</td><td class="nc">${fN(l.pv_amplitude,2)}</td><td class="nc">${fN(l.op_activity,3)}</td><td class="nc">${hag}</td><td class="nc">${l.dominant_period||'—'}</td><td class="nc">${conf}</td><td style="font-size:11px">${l.data_quality_status||'—'}</td></tr>`;}).join('');}
+function renderTech(){const q=(document.getElementById('srchEng')?.value||'').toLowerCase();let rows=S.loops.filter(l=>{if(!l.loop)return false;if(q&&!l.loop.toLowerCase().includes(q))return false;return true;});const ng=(l,f)=>parseFloat(l[f])||0;rows.sort((a,b)=>{let va,vb;const c=S.techSC;if(c==='loop'){va=a.loop;vb=b.loop;}else if(c==='severity'){va=sc(a);vb=sc(b);}else if(c==='stiction_label'){va=a.stiction_label||'';vb=b.stiction_label||'';}else if(c==='data_quality_status'){va=a.data_quality_status||'';vb=b.data_quality_status||'';}else{va=ng(a,c);vb=ng(b,c);}return va<vb?-S.techSD:va>vb?S.techSD:0;});const tbody=document.getElementById('techBody');if(!rows.length){tbody.innerHTML='<tr><td colspan="15" style="text-align:center;padding:24px;color:var(--text4)">No loops match</td></tr>';return;}tbody.innerHTML=rows.map((l,i)=>{const sev=sc(l),rank=i+1;const rkCls=rank<=3?'rk-c':rank<=8?'rk-w':'rk-g';const h=parseFloat(l.health),hN=!isNaN(h)?Math.round(h):null;const hbar=hN!==null?`<div class="hbc"><div class="mb"><div class="mbf" style="width:${Math.min(hN,100)}%;background:${sev==='critical'?'var(--crit)':sev==='poor'?'var(--warn)':'#3b82f6'}"></div></div><span class="nc">${hN}</span></div>`:'—';const conf=l.confidence!=null?Math.round(parseFloat(l.confidence))+'%':'—';const sf=l.service_factor!=null?Math.round(parseFloat(l.service_factor))+'%':'—';const hag=l.hagglund_regularity!=null?fN(l.hagglund_regularity,3):'—';const action=l.recommended_action||'Call Maintenance';const sevCls=sev==='critical'?'crit':sev==='poor'?'warn':'ok';const severity=`<div class="severity-btn ${sevCls}" data-tip="${action.replace(/"/g,'&quot;')}"><span class="severity-dot"></span>${sev==='critical'?'Act Now':sev==='poor'?'Watch':'OK'}</div>`;const _u=S.uomMap[l.loop];return `<tr onclick="openLD('${l.loop.replace(/'/g,"\\'")}')"><td><span class="rkb ${rkCls}">${rank}</span></td><td class="lname" style="text-align:center">${l.loop}${_u?`<div style="font-size:9px;color:#94a3b8;font-family:'IBM Plex Mono',monospace;margin-top:1px">(${_u})</div>`:''}</td><td>${hbar}</td><td>${severity}</td><td class="pdiag">${l.diagnosis||'—'}</td><td style="font-size:11px">${l.stiction_label||'—'}</td><td class="nc">${sf}</td><td class="nc">${fN(l.iae_per_hour,3)}</td><td class="nc">${fN(l.harris_index,3)}</td><td class="nc">${fN(l.pv_amplitude,2)}</td><td class="nc">${fN(l.op_activity,3)}</td><td class="nc">${hag}</td><td class="nc">${l.dominant_period||'—'}</td><td class="nc">${conf}</td><td style="font-size:11px">${l.data_quality_status||'—'}</td></tr>`;}).join('');}
 function sortTech(col){if(S.techSC===col)S.techSD*=-1;else{S.techSC=col;S.techSD=1;}renderTech();}
 
 (function(){const tip=document.createElement('div');tip.id='sevTip';tip.style.cssText='display:none;position:fixed;z-index:9999;background:#0f2744;color:#fff;font-size:11px;font-family:IBM Plex Sans,sans-serif;font-weight:500;line-height:1.5;padding:10px 14px;border-radius:8px;width:260px;white-space:normal;pointer-events:none;box-shadow:0 8px 24px rgba(15,39,68,.25);border:1px solid rgba(255,255,255,.1)';document.body.appendChild(tip);document.addEventListener('mouseover',function(e){const btn=e.target.closest('.severity-btn[data-tip]');if(!btn)return;const text=btn.getAttribute('data-tip');if(!text)return;tip.textContent=text;tip.style.display='block';const r=btn.getBoundingClientRect();const tw=260,th=tip.offsetHeight;let left=r.left;if(left+tw>window.innerWidth-8)left=window.innerWidth-tw-8;if(left<8)left=8;const top=r.top>=th+12?r.top-th-8:r.bottom+6;tip.style.left=left+'px';tip.style.top=top+'px';});document.addEventListener('mousemove',function(e){if(tip.style.display==='none')return;if(!e.target.closest('.severity-btn[data-tip]'))tip.style.display='none';});})();
@@ -1447,7 +1448,32 @@ const CFG_STATE={config:null,loaded:false};
 async function openSettings(){document.getElementById('settingsModal').classList.add('open');if(!CFG_STATE.loaded){try{const res=await fetch('/api/config');if(!res.ok)throw new Error('HTTP '+res.status);CFG_STATE.config=await res.json();CFG_STATE.loaded=true;renderSettingsTabs();}catch(e){document.getElementById('settings-status').textContent='Error loading config: '+e.message;}}}
 function closeSettings(){document.getElementById('settingsModal').classList.remove('open');}
 function switchStab(tab){['params','diag','mode','unit','excl'].forEach(t=>{document.getElementById('stab-'+t)?.classList.toggle('active',t===tab);const pane=document.getElementById('spane-'+t);if(pane)pane.style.display=t===tab?'block':'none';});const rerunBtn=document.getElementById('btn-rerun');if(rerunBtn){rerunBtn.disabled=tab==='unit';rerunBtn.style.opacity=tab==='unit'?'0.4':'1';rerunBtn.style.cursor=tab==='unit'?'not-allowed':'pointer';}if(tab==='unit'&&typeof umInit==='function')umInit();if(tab==='excl'&&typeof renderExclDnD==='function')renderExclDnD();}
-function renderSettingsTabs(){const cfg=CFG_STATE.config||{};const pb=document.getElementById('stbl-params-body');const params=cfg.diagnostic_config||[];if(!params.length){pb.innerHTML='<tr><td colspan="3" style="padding:16px;text-align:center;color:var(--text4)">No parameters found</td></tr>';}else{pb.innerHTML=params.map((r,i)=>{const isNum=!isNaN(parseFloat(r.value));return `<tr style="border-bottom:1px solid var(--border2)"><td style="padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--navy);font-weight:600">${r.parameter||''}</td><td style="padding:9px 12px"><input type="${isNum?'number':'text'}" value="${r.value??''}" step="any" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:'IBM Plex Mono',monospace;background:var(--bg2);color:var(--text)" onchange="updateCfgParam(${i},this.value)" oninput="markChanged()"/></td><td style="padding:9px 12px;font-size:11px;color:var(--text3)">${r.description||''}</td></tr>`;}).join('');}const db=document.getElementById('stbl-diag-body');const diags=cfg.diagnostic_selection||[];if(!diags.length){db.innerHTML='<tr><td colspan="2" style="padding:16px;text-align:center;color:var(--text4)">No diagnostics found</td></tr>';}else{db.innerHTML=diags.map((r,i)=>{const indent=r.indent||0;const enabled=String(r.enabled).toLowerCase()==='yes'||r.enabled===true||r.enabled===1;return `<tr style="border-bottom:1px solid var(--border2)"><td style="padding:9px 12px;padding-left:${12+indent*20}px;font-size:12px;color:var(--text)">${r.diagnostic||''}</td><td style="padding:9px 12px;text-align:center"><input type="checkbox" ${enabled?'checked':''} style="width:15px;height:15px;cursor:pointer" onchange="updateCfgDiag(${i},this.checked);markChanged()"/></td></tr>`;}).join('');}const mb=document.getElementById('stbl-mode-body');const modes=cfg.mode_mapping||[];if(!modes.length){mb.innerHTML='<tr><td colspan="2" style="padding:16px;text-align:center;color:var(--text4)">No mode mapping found</td></tr>';}else{mb.innerHTML=modes.map((r,i)=>{return `<tr style="border-bottom:1px solid var(--border2)"><td style="padding:9px 12px;font-size:12px;color:var(--text2);font-weight:600">${r.category||''}</td><td style="padding:9px 12px"><input type="text" value="${r.value??''}" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;background:var(--bg2);color:var(--text)" onchange="updateCfgMode(${i},this.value)" oninput="markChanged()"/></td></tr>`;}).join('');}}
+function renderSettingsTabs(){const cfg=CFG_STATE.config||{};const pb=document.getElementById('stbl-params-body');const params=cfg.diagnostic_config||[];if(!params.length){pb.innerHTML='<tr><td colspan="3" style="padding:16px;text-align:center;color:var(--text4)">No parameters found</td></tr>';}else{pb.innerHTML=params.map((r,i)=>{const isNum=!isNaN(parseFloat(r.value));return `<tr style="border-bottom:1px solid var(--border2)"><td style="padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--navy);font-weight:600">${r.parameter||''}</td><td style="padding:9px 12px"><input type="${isNum?'number':'text'}" value="${r.value??''}" step="any" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:'IBM Plex Mono',monospace;background:var(--bg2);color:var(--text)" onchange="updateCfgParam(${i},this.value)" oninput="markChanged()"/></td><td style="padding:9px 12px;font-size:11px;color:var(--text3)">${r.description||''}</td></tr>`;}).join('');}// Diagnostics tab: loop × method tick table
+// Leaf methods only, deduplicated, excluding "Fall back..." row
+const _seen=new Set();
+const diagMethods=(cfg.diagnostic_selection||[]).filter(r=>{
+  if((r.indent||0)===0)return false;
+  const name=(r.diagnostic||'').trim();
+  if(/fall back/i.test(name))return false;
+  if(_seen.has(name))return false;
+  _seen.add(name);
+  return true;
+});
+const diagLoops=(S.loops||[]).map(l=>l.loop).filter(Boolean);
+const diagPane=document.getElementById('spane-diag');
+diagPane.innerHTML=`
+  <div style="margin-bottom:8px;display:flex;align-items:center;gap:8px">
+    <input id="diag-search" type="text" placeholder="🔍  Search loops…" oninput="renderDiagTable()" style="flex:1;padding:7px 12px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--bg2);color:var(--text);outline:none"/>
+  </div>
+  <div style="overflow:auto;max-height:calc(88vh - 290px);border:1px solid var(--border2);border-radius:8px">
+    <table id="diag-tbl" style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead id="diag-thead"></thead>
+      <tbody id="diag-tbody"></tbody>
+    </table>
+  </div>`;
+// store methods on state for use in renderDiagTable
+CFG_STATE.diagMethods=diagMethods;
+renderDiagTable();const mb=document.getElementById('stbl-mode-body');const modes=cfg.mode_mapping||[];if(!modes.length){mb.innerHTML='<tr><td colspan="2" style="padding:16px;text-align:center;color:var(--text4)">No mode mapping found</td></tr>';}else{mb.innerHTML=modes.map((r,i)=>{return `<tr style="border-bottom:1px solid var(--border2)"><td style="padding:9px 12px;font-size:12px;color:var(--text2);font-weight:600">${r.category||''}</td><td style="padding:9px 12px"><input type="text" value="${r.value??''}" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;background:var(--bg2);color:var(--text)" onchange="updateCfgMode(${i},this.value)" oninput="markChanged()"/></td></tr>`;}).join('');}}
 function updateCfgParam(i,val){if(!CFG_STATE.config?.diagnostic_config)return;const row=CFG_STATE.config.diagnostic_config[i];if(row)row.value=isNaN(parseFloat(val))?val:parseFloat(val);}
 function updateCfgDiag(i,checked){if(!CFG_STATE.config?.diagnostic_selection)return;const row=CFG_STATE.config.diagnostic_selection[i];if(row)row.enabled=checked?'Yes':'No';}
 function updateCfgMode(i,val){if(!CFG_STATE.config?.mode_mapping)return;const row=CFG_STATE.config.mode_mapping[i];if(row)row.value=val;}
@@ -1507,21 +1533,18 @@ let EXCL_DATA={};
 
 async function renderExclDnD(){
   if(!(S.loops||[]).length){
-    try{
-      const r=await fetch('/api/latest');
-      const d=await r.json();
-      if(d&&d.loops)S.loops=d.loops;
-    }catch(e){}
+    try{const r=await fetch('/api/latest');const d=await r.json();if(d&&d.loops)S.loops=d.loops;}catch(e){}
   }
-  const loops=(S.loops||[]).map(l=>l.loop).filter(Boolean);
-  if(!loops.length){document.getElementById('excl-tbody').innerHTML='<tr><td colspan="99" style="padding:16px;text-align:center;color:var(--text4)">No loops loaded</td></tr>';return;}
-  // Header row: Loop | Problem1 | Problem2 ...
-  document.getElementById('excl-thead').innerHTML=`<tr><th class="excl-tbl-hdr" style="text-align:left;min-width:140px;width:140px">Loop</th>${EXCL_PROBLEMS.map(p=>`<th class="excl-tbl-hdr" title="${p.label}">${p.label}</th>`).join('')}</tr>`;
-  // Body rows: one per loop
+  const allLoops=(S.loops||[]).map(l=>l.loop).filter(Boolean);
+  const _q=(document.getElementById('excl-search')?.value||'').toLowerCase().trim();
+  const loops=_q?allLoops.filter(l=>l.toLowerCase().includes(_q)):allLoops;
+  if(!allLoops.length){document.getElementById('excl-tbody').innerHTML='<tr><td colspan="99" style="padding:16px;text-align:center;color:var(--text4)">No loops loaded</td></tr>';return;}
+  if(!loops.length){document.getElementById('excl-tbody').innerHTML='<tr><td colspan="99" style="padding:12px;text-align:center;color:var(--text4);font-size:11px">No loops match search</td></tr>';return;}
+  document.getElementById('excl-thead').innerHTML=`<tr><th class="excl-tbl-hdr" style="text-align:left;min-width:140px;width:140px">Loop</th>${EXCL_PROBLEMS.map(p=>`<th class="excl-tbl-hdr" title="${p.label}">${p.label}</th>`).join('')}</tr><tr style="background:#e8f0fe"><td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1e40af;white-space:nowrap;position:sticky;left:0;background:#e8f0fe;z-index:1">Global Select</td>${EXCL_PROBLEMS.map(p=>{const allLoops=(S.loops||[]).map(l=>l.loop);const allExcl=allLoops.every(l=>(EXCL_DATA[p.id]||[]).includes(l));return `<td style="text-align:center;padding:3px 2px;border-left:1px solid rgba(0,0,0,.08)"><button class="excl-toggle ${allExcl?'':'ticked'}" onclick="exclToggleAll('${p.id}')" title="Toggle all loops for ${p.label}">✓</button></td>`;}).join('')}</tr>`;
   document.getElementById('excl-tbody').innerHTML=loops.map(loop=>{
     const cells=EXCL_PROBLEMS.map(p=>{
       const isExcl=(EXCL_DATA[p.id]||[]).includes(loop);
-      return `<td class="excl-tbl-cell"><button class="excl-toggle ${isExcl?'no':'yes'}" onclick="exclToggle('${p.id}','${loop.replace(/'/g,"\\'")}')">${isExcl?'No':'Yes'}</button></td>`;
+      return `<td class="excl-tbl-cell"><button class="excl-toggle ${isExcl?'':'ticked'}" onclick="exclToggle('${p.id}','${loop.replace(/'/g,"\\'")}')">✓</button></td>`;
     }).join('');
     return `<tr><td class="excl-tbl-loop">${loop}</td>${cells}</tr>`;
   }).join('');
@@ -1532,6 +1555,72 @@ function exclToggle(pid,loop){
   if(idx>=0)EXCL_DATA[pid].splice(idx,1);
   else EXCL_DATA[pid].push(loop);
   renderExclDnD();
+}
+function exclToggleAll(pid){
+  const allLoops=S.loops.map(l=>l.loop);
+  if(!EXCL_DATA[pid])EXCL_DATA[pid]=[];
+  const allExcl=allLoops.every(l=>(EXCL_DATA[pid]||[]).includes(l));
+  EXCL_DATA[pid]=allExcl?[]:[...allLoops];
+  renderExclDnD();
+}
+function renderDiagTable(){
+  const methods=CFG_STATE.diagMethods||[];
+  const allLoops=(S.loops||[]).map(l=>l.loop).filter(Boolean);
+  const q=(document.getElementById('diag-search')?.value||'').toLowerCase().trim();
+  const loops=q?allLoops.filter(l=>l.toLowerCase().includes(q)):allLoops;
+  const thead=document.getElementById('diag-thead');
+  const tbody=document.getElementById('diag-tbody');
+  if(!thead||!tbody)return;
+  if(!allLoops.length){
+    tbody.innerHTML='<tr><td colspan="99" style="padding:16px;text-align:center;color:var(--text4)">No loops loaded — upload a file first</td></tr>';
+    thead.innerHTML='';return;
+  }
+  if(!methods.length){
+    tbody.innerHTML='<tr><td colspan="99" style="padding:16px;text-align:center;color:var(--text4)">No diagnostic methods found in config</td></tr>';
+    thead.innerHTML='';return;
+  }
+  thead.innerHTML=`<tr>
+    <th class="excl-tbl-hdr" style="text-align:left;min-width:160px;width:160px;position:sticky;left:0;z-index:3">Loop</th>
+    ${methods.map(m=>`<th class="excl-tbl-hdr" title="${m.diagnostic}">${m.diagnostic}</th>`).join('')}
+  </tr>
+  <tr style="background:#e8f0fe">
+    <td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1e40af;white-space:nowrap;position:sticky;left:0;background:#e8f0fe;z-index:2">Global Select</td>
+    ${methods.map((m,mi)=>{
+      const allOn=allLoops.every(l=>diagIsEnabled(mi,l));
+      return `<td style="text-align:center;padding:3px 2px;border-left:1px solid rgba(0,0,0,.08)">
+        <button class="excl-toggle ${allOn?'ticked':''}" onclick="diagToggleAll(${mi})" title="Toggle all: ${m.diagnostic}">✓</button>
+      </td>`;
+    }).join('')}
+  </tr>`;
+  tbody.innerHTML=loops.length?loops.map(loop=>`
+    <tr>
+      <td class="excl-tbl-loop" style="position:sticky;left:0;z-index:1">${loop}</td>
+      ${methods.map((m,mi)=>`
+        <td class="excl-tbl-cell">
+          <button class="excl-toggle ${diagIsEnabled(mi,loop)?'ticked':''}" onclick="diagToggle(${mi},'${loop.replace(/'/g,"\\'")}')">✓</button>
+        </td>`).join('')}
+    </tr>`).join(''):'<tr><td colspan="99" style="padding:12px;text-align:center;color:var(--text4);font-size:11px">No loops match search</td></tr>';
+}
+function diagIsEnabled(mi,loop){
+  // Each method has its own per-loop override; default = enabled (ticked)
+  if(!CFG_STATE.diagOverrides)CFG_STATE.diagOverrides={};
+  const key=mi+'|'+loop;
+  return CFG_STATE.diagOverrides[key]!==false;
+}
+function diagToggle(mi,loop){
+  if(!CFG_STATE.diagOverrides)CFG_STATE.diagOverrides={};
+  const key=mi+'|'+loop;
+  CFG_STATE.diagOverrides[key]=!diagIsEnabled(mi,loop);
+  markChanged();
+  renderDiagTable();
+}
+function diagToggleAll(mi){
+  if(!CFG_STATE.diagOverrides)CFG_STATE.diagOverrides={};
+  const allLoops=(S.loops||[]).map(l=>l.loop).filter(Boolean);
+  const allOn=allLoops.every(l=>diagIsEnabled(mi,l));
+  allLoops.forEach(l=>{CFG_STATE.diagOverrides[mi+'|'+l]=!allOn;});
+  markChanged();
+  renderDiagTable();
 }
 function exclReset(){EXCL_DATA={};renderExclDnD();}
 

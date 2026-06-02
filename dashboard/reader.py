@@ -8,6 +8,93 @@ from typing import Optional
 import openpyxl
 
 
+def read_loop_format(xlsx_path: str) -> dict:
+    """
+    Read the 'loop_format' sheet to get possible suffix candidates per signal role.
+
+    New sheet layout — header row is pv | op | sp | mode (no loop column needed).
+    Each column lists possible suffixes for that role, one per row below the header:
+
+        pv   | op  | sp  | mode
+        PV   | OP  | SP  | mode
+        MV   |     |     | MODE
+
+    Returns a dict e.g.:
+        {'pv': ['PV', 'MV'], 'sp': ['SP'], 'op': ['OP'], 'mode': ['mode', 'MODE']}
+
+    Also supports the OLD layout (with a 'loop' column and full tag names) for
+    backwards compatibility — extracts suffix from the first data row in that case.
+
+    Falls back to default suffixes if sheet is missing or unreadable.
+    """
+    DEFAULT = {'pv': ['PV'], 'sp': ['SP'], 'op': ['OP'], 'mode': ['MODE']}
+    if not xlsx_path or not os.path.exists(xlsx_path):
+        return DEFAULT
+    try:
+        wb = openpyxl.load_workbook(xlsx_path, read_only=True, data_only=True)
+        if 'loop_format' not in wb.sheetnames:
+            wb.close()
+            return DEFAULT
+        ws = wb['loop_format']
+        rows = list(ws.iter_rows(values_only=True))
+        wb.close()
+        if len(rows) < 1:
+            return DEFAULT
+
+        header = [str(c).strip().lower() if c is not None else '' for c in rows[0]]
+
+        # ── OLD layout: has a 'loop' column with full tag names ──────────────
+        if 'loop' in header and len(rows) >= 2:
+            data = rows[1]
+            role_cols = {}
+            for role in ['loop', 'pv', 'sp', 'op', 'mode']:
+                if role in header:
+                    role_cols[role] = header.index(role)
+            if 'loop' in role_cols and data[role_cols['loop']]:
+                loop_base = str(data[role_cols['loop']]).strip()
+                result = {}
+                for role in ['pv', 'sp', 'op', 'mode']:
+                    if role not in role_cols:
+                        result[role] = [role.upper()]
+                        continue
+                    full_tag = str(data[role_cols[role]] or '').strip()
+                    if full_tag.upper().startswith(loop_base.upper()):
+                        remainder = full_tag[len(loop_base):]
+                        suffix = remainder.lstrip('_.-').upper()
+                        result[role] = [suffix if suffix else role.upper()]
+                    else:
+                        result[role] = [role.upper()]
+                return result
+
+        # ── NEW layout: pv | op | sp | mode columns, suffixes listed below ──
+        role_col_idx = {}
+        for role in ['pv', 'sp', 'op', 'mode']:
+            if role in header:
+                role_col_idx[role] = header.index(role)
+
+        if not role_col_idx:
+            return DEFAULT
+
+        result = {}
+        for role, col_idx in role_col_idx.items():
+            candidates = []
+            for row in rows[1:]:
+                if col_idx < len(row) and row[col_idx] is not None:
+                    val = str(row[col_idx]).strip()
+                    if val:
+                        candidates.append(val)  # preserve original case
+            result[role] = candidates if candidates else [role.upper()]
+
+        # Fill any missing roles with defaults
+        for role in ['pv', 'sp', 'op', 'mode']:
+            if role not in result:
+                result[role] = [role.upper()]
+
+        return result
+    except Exception:
+        return DEFAULT
+
+
 def read_unit_mapping(results_dir: str, base_dir: str) -> dict:
     """
     Read UNIT_MAPPING sheet from the original input Excel file.
@@ -193,8 +280,11 @@ def read_dashboard_data(results_dir: str, base_dir: str = None) -> dict:
     }
 
 
-def read_loop_timeseries(results_dir: str, loop_name: str) -> dict:
-    """Read PV, OP, SP, MODE time series for a specific loop from data_v3_processed.xlsx."""
+def read_loop_timeseries(results_dir: str, loop_name: str, base_dir: str = None) -> dict:
+    """Read PV, OP, SP, MODE time series for a specific loop from data_v3_processed.xlsx.
+    Automatically reads suffix names (PV/MV etc.) from the loop_format sheet
+    in the input Excel file if present. Falls back to PV/SP/OP/MODE.
+    """
     xlsx_path = os.path.join(results_dir, "data_v3_processed.xlsx")
     if not os.path.exists(xlsx_path):
         raise FileNotFoundError(f"No data_v3_processed.xlsx in {results_dir}")
@@ -211,47 +301,69 @@ def read_loop_timeseries(results_dir: str, loop_name: str) -> dict:
 
     # Find columns for this loop — try exact match and all separator variants
     SEPARATORS = ["_", "-", ".", " "]
-    SUFFIXES = ["PV", "SP", "OP", "MODE"]
+    # Auto-detect suffix candidates from loop_format sheet, fallback to defaults
+    input_xlsx = _get_input_xlsx(results_dir, base_dir)
+    SUFFIX_MAP = read_loop_format(input_xlsx)
+    # SUFFIX_MAP is e.g. {'pv': ['PV', 'MV'], 'sp': ['SP'], 'op': ['OP'], 'mode': ['mode', 'MODE']}
+    # Engine normalises _MV -> _PV in processed file, so always include PV as fallback for MV and vice versa
+    def _expand(candidates):
+        expanded = list(candidates)
+        for s in list(candidates):
+            su = s.upper()
+            if su == 'MV' and 'PV' not in [x.upper() for x in expanded]:
+                expanded.append('PV')
+            if su == 'PV' and 'MV' not in [x.upper() for x in expanded]:
+                expanded.append('MV')
+        return expanded
 
-    def find_col(suffix):
-        suffix_up = suffix.upper()
-        # 1. Exact: loop_name + sep + suffix (any case)
-        for sep in SEPARATORS:
+    def find_col(role):
+        # Get all candidate suffixes for this role, expanded with engine aliases
+        raw_candidates = SUFFIX_MAP.get(role, [role.upper()])
+        candidates_to_try = _expand(raw_candidates)
+        for suffix in candidates_to_try:
+            suffix_up = suffix.upper()
+            has_sep = suffix[:1] in ('_', '.', '-', ' ')
+            # 1. If suffix already has separator, try as-is (exact) first
+            if has_sep:
+                for s in [suffix, suffix.upper(), suffix.lower()]:
+                    candidate = f"{loop_name}{s}"
+                    if candidate in headers:
+                        return headers.index(candidate)
+            # 2. Try loop_name + sep + suffix (any case) — for bare suffixes
+            for sep in SEPARATORS:
+                for s in [suffix_up, suffix.lower(), suffix]:
+                    candidate = f"{loop_name}{sep}{s}"
+                    if candidate in headers:
+                        return headers.index(candidate)
+            # 3. No separator
             for s in [suffix_up, suffix.lower(), suffix]:
-                candidate = f"{loop_name}{sep}{s}"
+                candidate = f"{loop_name}{s}"
                 if candidate in headers:
                     return headers.index(candidate)
-        # 2. No separator: loop_name + suffix directly
-        for s in [suffix_up, suffix.lower(), suffix]:
-            candidate = f"{loop_name}{s}"
-            if candidate in headers:
-                return headers.index(candidate)
-        # 3. Case-insensitive scan: header ends with any sep+suffix or just suffix
-        for i, h in enumerate(headers):
-            hu = h.upper()
-            # with separator
-            for sep in SEPARATORS:
-                if hu.endswith(sep + suffix_up):
-                    loop_part = h[:-(len(suffix) + 1)]
+            # 3. Case-insensitive scan
+            for i, h in enumerate(headers):
+                hu = h.upper()
+                for sep in SEPARATORS:
+                    if hu.endswith(sep + suffix_up):
+                        loop_part = h[:-(len(suffix) + 1)]
+                        if loop_part.replace("-","_").replace(".","_") == loop_name.replace("-","_").replace(".","_"):
+                            return i
+                if hu.endswith(suffix_up) and not any(hu.endswith(sep + suffix_up) for sep in SEPARATORS):
+                    loop_part = h[:-len(suffix)]
                     if loop_part.replace("-","_").replace(".","_") == loop_name.replace("-","_").replace(".","_"):
                         return i
-            # without separator
-            if hu.endswith(suffix_up) and not any(hu.endswith(sep + suffix_up) for sep in SEPARATORS):
-                loop_part = h[:-len(suffix)]
-                if loop_part.replace("-","_").replace(".","_") == loop_name.replace("-","_").replace(".","_"):
-                    return i
         return None
 
-    ts_idx = 0  # TIMESTAMP always first
-    pv_idx = find_col("PV")
-    op_idx = find_col("OP")
-    sp_idx = find_col("SP")
-    mode_idx = find_col("MODE")
+    ts_idx   = 0
+    pv_idx   = find_col('pv')
+    sp_idx   = find_col('sp')
+    op_idx   = find_col('op')
+    mode_idx = find_col('mode')
 
     if pv_idx is None:
-        # Try to find any column containing the loop name
         available = [h for h in headers if loop_name.replace("-","_") in h.replace("-","_")]
-        raise ValueError(f"Loop '{loop_name}' not found. Available columns: {available[:10]}")
+        pv_candidates = SUFFIX_MAP.get('pv', ['PV'])
+        raise ValueError(f"Loop '{loop_name}' not found (tried PV candidates: {pv_candidates}). Available columns: {available[:10]}")
 
     timestamps = []
     pv_vals = []
@@ -283,16 +395,35 @@ def read_loop_timeseries(results_dir: str, loop_name: str) -> dict:
         "sp": sp_vals,
         "mode": mode_vals,
         "columns_found": {
-            "pv": headers[pv_idx] if pv_idx is not None else None,
-            "op": headers[op_idx] if op_idx is not None else None,
-            "sp": headers[sp_idx] if sp_idx is not None else None,
+            "pv":   headers[pv_idx]   if pv_idx   is not None else None,
+            "sp":   headers[sp_idx]   if sp_idx   is not None else None,
+            "op":   headers[op_idx]   if op_idx   is not None else None,
             "mode": headers[mode_idx] if mode_idx is not None else None,
-        }
+        },
+        "suffixes_used": SUFFIX_MAP
     }
 
 
-def read_all_loop_names(results_dir: str) -> list:
-    """Return list of loop names found in data_v3_processed.xlsx."""
+def _get_input_xlsx(results_dir: str, base_dir: str = None):
+    """Derive the input Excel path from the results folder name."""
+    folder_name = os.path.basename(results_dir)
+    stem = folder_name.removeprefix("results_").removesuffix("_manual")
+    search_dirs = [base_dir] if base_dir else []
+    search_dirs.append(os.path.dirname(results_dir))
+    for d in search_dirs:
+        if not d:
+            continue
+        candidate = os.path.join(d, f"{stem}.xlsx")
+        if os.path.exists(candidate):
+            return candidate
+    return None
+
+
+def read_all_loop_names(results_dir: str, base_dir: str = None) -> list:
+    """Return list of loop names found in data_v3_processed.xlsx.
+    Automatically reads suffix names (PV/MV etc.) from the loop_format sheet
+    in the input Excel file if present. Falls back to PV/SP/OP/MODE.
+    """
     xlsx_path = os.path.join(results_dir, "data_v3_processed.xlsx")
     if not os.path.exists(xlsx_path):
         return []
@@ -300,13 +431,29 @@ def read_all_loop_names(results_dir: str) -> list:
     ws = wb["Sheet1"]
     headers = [str(c).strip() if c is not None else "" for c in next(ws.iter_rows(values_only=True))]
     wb.close()
+    input_xlsx = _get_input_xlsx(results_dir, base_dir)
+    _sfx_map = read_loop_format(input_xlsx)
+    # Flatten all candidate suffixes from all roles into one list (uppercased, deduplicated)
+    _all_sfx = []
+    seen = set()
+    for candidates in _sfx_map.values():
+        for s in candidates:
+            su = s.upper()
+            if su not in seen:
+                _all_sfx.append(su)
+                seen.add(su)
+            # Also add PV<->MV alias
+            if su == 'MV' and 'PV' not in seen:
+                _all_sfx.append('PV'); seen.add('PV')
+            if su == 'PV' and 'MV' not in seen:
+                _all_sfx.append('MV'); seen.add('MV')
     loops = set()
     for h in headers:
         if h.upper() in ('TIMESTAMP', ''):
             continue
         matched = False
         for sep in ['_', '-', '.', ' ']:
-            for suffix in ['PV', 'SP', 'OP', 'MODE']:
+            for suffix in _all_sfx:
                 if h.upper().endswith(sep + suffix):
                     loops.add(h[:-(len(suffix) + 1)])
                     matched = True
@@ -314,7 +461,7 @@ def read_all_loop_names(results_dir: str) -> list:
             if matched:
                 break
         if not matched:
-            for suffix in ['PV', 'SP', 'OP', 'MODE']:
+            for suffix in _all_sfx:
                 if h.upper().endswith(suffix) and not any(h.upper().endswith(sep + suffix) for sep in ['_', '-', '.', ' ']):
                     loops.add(h[:-len(suffix)])
                     break

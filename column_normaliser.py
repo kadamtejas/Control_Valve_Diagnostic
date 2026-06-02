@@ -86,7 +86,10 @@ def normalise_columns(df: pd.DataFrame, auto_mode_value: str = "AUTO"):
 # Format detection
 # ---------------------------------------------------------------------------
 
-_SIGNAL_SUFFIXES = ("PV", "OP", "SP", "MODE")
+_SIGNAL_SUFFIXES = ("PV", "MV", "OP", "SP", "MODE")
+
+# Map non-standard suffixes to the canonical name the engine expects
+_SUFFIX_ALIAS = {"MV": "PV"}
 
 
 def _detect_format(cols):
@@ -142,12 +145,13 @@ def _normalise_format1(df, sep):
     for col in df.columns:
         # Match anything ending with <sep><signal> (case-insensitive)
         m = re.match(
-            rf"^(.+){escaped}(PV|OP|SP|MODE)$",
+            rf"^(.+){escaped}(PV|MV|OP|SP|MODE)$",
             col,
             flags=re.IGNORECASE,
         )
         if m:
             tag, signal = m.group(1), m.group(2).upper()
+            signal = _SUFFIX_ALIAS.get(signal, signal)  # MV → PV
             new_name = f"{tag}_{signal}"
             if new_name != col:
                 rename_map[col] = new_name
@@ -230,7 +234,7 @@ def _fill_missing_mode(df, auto_mode_value):
     with auto_mode_value. Modifies df in-place; returns report lines.
     """
     report = []
-    pv_cols = [c for c in df.columns if c.upper().endswith("_PV")]
+    pv_cols = [c for c in df.columns if c.upper().endswith("_PV") or c.upper().endswith("_MV")]
 
     for pv_col in pv_cols:
         tag = pv_col[:-3]  # strip "_PV"

@@ -13,29 +13,46 @@
   --ok:#1a9e5a;--ok-bg:#e6f7ef;--ok-border:#a3d9bc;
   --crit:#dc2626;--crit-bg:#fdf0ef;
   --warn:#d97706;--warn-bg:#fef3e2;
-  --bg:#f0f4f8;--surface:#fff;--border:#d8e2ec;
-  --text:#0f2744;--text2:#3a5068;--text3:#6b8299;
-  --r:8px;--shadow-md:0 4px 24px rgba(15,39,68,.12);
+  --bg:#f0f4f8;--surface:#fff;--border:#d8e2ec;--border2:#e8eef4;
+  --text:#0f2744;--text2:#3a5068;--text3:#6b8299;--text4:#9ab0c4;
+  --r:8px;--rl:12px;
+  --shadow-md:0 4px 24px rgba(15,39,68,.12);
 }
-html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text)}
-.topbar{background:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;border-bottom:3px solid #3b82f6;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+html,body{min-height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;border:none;background:none;font-family:inherit}
+*:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* ── TOPBAR ── */
+.topbar{background:#1e293b;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:300;border-bottom:1px solid rgba(255,255,255,.08)}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-hex{width:36px;height:36px;background:#3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-hex{width:32px;height:32px;background:#3b82f6;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logo-brand{display:flex;flex-direction:column;gap:1px}
-.logo-brand-main{color:#1e3a5f;font-size:15px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;letter-spacing:-.01em;line-height:1}
-.logo-brand-main span{color:#3b82f6;font-weight:300}
+.logo-brand-main{color:#fff;font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace;letter-spacing:-.01em;line-height:1}
+.logo-brand-main span{color:#93c5fd;font-weight:400}
 .logo-brand-sub{color:#64748b;font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
-.topbar-right{display:flex;align-items:center;gap:12px}
-.user-pill{background:#f1f5f9;color:#475569;font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid #e2e8f0}
-.btn-logout{color:#94a3b8;font-size:12px;background:none;border:none;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;padding:4px 8px;border-radius:6px;transition:background .2s}
-.btn-logout:hover{background:#f1f5f9;color:#1e293b}
-.page{min-height:calc(100vh - 54px);display:flex;align-items:center;justify-content:center;padding:40px 24px}
-.card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow-md);width:100%;max-width:580px;padding:40px 44px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.user-pill{background:rgba(255,255,255,.08);color:#94a3b8;font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.1)}
+.btn-logout{color:#64748b;font-size:12px;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .2s;font-family:inherit}
+.btn-logout:hover{background:rgba(255,255,255,.08);color:#94a3b8}
+
+/* ── SOURCE SELECTOR (above the card) ── */
+.src-selector-wrap{display:flex;justify-content:center;padding:36px 24px 0}
+.src-selector{display:flex;background:#fff;border-radius:10px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(15,39,68,.07);overflow:hidden;width:100%;max-width:580px}
+.src-tab{flex:1;padding:15px 20px;font-size:13px;font-weight:600;color:var(--text3);background:none;border:none;cursor:pointer;transition:all .2s;font-family:inherit;border-bottom:3px solid transparent;user-select:none}
+.src-tab:not(:last-child){border-right:1px solid var(--border)}
+.src-tab:hover:not(.active){background:#f8fafc;color:var(--text2)}
+.src-tab.active{color:#3b82f6;background:#f0f7ff;border-bottom-color:#3b82f6;font-weight:700}
+.src-panel{display:none}
+.src-panel.active{display:block}
+
+/* PANEL A — EXCEL UPLOAD */
+.upload-page{display:flex;align-items:center;justify-content:center;padding:24px 24px 48px;min-height:calc(100vh - 160px)}
+.upload-card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow-md);width:100%;max-width:580px;padding:40px 44px}
 .card-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px}
 .card-sub{font-size:13px;color:var(--text3);margin-bottom:32px}
 .mode-label{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px}
 .mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:28px}
-.mode-btn{padding:14px 16px;cursor:pointer;transition:background .2s,color .2s;border:none;font-family:'IBM Plex Sans',sans-serif;background:var(--surface);position:relative}
+.mode-btn{padding:14px 16px;cursor:pointer;transition:background .2s,color .2s;border:none;font-family:inherit;background:var(--surface)}
 .mode-btn:first-child{border-right:1px solid var(--border)}
 .mode-btn.active{background:var(--navy);color:#fff}
 .mode-btn:not(.active){color:var(--text2)}
@@ -66,12 +83,14 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
 .file-pill-size{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;flex-shrink:0}
 .file-pill-remove{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:4px;transition:color .2s}
 .file-pill-remove:hover{color:var(--crit)}
-.btn-run{width:100%;margin-top:24px;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-run{width:100%;margin-top:24px;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-run:hover:not(:disabled){background:#2272c3}
 .btn-run:disabled{opacity:.45;cursor:not-allowed}
 .error-box{background:var(--crit-bg);border:1px solid #f5aaaa;border-radius:var(--r);padding:12px 16px;margin-top:16px;font-size:13px;color:var(--crit);display:none;line-height:1.6}
 .error-box.show{display:block}
-.loading-overlay{display:none;position:fixed;inset:0;background:rgba(15,39,68,.82);z-index:999;flex-direction:column;align-items:center;justify-content:center;font-family:'IBM Plex Sans',sans-serif;color:#fff}
+
+/* LOADING OVERLAY */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(15,39,68,.82);z-index:999;flex-direction:column;align-items:center;justify-content:center;color:#fff}
 .loading-overlay.show{display:flex}
 .spinner{width:56px;height:56px;border:4px solid rgba(255,255,255,.15);border-top-color:var(--blue-lt);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:24px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -81,11 +100,222 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
 .lmb-auto{background:rgba(46,134,222,.25);color:#7fd3ff;border:1px solid rgba(78,168,248,.3)}
 .lmb-manual{background:rgba(124,58,237,.25);color:#c4b5fd;border:1px solid rgba(196,181,253,.3)}
 .loading-steps{margin-top:28px;display:flex;flex-direction:column;gap:10px;width:280px}
-.step{display:flex;align-items:center;gap:10px;font-size:12px;color:#7aaccf;opacity:.35;transition:opacity .4s,color .4s}
-.step.active{opacity:1;color:#fff}
-.step.done{opacity:.65;color:var(--ok)}
-.step-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
-.step.done .step-dot{background:var(--ok)}
+.lstep{display:flex;align-items:center;gap:10px;font-size:12px;color:#7aaccf;opacity:.35;transition:opacity .4s,color .4s}
+.lstep.active{opacity:1;color:#fff}
+.lstep.done{opacity:.65;color:var(--ok)}
+.lstep-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
+.lstep.done .lstep-dot{background:var(--ok)}
+
+/* PANEL B — MANAGER (DB CONFIGURE) */
+.mgr-wrap{padding-bottom:80px}
+.steps{display:flex;align-items:stretch;background:#fff;border-bottom:.5px solid rgba(0,0,0,.14);overflow-x:auto;position:sticky;top:110px;z-index:100}
+.step{display:flex;align-items:center;gap:9px;padding:13px 18px;cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;white-space:nowrap;flex-shrink:0}
+.step:hover{background:#f9f8f5}
+.step.active{border-bottom-color:#2e86de}
+.step.done{border-bottom-color:#e6f7ef}
+.step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:#e8e7e2;color:#9a9994;flex-shrink:0;transition:all .2s}
+.step.active .step-num{background:#e8f1fb;color:#0c447c}
+.step.done .step-num{background:#e1f5ee;color:#0f6e56;font-size:12px}
+.step-lbl{font-size:12px;color:#5f5e5a;transition:color .15s}
+.step.active .step-lbl{color:var(--navy);font-weight:600}
+.step-sep{color:rgba(0,0,0,.14);font-size:18px;flex-shrink:0;align-self:center;padding:0 2px;user-select:none}
+.step-prog{height:2px;background:#e8f1fb;position:relative;overflow:hidden}
+.step-prog-bar{height:100%;background:#2e86de;transition:width .4s cubic-bezier(.4,0,.2,1);width:0%}
+.mgr-page{max-width:980px;margin:0 auto;padding:24px 24px 40px}
+.scr{display:none;animation:fadeIn .2s ease}.scr.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card{background:#fff;border:.5px solid rgba(0,0,0,.08);border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.card-hdr{padding:13px 18px;border-bottom:.5px solid rgba(0,0,0,.08);display:flex;align-items:center;gap:10px}
+.card-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.card-title{font-size:13px;font-weight:700;color:var(--navy)}
+.card-sub{font-size:11px;color:#9a9994;margin-top:1px}
+.card-body{padding:16px 18px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9a9994}
+.fi{height:36px;padding:0 12px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:12px;font-family:inherit;color:var(--text);background:#f9f8f5;transition:all .15s;width:100%}
+.fi:focus{outline:none;border-color:#185fa5;box-shadow:0 0 0 3px rgba(24,95,165,.1);background:#fff}
+.fi-mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+.fi-num{text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600}
+.fi-num.changed{border-color:#fac775;background:#fffcf5}
+input[type=datetime-local]{height:36px;padding:0 10px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--text);background:#f9f8f5;transition:all .15s}
+input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 0 0 3px rgba(24,95,165,.1);background:#fff}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,0,0,.08)}
+.gbox{background:#fff;padding:16px 18px}
+.kpi-lbl{font-size:10px;color:#9a9994;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;font-weight:600}
+.kpi-val{font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.kpi-sub{font-size:11px;color:#9a9994;margin-top:3px}
+.tag-mono{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0c447c;background:#e8f1fb;padding:2px 7px;border-radius:4px;border:.5px solid #b5d4f4}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;background:#e8f1fb;border:.5px solid #b5d4f4;color:#0c447c;font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace;white-space:nowrap;transition:all .12s}
+.chip:hover{background:#d5e9f8}
+.chip-rm{font-size:14px;color:#85b7eb;cursor:pointer;margin-left:1px;line-height:1;font-family:sans-serif}
+.chip-rm:hover{color:#0c447c}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.b-flow{background:#e1f5ee;color:#0f6e56}.b-level{background:#e8f1fb;color:#0c447c}
+.b-pressure{background:#faeeda;color:#854f0b}.b-unknown{background:#f1efe8;color:#5f5e5a}
+.sdot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+.dok{background:#1d9e75}.dwarn{background:#ef9f27}.dna{background:#b4b2a9}
+.rng{height:36px;padding:0 13px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:11px;font-weight:600;color:#5f5e5a;background:#f9f8f5;transition:all .12s}
+.rng:hover,.rng.on{background:#e8f1fb;border-color:#b5d4f4;color:#0c447c}
+.fetch-bar{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:.5px solid rgba(0,0,0,.08);margin-top:2px}
+.fetch-status{font-size:11px;color:#9a9994;display:flex;align-items:center;gap:7px}
+.fetch-status.ok{color:#0f6e56;font-weight:600}
+.btn-fetch{height:38px;padding:0 22px;background:#185fa5;color:#fff;border-radius:var(--r);font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px;transition:all .15s}
+.btn-fetch:hover{background:#0c447c}
+.btn-fetch:disabled{opacity:.55;cursor:not-allowed}
+.fetch-spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.fetch-progress{display:none;gap:0;flex-direction:column;margin-top:12px;border:.5px solid rgba(0,0,0,.08);border-radius:var(--r);overflow:hidden}
+.fetch-progress.visible{display:flex}
+.fp-row{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:.5px solid rgba(0,0,0,.08);background:#f9f8f5;font-size:11px;color:#5f5e5a;transition:all .3s}
+.fp-row:last-child{border-bottom:none}
+.fp-row.done{background:#fff;color:var(--text)}
+.fp-row.active{background:#e8f1fb;color:#0c447c;font-weight:600}
+.fp-icon{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+/* ── LOOP CARD LIST ── */
+.loop-list{margin-top:6px;overflow-x:auto;overflow-y:auto;max-height:320px;border:.5px solid #e8e6e1;border-radius:var(--r)}
+.loop-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.loop-tbl th{background:#f0f4f8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:7px 10px;border:.5px solid #dde3ea;color:#5f5e5a;white-space:nowrap;position:sticky;top:0;z-index:2}
+.loop-tbl th.col-pv{color:#0f6e56}
+.loop-tbl th.col-sp{color:#185fa5}
+.loop-tbl th.col-op{color:#854f0b}
+.loop-tbl th.col-mode{color:#6d28d9}
+.loop-tbl td{padding:4px 6px;border:.5px solid #e8e6e1;vertical-align:middle}
+.loop-tbl tr:hover td{background:#f7f9fc}
+.loop-tbl td.col-id{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#0c447c;white-space:nowrap;padding:4px 10px}
+.loop-tbl td.col-rm{width:28px;text-align:center;padding:2px}
+.tbl-tag-inp{width:100%;height:28px;padding:0 7px;border:.5px solid transparent;border-radius:4px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text);background:transparent;transition:all .12s;min-width:140px}
+.tbl-tag-inp:hover{border-color:rgba(0,0,0,.12);background:#fafcff}
+.tbl-tag-inp:focus{outline:none;border-color:#3b82f6;background:#fff;box-shadow:0 0 0 2px rgba(59,130,246,.1)}
+.tbl-rm-btn{width:22px;height:22px;border:none;background:none;color:#c0bdb8;cursor:pointer;border-radius:4px;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.tbl-rm-btn:hover{color:#e53e3e;background:#fff1f0}
+.loop-chevron{font-size:10px;color:#9a9994;transition:transform .2s;flex-shrink:0;margin-left:auto}
+.loop-card.open .loop-chevron{transform:rotate(90deg)}
+.loop-card-name{font-size:12px;font-weight:700;color:#0c447c;font-family:'IBM Plex Mono',monospace;flex:1}
+.loop-card-summary{font-size:10px;color:#9a9994;font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+
+.loop-list-ph{font-size:11px;color:#9a9994;font-style:italic;padding:8px 4px}
+.unit-inp{height:36px;padding:0 10px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:12px;font-family:'IBM Plex Sans',sans-serif;color:var(--text);background:#fff;width:160px;transition:border .12s}
+.unit-inp:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.1)}
+.unit-datalist option{font-size:12px}
+.tbl-toolbar{display:flex;align-items:center;gap:8px;margin-top:10px;margin-bottom:4px}
+.tbl-search{height:30px;padding:0 10px 0 28px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:12px;color:var(--text);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239a9994' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 8px center no-repeat;width:200px;transition:border .12s}
+.tbl-search:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.1)}
+.tbl-reset-btn{height:30px;padding:0 12px;border:.5px solid rgba(220,38,38,.3);border-radius:var(--r);font-size:11px;font-weight:600;color:#dc2626;background:#fff5f5;cursor:pointer;transition:all .12s;white-space:nowrap;margin-left:auto}
+.tbl-reset-btn:hover{background:#fee2e2;border-color:#dc2626}
+.loop-tbl th.col-unit{color:#6d28d9}
+.tbl-unit-cell{font-size:11px;color:#5f5e5a;white-space:nowrap;padding:4px 8px}
+.fmt-change-btn{font-size:10px;color:#185fa5;cursor:pointer;text-decoration:underline;margin-left:6px}
+.fmt-change-btn:hover{color:#0c447c}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:8px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:#9a9994;border-bottom:1px solid rgba(0,0,0,.08);background:#f9f8f5}
+.tbl td{padding:9px 14px;border-bottom:.5px solid rgba(0,0,0,.08);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#fafaf8}
+.tbl-tag-name{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--navy)}
+.tbl-desc{font-size:11px;color:#5f5e5a;line-height:1.4}
+.thr-slider{display:flex;align-items:center;gap:10px}
+.thr-slider input[type=number]{width:88px;height:32px;padding:0 8px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);background:#f9f8f5;color:var(--text);transition:all .15s}
+.thr-slider input[type=number]:focus{outline:none;border-color:#185fa5;background:#fff;box-shadow:0 0 0 3px rgba(24,95,165,.1)}
+.thr-slider input[type=number].changed{border-color:#fac775;background:#fffcf5}
+.def-lbl{font-size:10px;color:#9a9994;font-family:'IBM Plex Mono',monospace;white-space:nowrap}
+.reset-btn{font-size:10px;color:#185fa5;cursor:pointer;border:none;background:none;padding:0;opacity:0;transition:opacity .15s;font-family:inherit}
+.tbl tr:hover .reset-btn{opacity:1}
+.reset-btn:hover{text-decoration:underline}
+.mrow{display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:.5px solid rgba(0,0,0,.08);transition:background .12s}
+.mrow:last-child{border-bottom:none}
+.mrow:hover{background:#f9f8f5}
+.mrow.sub{padding-left:42px;background:#f9f8f5}
+.mrow.sub:hover{background:#f2f1ec}
+.mrow-name{flex:1;font-size:12px;color:#5f5e5a}
+.mrow.parent .mrow-name{font-weight:600;color:var(--text)}
+.mrow.disabled-row .mrow-name{color:#9a9994;text-decoration:line-through}
+.tog{position:relative;width:36px;height:20px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-track{position:absolute;inset:0;background:#d3d1c7;border-radius:10px;cursor:pointer;transition:background .2s}
+.tog input:checked+.tog-track{background:#1d9e75}
+.tog-thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.22);pointer-events:none}
+.tog input:checked~.tog-thumb{transform:translateX(16px)}
+.excl-tbl-hdr{padding:5px 3px;background:#1a7fd4;color:#fff;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;z-index:2;text-align:center;width:65px;max-width:65px;word-break:break-word;white-space:normal;line-height:1.3}
+.excl-tbl-loop{padding:5px 8px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0f172a;background:#f9f8f5;border-bottom:1px solid rgba(0,0,0,.08);white-space:nowrap;position:sticky;left:0;z-index:1;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.excl-tbl-cell{padding:3px 2px;text-align:center;border-bottom:1px solid rgba(0,0,0,.08);border-left:1px solid rgba(0,0,0,.08);width:65px}
+.excl-toggle{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;transition:all .15s;color:transparent}
+.excl-toggle.ticked{background:#eff6ff;border-color:#3b82f6;color:#2563eb}
+.excl-toggle:hover{border-color:#3b82f6;background:#f0f7ff}
+.exc-rm{font-size:14px;color:#85b7eb;cursor:pointer;font-weight:400;font-family:sans-serif}
+.exc-rm:hover{color:#0c447c}
+.prob-col{padding:14px;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.prob-block{border:.5px solid rgba(0,0,0,.08);border-radius:var(--r);overflow:hidden}
+.prob-hdr{padding:8px 13px;background:#f9f8f5;border-bottom:.5px solid rgba(0,0,0,.08);font-size:11px;font-weight:700;color:var(--navy);display:flex;align-items:center;justify-content:space-between}
+.prob-hdr .cnt{font-size:10px;font-weight:600;color:#9a9994;background:#e8e7e2;padding:1px 6px;border-radius:8px}
+.prob-hdr .cnt.has{background:var(--crit-bg);color:var(--crit)}
+.dz{min-height:38px;padding:7px 10px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;transition:all .15s}
+.dz.over{background:#e8f1fb;outline:2px dashed #b5d4f4;outline-offset:-2px}
+.dz-ph{font-size:10px;color:#9a9994;font-style:italic}
+.rev-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.rev-box{background:#f9f8f5;border:.5px solid rgba(0,0,0,.08);border-radius:var(--r);padding:14px 16px}
+.rev-lbl{font-size:10px;color:#9a9994;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;font-weight:700}
+.rev-val{font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text)}
+.rev-sub{font-size:11px;color:#9a9994;margin-top:3px}
+.rev-section{margin-top:14px}
+.rev-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#5f5e5a;margin-bottom:8px}
+.rev-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:.5px solid rgba(0,0,0,.08);font-size:12px}
+.rev-row:last-child{border-bottom:none}
+.rev-key{font-family:'IBM Plex Mono',monospace;color:var(--text)}
+.rev-old{color:#9a9994;text-decoration:line-through;margin-right:10px;font-family:'IBM Plex Mono',monospace}
+.rev-new{color:#854f0b;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.mgr-topbar{display:flex;align-items:center;justify-content:flex-end;padding:10px 24px 0;gap:10px;max-width:980px;margin:0 auto}
+.btn-save{background:#185fa5;color:#fff;padding:8px 18px;border-radius:var(--r);font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;transition:all .15s}
+.btn-save:hover{background:#0c447c}
+.btn-save.saved{background:#0f6e56}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 0 0}
+.btn-next{background:#185fa5;color:#fff;padding:8px 18px;border-radius:var(--r);font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;transition:background .15s}
+.btn-next:hover{background:#0c447c}
+.btn-prev{background:transparent;border:.5px solid rgba(0,0,0,.14);padding:7px 14px;border-radius:var(--r);font-size:12px;color:#5f5e5a;display:flex;align-items:center;gap:5px;transition:background .12s}
+.btn-prev:hover{background:#f9f8f5}
+#overviewLocked{display:flex;align-items:center;justify-content:center;padding:40px;flex-direction:column;gap:10px;color:#9a9994}
+#overviewLocked svg{opacity:.3}
+#overviewLoaded{display:none}
+.hint{font-size:10px;margin-top:3px;min-height:14px;transition:all .2s}
+.hint.err{color:var(--crit)}.hint.ok-msg{color:var(--ok)}
+#mgr-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(24px);background:var(--navy);color:#e8f3fd;font-size:12px;padding:10px 20px;border-radius:8px;border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 20px rgba(15,39,68,.25);opacity:0;transition:opacity .35s,transform .35s;pointer-events:none;z-index:9999;white-space:nowrap;display:flex;align-items:center;gap:8px}
+#mgr-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── RESOLUTION TOGGLE ── */
+.res-toggle{display:flex;gap:0;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);overflow:hidden;width:fit-content;margin-bottom:4px}
+.res-btn{padding:7px 18px;font-size:12px;font-weight:600;color:#5f5e5a;background:#f9f8f5;border:none;cursor:pointer;transition:all .15s;font-family:inherit;border-right:.5px solid rgba(0,0,0,.1)}
+.res-btn:last-child{border-right:none}
+.res-btn:hover:not(.active){background:#e8f1fb;color:#0c447c}
+.res-btn.active{background:#3b82f6;color:#fff}
+.res-hint{font-size:10px;color:#9a9994;font-style:italic}
+
+/* ── TAG FORMAT SETUP ── */
+.fmt-box{background:#f0f7ff;border:1px solid #b5d4f4;border-radius:var(--r);padding:14px 16px;margin-bottom:4px}
+.fmt-box.fmt-set{background:#e6f7ef;border-color:#a3d9bc}
+.fmt-title{font-size:11px;font-weight:700;color:#0c447c;margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.fmt-title.set{color:#0f6e56}
+.fmt-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:#3b82f6;color:#fff;letter-spacing:.04em}
+.fmt-badge.set{background:#0f6e56}
+.fmt-sub{font-size:10px;color:#5f7a8a;margin-bottom:10px}
+.fmt-grid{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;align-items:center}
+.fmt-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.fmt-lbl.pv{color:#0f6e56}.fmt-lbl.sp{color:#185fa5}.fmt-lbl.op{color:#854f0b}.fmt-lbl.mode{color:#6d28d9}
+.fmt-inp{height:30px;padding:0 9px;border:.5px solid rgba(0,0,0,.12);border-radius:6px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text);background:#fff;width:100%;transition:all .15s}
+.fmt-inp:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.1)}
+.fmt-inp.detected{border-color:#a3d9bc;background:#f6fef9}
+.fmt-preview{font-size:10px;color:#9a9994;margin-top:6px;font-family:'IBM Plex Mono',monospace;line-height:1.8}
+.fmt-preview span{background:#e8f1fb;border-radius:3px;padding:1px 5px;color:#0c447c;font-weight:600}
+.fmt-summary{font-size:11px;font-family:'IBM Plex Mono',monospace;color:#0f6e56;font-weight:600}
+.fmt-reset{font-size:10px;color:#9a9994;cursor:pointer;text-decoration:underline;margin-left:auto}
+.fmt-reset:hover{color:var(--crit)}
+/* ── AUTOCOMPLETE ── */
+.ac-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:.5px solid #b5d4f4;border-radius:var(--r);box-shadow:0 4px 16px rgba(15,39,68,.12);z-index:50;display:none;overflow:hidden}
+.ac-dropdown.open{display:block}
+.ac-item{padding:9px 14px;cursor:pointer;transition:background .12s;border-bottom:.5px solid rgba(0,0,0,.06)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.sel{background:#e8f1fb}
+.ac-base{font-size:12px;font-weight:700;color:#0c447c;font-family:'IBM Plex Mono',monospace}
+.ac-tags{font-size:10px;color:#9a9994;margin-top:2px;font-family:'IBM Plex Mono',monospace}
+.ac-hint{font-size:10px;color:#9a9994;min-height:14px;margin-top:3px}
 </style>
 </head>
 <body>
@@ -106,194 +336,949 @@ html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg
   </div>
 </div>
 
-<div class="page">
-  <div class="card">
-    <div class="card-title">Upload Diagnostic Data</div>
-    <div class="card-sub">Choose a run mode, upload your plant Excel file, then review settings before running.</div>
-
-    <div class="mode-label">Run Mode</div>
-    <div class="mode-toggle">
-      <button class="mode-btn active" id="btn-auto" onclick="setMode('auto')">
-        <div class="mode-badge badge-auto">AUTO</div>
-        <div class="mode-name">Auto Calibration</div>
-        <div class="mode-desc">Engine calibrates thresholds from your data. Recommended for first-time runs.</div>
-      </button>
-      <button class="mode-btn" id="btn-manual" onclick="setMode('manual')">
-        <div class="mode-badge badge-manual">MANUAL</div>
-        <div class="mode-name">Manual Config</div>
-        <div class="mode-desc">Uses your DIAGNOSTIC_CONFIG values exactly. Same as v2 diagnostics engine.</div>
-      </button>
-    </div>
-
-    <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input" accept=".xlsx,.xls"/>
-      <div class="drop-icon">
-        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      </div>
-      <div class="drop-title">Drag &amp; drop your Excel file here</div>
-      <div class="drop-hint">or <b>click to browse</b></div>
-      <div class="drop-types">.xlsx &nbsp;/&nbsp; .xls</div>
-    </div>
-
-    <div class="file-pill" id="file-pill">
-      <div class="file-pill-icon">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      </div>
-      <span class="file-pill-name" id="pill-name"></span>
-      <span class="file-pill-size" id="pill-size"></span>
-      <button class="file-pill-remove" id="pill-remove" title="Remove">✕</button>
-    </div>
-
-    <div class="error-box" id="error-box"></div>
-
-    <button class="btn-run" id="btn-run" disabled>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      <span id="btn-run-txt">Upload &amp; Run</span>
-    </button>
+<!-- ── SOURCE SELECTOR ── -->
+<div class="src-selector-wrap">
+  <div class="src-selector">
+    <button class="src-tab active" id="srcTabExcel" onclick="switchSrc('excel')">Excel Upload</button>
+    <button class="src-tab" id="srcTabDb" onclick="switchSrc('db')">Configure &amp; Run from Database</button>
   </div>
 </div>
 
+<!-- ══ PANEL A: EXCEL UPLOAD ══ -->
+<div class="src-panel active" id="panelExcel">
+  <div class="upload-page">
+    <div class="upload-card">
+      <div class="card-title">Upload Diagnostic Data</div>
+      <div class="card-sub">Choose a run mode, upload your plant Excel file, then review settings before running.</div>
+      <div class="mode-label">Run Mode</div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="btn-auto" onclick="setMode('auto')">
+          <div class="mode-badge badge-auto">AUTO</div>
+          <div class="mode-name">Auto Calibration</div>
+          <div class="mode-desc">Engine calibrates thresholds from your data. Recommended for first-time runs.</div>
+        </button>
+        <button class="mode-btn" id="btn-manual" onclick="setMode('manual')">
+          <div class="mode-badge badge-manual">MANUAL</div>
+          <div class="mode-name">Manual Config</div>
+          <div class="mode-desc">Uses your DIAGNOSTIC_CONFIG values exactly. Same as v2 diagnostics engine.</div>
+        </button>
+      </div>
+
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" accept=".xlsx,.xls"/>
+        <div class="drop-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="drop-title">Drag &amp; drop your Excel file here</div>
+        <div class="drop-hint">or <b>click to browse</b></div>
+        <div class="drop-types">.xlsx &nbsp;/&nbsp; .xls</div>
+      </div>
+      <div class="file-pill" id="file-pill">
+        <div class="file-pill-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <span class="file-pill-name" id="pill-name"></span>
+        <span class="file-pill-size" id="pill-size"></span>
+        <button class="file-pill-remove" id="pill-remove" title="Remove">✕</button>
+      </div>
+      <div class="error-box" id="error-box"></div>
+      <button class="btn-run" id="btn-run" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span id="btn-run-txt">Upload &amp; Run</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PANEL B: CONFIGURE & RUN FROM DATABASE ══ -->
+<div class="src-panel" id="panelDb">
+  <div class="mgr-wrap">
+    <div class="mgr-topbar">
+      <button class="btn-save" id="mgrSaveBtn" onclick="mgrSaveAll()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save &amp; apply
+      </button>
+    </div>
+    <div class="steps" id="stepNav">
+      <div class="step active" id="s1" onclick="mgrShow(1)"><span class="step-num">1</span><span class="step-lbl">Session &amp; data</span></div>
+      <span class="step-sep">›</span>
+      <div class="step" id="s2" onclick="mgrShow(2)"><span class="step-num">2</span><span class="step-lbl">Thresholds</span></div>
+      <span class="step-sep">›</span>
+      <div class="step" id="s3" onclick="mgrShow(3)"><span class="step-num">3</span><span class="step-lbl">Detection methods</span></div>
+      <span class="step-sep">›</span>
+      <div class="step" id="s4" onclick="mgrShow(4)"><span class="step-num">4</span><span class="step-lbl">Loop exclusions</span></div>
+      <span class="step-sep">›</span>
+      <div class="step" id="s5" onclick="mgrShow(5)"><span class="step-num">5</span><span class="step-lbl">Review &amp; save</span></div>
+    </div>
+    <div class="step-prog"><div class="step-prog-bar" id="mgrProgBar"></div></div>
+    <div class="mgr-page">
+
+      <!-- SCREEN 1 -->
+      <div class="scr active" id="scr1">
+        <div class="card">
+          <div class="card-hdr"><div class="card-icon" style="background:#f1efe8">🏭</div><div><div class="card-title">Session details</div><div class="card-sub">Enter plant and affiliate information for this diagnostic run</div></div></div>
+          <div class="card-body">
+            <div class="g3">
+              <div class="field"><label>Affiliate / Company</label><input class="fi" id="infoAffiliate" type="text" placeholder="e.g. Ingenero Pte Ltd" oninput="onInfoChange()"/><div class="hint" id="hintAff"></div></div>
+              <div class="field"><label>Plant name</label><input class="fi" id="infoPlant" type="text" placeholder="e.g. Ethylene Fractionator" oninput="onInfoChange()"/><div class="hint" id="hintPlant"></div></div>
+              <div class="field"><label>Location</label><input class="fi" id="infoLocation" type="text" placeholder="e.g. Singapore" oninput="onInfoChange()"/></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-icon" style="background:#e8f1fb">🗄️</div><div><div class="card-title">Data selection</div><div class="card-sub">Add loop tags and set a date range, then fetch from the database</div></div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap">
+              <div class="field" style="flex:0 0 auto"><label>Start date &amp; time</label><input type="datetime-local" id="startDt" oninput="validateDates()"/></div>
+              <div class="field" style="flex:0 0 auto"><label>End date &amp; time</label><input type="datetime-local" id="endDt" oninput="validateDates()"/></div>
+              <div style="display:flex;gap:5px;padding-bottom:1px">
+                <button class="rng" data-r="7" onclick="setRange(7)">7d</button>
+                <button class="rng" data-r="14" onclick="setRange(14)">14d</button>
+                <button class="rng" data-r="30" onclick="setRange(30)">30d</button>
+                <button class="rng" data-r="90" onclick="setRange(90)">90d</button>
+              </div>
+              <div class="hint err" id="dateHint" style="align-self:center;padding-bottom:1px"></div>
+            </div>
+            <!-- DATA RESOLUTION -->
+            <div class="field">
+              <label>Data resolution</label>
+              <div class="res-toggle">
+                <button class="res-btn active" data-res="minute" onclick="setResolution('minute')">Minute</button>
+                <button class="res-btn" data-res="hourly" onclick="setResolution('hourly')">Hourly</button>
+                <button class="res-btn" data-res="daily" onclick="setResolution('daily')">Daily</button>
+              </div>
+              <div class="res-hint" id="resHint">Minute-level data — full fidelity, larger dataset</div>
+            </div>
+
+            <!-- TAG FORMAT SETUP -->
+            <div class="field">
+              <label>Tag format suffixes <span style="font-size:9px;font-weight:400;color:#9a9994;text-transform:none;letter-spacing:0">(add possible suffixes per role — leave empty to use defaults)</span></label>
+              <div id="fmtSetupBox">
+                <div style="display:grid;grid-template-columns:auto 1fr auto 1fr;gap:6px 10px;align-items:center;margin-bottom:10px">
+                  <span class="fmt-lbl pv">PV</span>
+                  <input class="fmt-inp fi fi-mono" id="fmtPV" type="text" placeholder="e.g. _MV or .PV" autocomplete="off"/>
+                  <span class="fmt-lbl sp">SP</span>
+                  <input class="fmt-inp fi fi-mono" id="fmtSP" type="text" placeholder="e.g. _SP or .SP" autocomplete="off"/>
+                  <span class="fmt-lbl op">OP</span>
+                  <input class="fmt-inp fi fi-mono" id="fmtOP" type="text" placeholder="e.g. _OP or .OP" autocomplete="off"/>
+                  <span class="fmt-lbl mode">MODE</span>
+                  <input class="fmt-inp fi fi-mono" id="fmtMODE" type="text" placeholder="e.g. _MODE or .mode" autocomplete="off"/>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <button onclick="confirmFormat()" style="height:34px;padding:0 16px;background:#3b82f6;border:none;border-radius:var(--r);font-size:12px;font-weight:600;color:#fff;cursor:pointer">
+                    Save format
+                  </button>
+                  <span style="font-size:10px;color:#9a9994">Leave all empty to use defaults (PV · SP · OP · MODE)</span>
+                </div>
+              </div>
+              <div class="fmt-box fmt-set" id="fmtConfirmedBox" style="display:none">
+                <div class="fmt-title set">
+                  <span class="fmt-badge set">&#10003; FORMAT SET</span>
+                  <span class="fmt-summary" id="fmtSummaryText"></span>
+                  <span class="fmt-reset" onclick="changeFormatKeepLoops()">Change format</span>
+                </div>
+                <div class="fmt-preview" id="fmtConfirmedPreview" style="margin-top:4px"></div>
+                <div id="fmtChangeNote" style="display:none;margin-top:5px;font-size:10px;color:#854f0b;background:#fff7ed;border:.5px solid #fed7aa;border-radius:4px;padding:4px 8px">
+                  ⚠ Existing loops kept — new format applies to loops added from now on
+                </div>
+              </div>
+            </div>
+
+            <!-- LOOP TAG INPUT (shown only after format confirmed) -->
+            <div class="field" id="loopInputSection" style="display:none">
+              <label>Loop IDs</label>
+              <div style="position:relative">
+                <div style="display:flex;gap:8px;align-items:center">
+                  <div style="position:relative;flex:1;max-width:400px">
+                    <input class="fi fi-mono" id="tagInput" type="text"
+                      placeholder="Loop ID e.g. 15FC315"
+                      oninput="onTagInput(this.value)"
+                      onkeydown="onTagKeydown(event)"
+                      autocomplete="off"/>
+                    <div class="ac-dropdown" id="acDropdown"></div>
+                  </div>
+                  <datalist id="unitSuggestions"></datalist>
+                  <input class="unit-inp" id="unitInput" type="text" list="unitSuggestions"
+                    placeholder="Unit (e.g. Deethanizer)"
+                    oninput="onUnitInput(this.value)"
+                    autocomplete="off"/>
+                  <button onclick="addTagFromInput()" style="height:36px;padding:0 16px;background:#3b82f6;border:none;border-radius:var(--r);font-size:12px;font-weight:600;color:#fff;white-space:nowrap">+ Add loop</button>
+                  <input type="file" id="tagExcelInput" accept=".xlsx,.xls" style="display:none" onchange="importTagsFromExcel(event)"/>
+                  <button onclick="document.getElementById('tagExcelInput').click()" style="height:36px;padding:0 14px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:12px;color:#5f5e5a;background:#f9f8f5;white-space:nowrap">Import from Excel</button>
+                  <button onclick="downloadSampleExcel()" style="height:36px;padding:0 12px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:12px;color:#185fa5;background:#f0f7ff;white-space:nowrap" title="Download sample Excel template">⬇ Sample</button>
+                </div>
+              </div>
+              <div class="ac-hint" id="acHint"></div>
+              <div class="tbl-toolbar" id="tblToolbar" style="display:none">
+                <input class="tbl-search" id="loopSearch" type="text" placeholder="Search loop ID…"
+                  oninput="filterLoopTable(this.value)" autocomplete="off"/>
+                <button class="tbl-reset-btn" onclick="confirmClearAll()">✕ Clear all loops</button>
+              </div>
+              <div class="loop-list" id="tagPool"><span class="loop-list-ph">No loops added yet — type a loop ID above or import from Excel</span></div>
+              <div style="font-size:11px;color:#9a9994;margin-top:2px" id="tagCount"></div>
+            </div>
+            <div class="fetch-bar">
+              <div class="fetch-status" id="fetchStatus">Add tags and set a date range, then fetch.</div>
+              <button class="btn-fetch" id="fetchBtn" onclick="fetchData()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+                Fetch data
+              </button>
+            </div>
+            <div class="fetch-progress" id="fetchProgress">
+              <div class="fp-row" id="fp1"><div class="fp-icon" id="fpi1">⏳</div>Connecting to database…</div>
+              <div class="fp-row" id="fp2"><div class="fp-icon" id="fpi2">⏳</div>Retrieving tag list…</div>
+              <div class="fp-row" id="fp3"><div class="fp-icon" id="fpi3">⏳</div>Pulling time-series data…</div>
+              <div class="fp-row" id="fp4"><div class="fp-icon" id="fpi4">⏳</div>Validating data quality…</div>
+              <div class="fp-row" id="fp5"><div class="fp-icon" id="fpi5">⏳</div>Building loop inventory…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav"><div></div><button class="btn-next" onclick="mgrShow(2)">Next: Thresholds →</button></div>
+      </div>
+
+      <!-- SCREEN 2 -->
+      <div class="scr" id="scr2">
+        <div class="card">
+          <div class="card-hdr"><div class="card-icon" style="background:#faeeda">⚙️</div><div><div class="card-title">Diagnostic thresholds</div><div class="card-sub" id="thrSubtitle">Numeric limits — 0 changed from defaults</div></div><div style="margin-left:auto"><button onclick="resetAllThresholds()" style="font-size:11px;color:#9a9994;border:.5px solid rgba(0,0,0,.14);padding:5px 11px;border-radius:var(--r);background:#f9f8f5">Reset all to defaults</button></div></div>
+          <table class="tbl"><thead><tr><th style="width:220px">Parameter</th><th>Description</th><th style="width:200px;text-align:right">Value</th></tr></thead><tbody id="thrBody"></tbody></table>
+        </div>
+        <div class="nav"><button class="btn-prev" onclick="mgrShow(1)">← Back</button><button class="btn-next" onclick="mgrShow(3)">Next: Detection methods →</button></div>
+      </div>
+
+      <!-- SCREEN 3 -->
+      <div class="scr" id="scr3">
+        <div class="card">
+          <div class="card-hdr"><div class="card-icon" style="background:#e1f5ee">🔬</div><div><div class="card-title">Detection Methods</div><div class="card-sub">Untick a method to disable it for that loop</div></div><div style="margin-left:auto"><button onclick="methReset()" style="font-size:11px;color:#dc2626;border:.5px solid rgba(0,0,0,.14);padding:5px 11px;border-radius:var(--r);background:#f9f8f5">↺ Reset all</button></div></div>
+          <div style="margin-bottom:8px"><input id="meth-search" type="text" placeholder="🔍  Search loops…" oninput="renderMethods()" style="width:100%;box-sizing:border-box;padding:7px 12px;border:1px solid rgba(0,0,0,.12);border-radius:7px;font-size:12px;background:#fff;outline:none"/></div>
+          <div style="overflow:auto;max-height:340px;border:.5px solid rgba(0,0,0,.1);border-radius:8px">
+            <table id="meth-tbl" style="width:100%;border-collapse:collapse;font-size:11px">
+              <thead id="meth-thead"></thead>
+              <tbody id="meth-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="nav"><button class="btn-prev" onclick="mgrShow(2)">← Back</button><button class="btn-next" onclick="mgrShow(4)">Next: Loop exclusions →</button></div>
+      </div>
+
+      <!-- SCREEN 4 -->
+      <div class="scr" id="scr4">
+        <div class="card">
+          <div class="card-hdr"><div class="card-icon" style="background:#fde8e8">🚫</div><div><div class="card-title">Required Diagnostics</div><div class="card-sub">Untick to suppress a detection for that loop. Takes effect when saved.</div></div><div style="margin-left:auto"><button onclick="clearAllExclusions()" style="font-size:11px;color:#dc2626;border:.5px solid rgba(0,0,0,.14);padding:5px 11px;border-radius:var(--r);background:#f9f8f5">↺ Reset all</button></div></div>
+          <div style="margin-bottom:8px"><input id="excl-search" type="text" placeholder="🔍  Search loops…" oninput="renderExclusions()" style="width:100%;box-sizing:border-box;padding:7px 12px;border:1px solid rgba(0,0,0,.12);border-radius:7px;font-size:12px;background:#fff;outline:none"/></div>
+          <div style="overflow:auto;max-height:340px;border:.5px solid rgba(0,0,0,.1);border-radius:8px;margin-top:4px">
+            <table id="excl-table" style="width:100%;border-collapse:collapse;font-size:11px">
+              <thead id="excl-thead"></thead>
+              <tbody id="excl-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="nav"><button class="btn-prev" onclick="mgrShow(3)">← Back</button><button class="btn-next" onclick="mgrShow(5)">Next: Review &amp; save →</button></div>
+      </div>
+
+      <!-- SCREEN 5 -->
+      <div class="scr" id="scr5">
+        <div class="card">
+          <div class="card-hdr"><div class="card-icon" style="background:#e1f5ee">✅</div><div><div class="card-title">Review &amp; save</div><div class="card-sub">Summary of your configuration — verify then click Save &amp; apply</div></div></div>
+          <div class="card-body">
+            <div class="rev-grid">
+              <div class="rev-box"><div class="rev-lbl">Loops</div><div class="rev-val" id="rv-loops">—</div><div class="rev-sub" id="rv-loops-sub">fetched tags</div></div>
+              <div class="rev-box"><div class="rev-lbl">Thresholds changed</div><div class="rev-val" id="rv-thr">0</div><div class="rev-sub">from defaults</div></div>
+              <div class="rev-box"><div class="rev-lbl">Methods enabled</div><div class="rev-val" id="rv-meth">—</div><div class="rev-sub">of 18 algorithms</div></div>
+              <div class="rev-box"><div class="rev-lbl">Exclusions</div><div class="rev-val" id="rv-excl">0</div><div class="rev-sub">loop-problem overrides</div></div>
+            </div>
+            <div class="rev-section" id="rv-session-wrap"><div class="rev-section-title">Session</div><div id="rv-session"></div></div>
+            <div class="rev-section" id="rv-thr-wrap" style="display:none"><div class="rev-section-title">Changed thresholds</div><div id="rv-thr-list"></div></div>
+            <div class="rev-section" id="rv-excl-wrap" style="display:none"><div class="rev-section-title">Exclusions set</div><div id="rv-excl-list"></div></div>
+          </div>
+        </div>
+        <div class="nav">
+          <button class="btn-prev" onclick="mgrShow(4)">← Back</button>
+          <button class="btn-next" id="finalSave" onclick="mgrSaveAll()" style="background:#0f6e56">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save &amp; apply configuration
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
 <div class="loading-overlay" id="loading-overlay">
   <div class="spinner"></div>
   <div class="loading-title" id="ltxt">Uploading file…</div>
   <div class="loading-sub">Please wait while your file is uploaded.</div>
   <div id="loading-mode-badge" class="loading-mode-badge lmb-auto">AUTO MODE</div>
   <div class="loading-steps">
-  <div class="step" id="step-1"><span class="step-dot"></span>Uploading file to server</div>
-  <div class="step" id="step-2"><span class="step-dot"></span>Validating file format</div>
-  <div class="step" id="step-3"><span class="step-dot"></span>Applying configuration</div>
-  <div class="step" id="step-4"><span class="step-dot"></span>Running diagnostics engine</div>
+    <div class="lstep" id="lstep-1"><span class="lstep-dot"></span>Uploading file to server</div>
+    <div class="lstep" id="lstep-2"><span class="lstep-dot"></span>Validating file format</div>
+    <div class="lstep" id="lstep-3"><span class="lstep-dot"></span>Applying configuration</div>
+    <div class="lstep" id="lstep-4"><span class="lstep-dot"></span>Running diagnostics engine</div>
   </div>
 </div>
 
+<div id="mgr-toast">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="mgr-toast-ico"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="mgr-toast-msg"></span>
+</div>
+
 <script>
+/* ── TAB SWITCH ── */
+function switchSrc(src){
+  document.getElementById('srcTabExcel').classList.toggle('active',src==='excel');
+  document.getElementById('srcTabDb').classList.toggle('active',src==='db');
+  document.getElementById('panelExcel').classList.toggle('active',src==='excel');
+  document.getElementById('panelDb').classList.toggle('active',src==='db');
+}
+
+/* ── EXCEL UPLOAD LOGIC ── */
 (function(){
-  let selectedFile = null;
-  let currentMode  = 'auto';
-  let pollTimer    = null;
-
-  window.setMode = function(mode){
-    currentMode = mode;
-    document.getElementById('btn-auto').classList.toggle('active', mode === 'auto');
-    document.getElementById('btn-manual').classList.toggle('active', mode === 'manual');
-  };
-
-  function formatBytes(b){
-    if(b<1024)return b+'B';
-    if(b<1048576)return (b/1024).toFixed(1)+'KB';
-    return (b/1048576).toFixed(1)+'MB';
-  }
-
-  function setFile(f){
-    const ext = f.name.split('.').pop().toLowerCase();
-    if(!['xlsx','xls'].includes(ext)){ showError('Only .xlsx and .xls files are accepted.'); return; }
-    selectedFile = f;
-    document.getElementById('pill-name').textContent = f.name;
-    document.getElementById('pill-size').textContent = formatBytes(f.size);
-    document.getElementById('file-pill').classList.add('show');
-    document.getElementById('btn-run').disabled = false;
-    hideError();
-  }
-
-  function clearFile(){
-    selectedFile = null;
-    document.getElementById('file-pill').classList.remove('show');
-    document.getElementById('btn-run').disabled = true;
-    document.getElementById('file-input').value = '';
-  }
-
-  function showError(msg){ const b=document.getElementById('error-box');b.innerHTML=msg;b.classList.add('show'); }
-  function hideError(){ document.getElementById('error-box').classList.remove('show'); }
-
-  document.getElementById('file-input').addEventListener('change', e => { if(e.target.files[0]) setFile(e.target.files[0]); });
-  document.getElementById('pill-remove').addEventListener('click', clearFile);
-
-  const dz = document.getElementById('drop-zone');
-  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); if(e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
-
-  // Activate upload step animation
-  function startSteps(){
-    for(let i=1;i<=4;i++) document.getElementById('step-'+i)?.classList.remove('active','done');
-    let s=1;
-    function next(){ 
-      if(s>1) document.getElementById('step-'+(s-1))?.classList.replace('active','done');
-      const el=document.getElementById('step-'+s);
-      if(el) el.classList.add('active');
-      s++;
-    }
-    next();
-    pollTimer=setInterval(()=>{ if(s<=4) next(); else clearInterval(pollTimer); }, 600);
-  }
-
-  document.getElementById('btn-run').addEventListener('click', async () => {
-    if(!selectedFile){ showError('Please select a file first.'); return; }
-    hideError();
-
-    const badge = document.getElementById('loading-mode-badge');
-    badge.textContent = currentMode === 'auto' ? 'AUTO MODE' : 'MANUAL MODE';
-    badge.className = 'loading-mode-badge ' + (currentMode === 'auto' ? 'lmb-auto' : 'lmb-manual');
+  let selectedFile=null,currentMode='auto',pollTimer=null;
+  window.setMode=function(mode){currentMode=mode;document.getElementById('btn-auto').classList.toggle('active',mode==='auto');document.getElementById('btn-manual').classList.toggle('active',mode==='manual');};
+  function formatBytes(b){if(b<1024)return b+'B';if(b<1048576)return (b/1024).toFixed(1)+'KB';return (b/1048576).toFixed(1)+'MB';}
+  function setFile(f){const ext=f.name.split('.').pop().toLowerCase();if(!['xlsx','xls'].includes(ext)){showErr('Only .xlsx and .xls files are accepted.');return;}selectedFile=f;document.getElementById('pill-name').textContent=f.name;document.getElementById('pill-size').textContent=formatBytes(f.size);document.getElementById('file-pill').classList.add('show');document.getElementById('btn-run').disabled=false;hideErr();}
+  function clearFile(){selectedFile=null;document.getElementById('file-pill').classList.remove('show');document.getElementById('btn-run').disabled=true;document.getElementById('file-input').value='';}
+  function showErr(m){const b=document.getElementById('error-box');b.innerHTML=m;b.classList.add('show');}
+  function hideErr(){document.getElementById('error-box').classList.remove('show');}
+  document.getElementById('file-input').addEventListener('change',e=>{if(e.target.files[0])setFile(e.target.files[0]);});
+  document.getElementById('pill-remove').addEventListener('click',clearFile);
+  const dz=document.getElementById('drop-zone');
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over');if(e.dataTransfer.files[0])setFile(e.dataTransfer.files[0]);});
+  function startSteps(){for(let i=1;i<=4;i++)document.getElementById('lstep-'+i)?.classList.remove('active','done');let s=1;function next(){if(s>1)document.getElementById('lstep-'+(s-1))?.classList.replace('active','done');const el=document.getElementById('lstep-'+s);if(el)el.classList.add('active');s++;}next();pollTimer=setInterval(()=>{if(s<=4)next();else clearInterval(pollTimer);},600);}
+  document.getElementById('btn-run').addEventListener('click',async()=>{
+    if(!selectedFile){showErr('Please select a file first.');return;}
+    hideErr();
+    const badge=document.getElementById('loading-mode-badge');
+    badge.textContent=currentMode==='auto'?'AUTO MODE':'MANUAL MODE';
+    badge.className='loading-mode-badge '+(currentMode==='auto'?'lmb-auto':'lmb-manual');
     document.getElementById('loading-overlay').classList.add('show');
-    document.getElementById('btn-run').disabled = true;
+    document.getElementById('btn-run').disabled=true;
     startSteps();
-
-    const fd = new FormData();
-    fd.append('file', selectedFile);
-    fd.append('mode', currentMode);
+    const fd=new FormData();fd.append('file',selectedFile);fd.append('mode',currentMode);
 
     try{
-      const res = await fetch('/upload', { method:'POST', body:fd });
-      const data = await res.json();
-
-      if(!res.ok){
-        clearInterval(pollTimer);
-        document.getElementById('loading-overlay').classList.remove('show');
-        showError('Upload error: ' + (data.detail || 'Unknown error.'));
-        document.getElementById('btn-run').disabled = false;
-        return;
-      }
-
-      // Engine started — poll job until done then redirect
+      const res=await fetch('/upload',{method:'POST',body:fd});
+      const data=await res.json();
+      if(!res.ok){clearInterval(pollTimer);document.getElementById('loading-overlay').classList.remove('show');showErr('Upload error: '+(data.detail||'Unknown error.'));document.getElementById('btn-run').disabled=false;return;}
       if(data.job_id){
-        const jobId = data.job_id;
-        document.getElementById('ltxt').textContent = 'Running diagnostics engine…';
-        // Advance steps to reflect engine stage
+        const jobId=data.job_id;
+        document.getElementById('ltxt').textContent='Running diagnostics engine…';
         clearInterval(pollTimer);
-        for(let i=1;i<=4;i++) document.getElementById('step-'+i)?.classList.remove('active','done');
-        ['step-1','step-2','step-3'].forEach(id=>document.getElementById(id)?.classList.add('done'));
-        document.getElementById('step-4')?.classList.add('active');
-
-        const poll = setInterval(async ()=>{
-          try{
-            const pr = await fetch('/api/job/'+jobId);
-            const pd = await pr.json();
-            if(pd.status==='done'){
-              clearInterval(poll);
-              window.location.href = '/';
-            } else if(pd.status==='error'){
-              clearInterval(poll);
-              document.getElementById('loading-overlay').classList.remove('show');
-              showError('Engine error: '+(pd.detail||'Unknown error.'));
-              document.getElementById('btn-run').disabled = false;
-            }
-          } catch{ /* retry */ }
-        }, 2000);
+        for(let i=1;i<=4;i++)document.getElementById('lstep-'+i)?.classList.remove('active','done');
+        ['lstep-1','lstep-2','lstep-3'].forEach(id=>document.getElementById(id)?.classList.add('done'));
+        document.getElementById('lstep-4')?.classList.add('active');
+        const poll=setInterval(async()=>{try{const pr=await fetch('/api/job/'+jobId);const pd=await pr.json();if(pd.status==='done'){clearInterval(poll);window.location.href='/';}else if(pd.status==='error'){clearInterval(poll);document.getElementById('loading-overlay').classList.remove('show');showErr('Engine error: '+(pd.detail||'Unknown error.'));document.getElementById('btn-run').disabled=false;}}catch{}},2000);
         return;
       }
-
-      // Fallback
-      clearInterval(pollTimer);
-      document.getElementById('loading-overlay').classList.remove('show');
-
-    } catch(e){
-      clearInterval(pollTimer);
-      document.getElementById('loading-overlay').classList.remove('show');
-      showError('Network error — please try again.');
-      document.getElementById('btn-run').disabled = false;
-    }
+      clearInterval(pollTimer);document.getElementById('loading-overlay').classList.remove('show');
+    }catch(e){clearInterval(pollTimer);document.getElementById('loading-overlay').classList.remove('show');showErr('Network error — please try again.');document.getElementById('btn-run').disabled=false;}
   });
 })();
+
+/* ── MANAGER / DB CONFIG LOGIC ── */
+const THRESHOLDS=[
+  {p:'AMP_THRESHOLD',v:16,def:15,desc:"PV peak-to-peak amplitude threshold for 'high oscillation'"},
+  {p:'OP_ACTIVITY_THRESHOLD',v:1.5,def:1.5,desc:"Mean |dOP| threshold for 'high OP activity'"},
+  {p:'IAE_PER_HOUR_THRESHOLD',v:200,def:200,desc:"IAE/hour threshold for 'poor tracking'"},
+  {p:'STICT_CONF_HIGH',v:70,def:70,desc:'Stiction confidence (%) classified as HIGH'},
+  {p:'STICT_CONF_MED',v:40,def:40,desc:'Stiction confidence (%) classified as MEDIUM'},
+  {p:'PROP_CONF_MIN',v:50,def:50,desc:'Min propagation confidence (%) to log a link'},
+  {p:'PROP_CONF_STRONG',v:70,def:70,desc:'Propagation confidence (%) classified as STRONG'},
+  {p:'SERVICE_FACTOR_MIN_PCT',v:70,def:70,desc:'Min % time in AUTO/CAS for loop to be analysed'},
+  {p:'SS_DETECTION_WINDOW',v:30,def:30,desc:'Window size (samples) for steady-state detection'},
+  {p:'SS_STD_THRESHOLD',v:0.5,def:0.5,desc:'Std dev threshold for steady-state classification'},
+  {p:'FROZEN_SAMPLES_MIN',v:10,def:10,desc:'Min consecutive identical PV samples to flag frozen sensor'},
+  {p:'QUANTISATION_UNIQUE_VALS_MAX',v:20,def:20,desc:'Max unique PV values before flagging quantisation'},
+  {p:'COMPRESSION_FLAT_FRACTION_MAX',v:0.3,def:0.3,desc:'Max fraction of flat (compressed) points before flagging'},
+  {p:'OSCILLATION_REGULARITY_MIN',v:0.6,def:0.6,desc:'Min Hagglund regularity score for oscillation flag'},
+  {p:'STICTION_S_MIN_PCT',v:0.5,def:0.5,desc:'Min stickband (%) to consider stiction physically present'},
+  {p:'HARRIS_INDEX_THRESHOLD',v:0.3,def:0.3,desc:"Min Harris index for 'good control'"},
+];
+// Unique detection methods only (sub-level, no duplicates, no fallback)
+const METHODS=(()=>{
+  const all=[
+    {name:'Heuristic method',enabled:true},{name:'Horch cross-correlation',enabled:true},
+    {name:'Yamashita shape method',enabled:true},{name:'Bicoherence',enabled:true},
+    {name:'Harris Index',enabled:true},{name:'Hagglund oscillation',enabled:true},
+    {name:'Cross-correlation',enabled:true},{name:'Granger causality',enabled:true},
+    {name:'Spectral coherence',enabled:true},
+  ];
+  return all;
+})();
+const DEFAULT_TAGS=['YN.ETH1.15FC311','YN.ETH1.15LC094','YN.ETH1.15PC217','YN.ETH1.15FC315','YN.ETH1.15FC316','YN.ETH1.15FFC317','YN.ETH1.15LC095','YN.ETH1.15FC901','YN.ETH1.16FC336','YN.ETH1.17FC347'];
+const LOOP_META={'15FC311':{unit:'Ethylene Fractionator',type:'Flow',uom:'Kg/Hr',pts:4320,status:'ok'},'15LC094':{unit:'Ethylene Fractionator',type:'Level',uom:'Kg/Hr',pts:4320,status:'ok'},'15PC217':{unit:'Ethylene Fractionator',type:'Pressure',uom:'Kg/Hr',pts:4280,status:'warn'},'15FC315':{unit:'Ethylene Fractionator',type:'Flow',uom:'Kg/Hr',pts:4320,status:'ok'},'15FC316':{unit:'Ethylene Fractionator',type:'Flow',uom:'Kg/Hr',pts:4320,status:'ok'},'15FFC317':{unit:'Ethylene Fractionator',type:'Flow',uom:'Kg/Hr',pts:4315,status:'ok'},'15LC095':{unit:'Ethylene Fractionator',type:'Level',uom:'%',pts:4320,status:'ok'},'15FC901':{unit:'Ethylene Fractionator',type:'Flow',uom:'—',pts:4100,status:'ok'},'16FC336':{unit:'Unknown',type:'Flow',uom:'—',pts:3900,status:'na'},'17FC347':{unit:'Unknown',type:'Flow',uom:'—',pts:3850,status:'na'}};
+const PROBLEMS=[
+  {id:'stiction',label:'Stiction',icon:'🔧'},
+  {id:'aggressive_tuning',label:'Aggressive Tuning',icon:'⚡'},
+  {id:'sluggish_tuning',label:'Sluggish Tuning',icon:'🐢'},
+  {id:'external_oscillation',label:'External Oscillation',icon:'∿'},
+  {id:'cross_loop_propagation',label:'Cross-loop Propagation',icon:'🔗'},
+  {id:'sensor_noise',label:'Sensor Issue / Noise',icon:'📡'},
+  {id:'manual_mode',label:'Manual Mode',icon:'✋'},
+  {id:'valve_wear',label:'Valve Wear',icon:'⚙'},
+  {id:'saturation',label:'Saturation',icon:'🔺'},
+  {id:'unresponsive_controller',label:'Unresponsive Controller',icon:'🚫'},
+];
+let selectedTags=[],excl={},dataFetched=false;
+
+PROBLEMS.forEach(p=>excl[p.id]=[]);
+
+/* ── RESOLUTION ── */
+const RES_HINTS={minute:'Minute-level data — full fidelity, larger dataset',hourly:'Hourly averages — good balance of detail and speed',daily:'Daily averages — fast fetch, long-range trends'};
+function setResolution(r){
+  currentResolution=r;
+  document.querySelectorAll('.res-btn').forEach(b=>b.classList.toggle('active',b.dataset.res===r));
+  document.getElementById('resHint').textContent=RES_HINTS[r];
+}
+
+/* ── TAG FORMAT STATE ── */
+let tagFormat=null;
+// tagFormat = { suffixes: {pv:['PV','MV'], sp:['SP'], op:['OP'], mode:['MODE','mode']} }
+
+/* ── SUFFIX ROW MANAGEMENT ── */
+function addSuffixRow(role, value=''){
+  const list=document.getElementById('fmt'+role+'-list');
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;align-items:center;gap:4px;margin-bottom:4px';
+  row.innerHTML=`<input type="text" value="${value}" placeholder="e.g. _MV or .MV or MV" style="flex:1;height:28px;padding:0 8px;border:.5px solid rgba(0,0,0,.12);border-radius:5px;font-size:11px;font-family:'IBM Plex Mono',monospace;background:#fff"/><button onclick="this.parentElement.remove()" style="width:22px;height:22px;border-radius:50%;border:none;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;flex-shrink:0">×</button>`;
+  list.appendChild(row);
+}
+
+function getSuffixValues(role){
+  const list=document.getElementById('fmt'+role+'-list');
+  if(!list)return[];
+  return Array.from(list.querySelectorAll('input')).map(i=>i.value.trim()).filter(Boolean);
+}
+
+// applysfx: if suffix starts with separator symbol, use as-is; otherwise append directly
+function applysfx(s){
+  return /^[_.\-]/.test(s) ? s : s;
+  // NOTE: no auto-separator added — user must include it if needed
+}
+
+function confirmFormat(){
+  const _v=r=>document.getElementById('fmt'+r)?.value.trim()||'';
+  const sfxMap={
+    pv:  [_v('PV')  ||'PV'],
+    sp:  [_v('SP')  ||'SP'],
+    op:  [_v('OP')  ||'OP'],
+    mode:[_v('MODE')||'MODE'],
+  };
+  tagFormat={suffixes: sfxMap};
+
+  const parts=Object.entries(sfxMap).map(([r,v])=>r.toUpperCase()+': '+v.join(' / '));
+  document.getElementById('fmtSummaryText').textContent=parts.join('  ·  ');
+  document.getElementById('fmtConfirmedPreview').innerHTML=
+    Object.entries(sfxMap).map(([r,v])=>
+      `<b style="font-family:'IBM Plex Mono',monospace;color:#0c447c">${r.toUpperCase()}→[${v.join(',')}]</b>`
+    ).join('  ');
+
+  document.getElementById('fmtSetupBox').style.display='none';
+  document.getElementById('fmtConfirmedBox').style.display='block';
+  document.getElementById('loopInputSection').style.display='block';
+  const note=document.getElementById('fmtChangeNote');
+  if(note) note.style.display=selectedTags.length?'block':'none';
+  mgrToast('Format saved — now add loop IDs');
+}
+
+function resetFormat(){
+  tagFormat=null;
+  selectedTags=[];
+  unitSuggestions=[];
+  ['PV','SP','OP','MODE'].forEach(r=>{const inp=document.getElementById('fmt'+r);if(inp)inp.value='';});
+  document.getElementById('fmtSetupBox').style.display='block';
+  document.getElementById('fmtConfirmedBox').style.display='none';
+  document.getElementById('loopInputSection').style.display='none';
+  document.getElementById('fmtChangeNote').style.display='none';
+  renderTagPool();
+}
+
+/* Change format WITHOUT wiping existing loops */
+function changeFormatKeepLoops(){
+  // Pre-fill single inputs with current suffix values
+  const prev=tagFormat?.suffixes||{pv:['PV'],sp:['SP'],op:['OP'],mode:['MODE']};
+  ['PV','SP','OP','MODE'].forEach(r=>{
+    const inp=document.getElementById('fmt'+r);
+    if(inp) inp.value=(prev[r.toLowerCase()]||[''])[0]||'';
+  });
+  tagFormat=null;
+  document.getElementById('fmtSetupBox').style.display='block';
+  document.getElementById('fmtConfirmedBox').style.display='none';
+  if(selectedTags.length) document.getElementById('loopInputSection').style.display='block';
+  note.style.display='none';
+}
+
+/* Clear all loops with confirmation */
+function confirmClearAll(){
+  if(!selectedTags.length) return;
+  if(confirm('Remove all '+selectedTags.length+' loop'+(selectedTags.length>1?'s':'')+' from the list?')){
+    selectedTags=[];
+    document.getElementById('loopSearch').value='';
+    renderTagPool();
+    mgrToast('All loops cleared');
+  }
+}
+
+/* Unit suggestions */
+let unitSuggestions=[];
+function addUnitSuggestion(unit){
+  if(unit && !unitSuggestions.includes(unit)){
+    unitSuggestions.push(unit);
+    const dl=document.getElementById('unitSuggestions');
+    if(dl) dl.innerHTML=unitSuggestions.map(u=>`<option value="${u}">`).join('');
+  }
+}
+function onUnitInput(val){
+  // Keep datalist updated dynamically (already handled by addUnitSuggestion)
+  // No extra action needed — browser datalist handles dropdown
+}
+
+/* Filter table rows by loop ID */
+function filterLoopTable(query){
+  const q=query.trim().toUpperCase();
+  const rows=document.querySelectorAll('#tagPool .loop-tbl tbody tr');
+  rows.forEach(row=>{
+    const id=row.querySelector('.col-id');
+    if(!id) return;
+    row.style.display=(!q||id.textContent.toUpperCase().includes(q))?'':'none';
+  });
+}
+
+/* ── BUILD LOOP TAGS FROM FORMAT ── */
+function buildLoopTags(shortId){
+  // With new suffix-based format, we just store the base loop name
+  // Suffix candidates are in tagFormat.suffixes and passed to the engine
+  return [shortId]; // base only; engine uses suffix candidates
+}
+
+/* ── KNOWN BASES for autocomplete (short IDs) ── */
+const KNOWN_BASES=['15FC311','15LC094','15PC217','15FC315','15FC316','15FFC317','15LC095','15FC901','16FC336','17FC347'];
+
+function onTagInput(val){
+  acIndex=-1;
+  const raw=val.trim();
+  const v=raw.toUpperCase();
+  const dd=document.getElementById('acDropdown');
+  const hint=document.getElementById('acHint');
+  if(v.length<2){dd.classList.remove('open');hint.textContent='';return;}
+  // Normalise input: strip prefix + suffix to get the short ID fragment for matching
+  const shortFrag=tagFormat?extractShortId(v):v;
+  const matches=KNOWN_BASES.filter(b=>b.includes(shortFrag));
+  // Also show a "custom" option if what they typed doesn't match any known base
+  const dd_items=[];
+  if(matches.length){
+    matches.forEach(b=>{
+      const preview=tagFormat?buildLoopTags(b).join(' · '):b+' — set format first';
+      dd_items.push(`<div class="ac-item" data-base="${b}" onclick="selectAcItem('${b}')">
+        <div class="ac-base">${b}</div>
+        <div class="ac-tags">${preview}</div>
+      </div>`);
+    });
+  }
+  // If user typed something not in KNOWN_BASES (e.g. a new loop ID from DB), offer it as-is
+  if(tagFormat && !matches.includes(shortFrag)){
+    const preview=buildLoopTags(shortFrag).join(' · ');
+    dd_items.push(`<div class="ac-item" data-base="${shortFrag}" onclick="selectAcItem('${shortFrag}')">
+      <div class="ac-base">${shortFrag} <span style="font-size:9px;color:#9a9994;font-weight:400">(new)</span></div>
+      <div class="ac-tags">${preview}</div>
+    </div>`);
+  }
+  if(!dd_items.length){dd.classList.remove('open');hint.textContent='Type a loop ID to see suggestions';return;}
+  hint.textContent='';
+  dd.innerHTML=dd_items.join('');
+  dd.classList.add('open');
+}
+
+function onTagKeydown(e){
+  const dd=document.getElementById('acDropdown');
+  const items=[...dd.querySelectorAll('.ac-item')];
+  if(!dd.classList.contains('open')){if(e.key==='Enter'){e.preventDefault();addTagFromInput();}return;}
+  if(e.key==='ArrowDown'){e.preventDefault();acIndex=Math.min(acIndex+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('sel',i===acIndex));}
+  else if(e.key==='ArrowUp'){e.preventDefault();acIndex=Math.max(acIndex-1,0);items.forEach((el,i)=>el.classList.toggle('sel',i===acIndex));}
+  else if(e.key==='Enter'){e.preventDefault();const sel=items[acIndex]||items[0];if(sel)selectAcItem(sel.dataset.base);}
+  else if(e.key==='Escape'){dd.classList.remove('open');}
+}
+
+function selectAcItem(shortId){
+  document.getElementById('tagInput').value=shortId;
+  document.getElementById('acDropdown').classList.remove('open');
+  addTagFromInput(shortId);
+}
+
+function extractShortId(raw){
+  // Strip any known suffix (_PV, _MV, _SP, _OP, _MODE etc.) from the end
+  const suffixRe=/[_\.][A-Za-z]{2,6}$/;
+  let s=raw.trim();
+  if(suffixRe.test(s)) s=s.replace(suffixRe,'');
+  return s;
+}
+
+function addTagFromInput(overrideId){
+  const raw=(overrideId||document.getElementById('tagInput').value).trim();
+  document.getElementById('acDropdown').classList.remove('open');
+  if(!raw){document.getElementById('tagInput').focus();return;}
+  if(!tagFormat){mgrToast('Set the tag format first','warn');return;}
+  const shortId=extractShortId(raw.toUpperCase());
+  const base=shortId;
+  if(selectedTags.find(l=>l.base===base)){mgrToast('Loop already added','warn');document.getElementById('tagInput').value='';return;}
+  const unit=(document.getElementById('unitInput').value||'').trim();
+  const sfxSnap=JSON.parse(JSON.stringify(tagFormat?.suffixes||{pv:['PV'],sp:['SP'],op:['OP'],mode:['MODE']}));
+  selectedTags.push({base,unit,suffixes:sfxSnap});
+  addUnitSuggestion(unit);
+  renderTagPool();
+  document.getElementById('tagInput').value='';
+  document.getElementById('acHint').textContent='';
+  mgrToast('Added '+shortId+(unit?' ('+unit+')':'')+' — 4 tags generated');
+}
+
+/* ── EXCEL IMPORT ── */
+async function loadXLSX(){
+  if(!window.XLSX){
+    await new Promise((res,rej)=>{
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+      s.onload=res;s.onerror=rej;document.head.appendChild(s);
+    });
+  }
+}
+
+async function importTagsFromExcel(e){
+  const file=e.target.files[0];if(!file)return;
+  if(!tagFormat){mgrToast('Set the tag format first, then import','warn');e.target.value='';return;}
+  try{
+    await loadXLSX();
+    const buf=await file.arrayBuffer();
+    const wb=window.XLSX.read(buf,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    // Read as objects using first row as header
+    const rows=window.XLSX.utils.sheet_to_json(ws,{defval:''});
+    let added=0,skipped=0;
+    rows.forEach(row=>{
+      // Support column names: loop_name / loop / tag / id (case-insensitive)
+      const loopKey=Object.keys(row).find(k=>/^(loop_name|loop|tag|id)$/i.test(k.trim()));
+      const unitKey=Object.keys(row).find(k=>/^unit$/i.test(k.trim()));
+      const rawLoop=loopKey?String(row[loopKey]||'').trim():'';
+      const unit=unitKey?String(row[unitKey]||'').trim():'';
+      if(!rawLoop) return;
+      const shortId=extractShortId(rawLoop.toUpperCase());
+      const base=shortId;
+      if(!selectedTags.find(l=>l.base===base)){
+        const _sfxSnap=JSON.parse(JSON.stringify(tagFormat?.suffixes||{pv:['PV'],sp:['SP'],op:['OP'],mode:['MODE']}));
+        selectedTags.push({base,unit,suffixes:_sfxSnap});
+        if(unit) addUnitSuggestion(unit);
+        added++;
+      } else { skipped++; }
+    });
+    renderTagPool();
+    mgrToast(added+' loop'+(added!==1?'s':'')+' imported'+(skipped?' ('+skipped+' already existed)':''));
+  }catch(err){
+    console.error(err);
+    mgrToast('Could not read Excel file — check format','warn');
+  }
+  e.target.value='';
+}
+
+async function downloadSampleExcel(){
+  await loadXLSX();
+  // Build sample rows using current format prefix as example, or generic fallback
+  const pfx=tagFormat?tagFormat.prefix:'YN.ETH2.';
+  const sampleRows=[
+    {loop_name: pfx+'FC1001', unit:'Deethanizer'},
+    {loop_name: pfx+'FC1002', unit:'Deethanizer'},
+    {loop_name: pfx+'LC2001', unit:'Debutanizer'},
+    {loop_name: pfx+'PC3001', unit:'Depropanizer'},
+    {loop_name: pfx+'FC4001', unit:''},
+  ];
+  const ws=window.XLSX.utils.json_to_sheet(sampleRows,{header:['loop_name','unit']});
+  // Set column widths
+  ws['!cols']=[{wch:28},{wch:18}];
+  const wb=window.XLSX.utils.book_new();
+  window.XLSX.utils.book_append_sheet(wb,ws,'Loops');
+  window.XLSX.writeFile(wb,'loop_import_sample.xlsx');
+  mgrToast('Sample Excel downloaded');
+}
+
+function removeLoop(base){selectedTags=selectedTags.filter(l=>l.base!==base);renderTagPool();}
+
+function updateSubtag(base,role,val){
+  const loop=selectedTags.find(l=>l.base===base);
+  if(!loop)return;
+  // roles order: PV=0, SP=1, OP=2, MODE=3
+  const roleMap={PV:0,SP:1,OP:2,MODE:3};
+  loop.tags[roleMap[role]]=val;
+}
+
+function renderTagPool(){
+  const pool=document.getElementById('tagPool');
+  const toolbar=document.getElementById('tblToolbar');
+  if(!selectedTags.length){
+    pool.innerHTML='<span class="loop-list-ph">No loops added yet — type a loop ID above or import from Excel</span>';
+    if(toolbar) toolbar.style.display='none';
+  } else {
+    if(toolbar) toolbar.style.display='flex';
+    const rows=selectedTags.map(l=>{
+      const short=l.base.split('.').pop();
+      const eb=l.base.replace(/'/g,"\'");
+      const unit=l.unit||'';
+      return `<tr>
+        <td class="col-id">${short}</td>
+        <td class="tbl-unit-cell">
+          <input class="tbl-tag-inp" style="color:#6d28d9;min-width:100px" value="${unit}"
+            oninput="updateLoopUnit('${eb}',this.value);addUnitSuggestion(this.value)"
+            list="unitSuggestions" placeholder="—" title="${unit}"/>
+        </td>
+        <td><input class="tbl-tag-inp" style="color:#0f6e56" value="${l.base+applysfx((l.suffixes?.pv||['PV'])[0])}" oninput="updateLoopSuffix('${eb}','pv',this.value)" title="PV tag"/></td>
+        <td><input class="tbl-tag-inp" style="color:#185fa5" value="${l.base+applysfx((l.suffixes?.sp||['SP'])[0])}" oninput="updateLoopSuffix('${eb}','sp',this.value)" title="SP tag"/></td>
+        <td><input class="tbl-tag-inp" style="color:#854f0b" value="${l.base+applysfx((l.suffixes?.op||['OP'])[0])}" oninput="updateLoopSuffix('${eb}','op',this.value)" title="OP tag"/></td>
+        <td><input class="tbl-tag-inp" style="color:#6d28d9" value="${l.base+applysfx((l.suffixes?.mode||['MODE'])[0])}" oninput="updateLoopSuffix('${eb}','mode',this.value)" title="MODE tag"/></td>
+        <td class="col-rm"><button class="tbl-rm-btn" onclick="removeLoop('${eb}')" title="Remove">×</button></td>
+      </tr>`;
+    }).join('');
+    pool.innerHTML=`<table class="loop-tbl">
+      <thead><tr>
+        <th>Loop ID</th>
+        <th class="col-unit">Unit</th>
+        <th class="col-pv">PV</th>
+        <th class="col-sp">SP</th>
+        <th class="col-op">OP</th>
+        <th class="col-mode">Mode</th>
+        <th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+    // Re-apply any active search filter
+    const q=document.getElementById('loopSearch')?.value||'';
+    if(q) filterLoopTable(q);
+  }
+  document.getElementById('tagCount').textContent=selectedTags.length
+    ?selectedTags.length+' loop'+(selectedTags.length>1?'s':'')+' · '+(selectedTags.length*4)+' tags total':'';
+  const fs=document.getElementById('fetchStatus');fs.className='fetch-status';
+  fs.textContent=selectedTags.length
+    ?selectedTags.length+' loop'+(selectedTags.length>1?'s':'')+' ready to fetch'
+    :'Add loops and set a date range, then fetch.';
+}
+
+function updateLoopSuffix(base,role,val){
+  const l=selectedTags.find(t=>t.base===base);
+  if(!l)return;
+  if(!l.suffixes)l.suffixes={pv:['PV'],sp:['SP'],op:['OP'],mode:['MODE']};
+  // val is full tag(s) like "YN.ETH1.15FC311_MV, YN.ETH1.15FC311_PV"
+  // extract suffix by stripping base prefix
+  l.suffixes[role]=val.split(',').map(v=>{
+    const t=v.trim();
+    if(t.startsWith(base)) return t.slice(base.length); // extract suffix part
+    return t; // user typed something custom, store as-is
+  }).filter(Boolean);
+}
+function updateLoopUnit(base,val){
+  const loop=selectedTags.find(l=>l.base===base);
+  if(loop) loop.unit=val;
+}
+
+function updateSubtagIdx(base,idx,val){
+  const loop=selectedTags.find(l=>l.base===base);
+  if(loop) loop.tags[idx]=val;
+}
+function mgrShow(n){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.step').forEach((s,i)=>{s.classList.remove('active','done');if(i+1<n)s.classList.add('done');if(i+1===n)s.classList.add('active');s.querySelector('.step-num').textContent=s.classList.contains('done')?'✓':(i+1);});
+  document.getElementById('scr'+n).classList.add('active');
+  document.getElementById('mgrProgBar').style.width=((n-1)/4*100)+'%';
+  if(n===3)renderMethods();if(n===4)renderExclusions();if(n===5)renderReview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function onInfoChange(){
+  const plant=document.getElementById('infoPlant').value.trim(),aff=document.getElementById('infoAffiliate').value.trim();
+  if(plant)document.getElementById('overviewTitle').textContent='Plant overview — '+plant;
+  const hA=document.getElementById('hintAff'),hP=document.getElementById('hintPlant');
+  hA.className='hint';hP.className='hint';
+  if(aff){hA.className='hint ok-msg';hA.textContent='✓';}else hA.textContent='';
+  if(plant){hP.className='hint ok-msg';hP.textContent='✓';}else hP.textContent='';
+}
+
+(function initDates(){
+  const now=new Date(),past=new Date(now);past.setDate(past.getDate()-30);
+  const fmt=d=>d.toISOString().slice(0,16);
+  document.getElementById('startDt').value=fmt(past);document.getElementById('endDt').value=fmt(now);
+  document.querySelector('.rng[data-r="30"]').classList.add('on');
+})();
+
+function setRange(days){
+  const now=new Date(),past=new Date(now);past.setDate(past.getDate()-days);
+  const fmt=d=>d.toISOString().slice(0,16);
+  document.getElementById('startDt').value=fmt(past);document.getElementById('endDt').value=fmt(now);
+  document.querySelectorAll('.rng').forEach(b=>b.classList.toggle('on',+b.dataset.r===days));validateDates();
+}
+
+function validateDates(){
+  const s=document.getElementById('startDt').value,e=document.getElementById('endDt').value;
+  const hint=document.getElementById('dateHint');
+  if(!s||!e){hint.textContent='';return;}
+  if(new Date(s)>=new Date(e)){hint.textContent='⚠ Start must be before end date';return false;}
+  const days=(new Date(e)-new Date(s))/(1000*86400);
+  hint.className='hint ok-msg';hint.textContent='✓ '+Math.round(days)+' days selected';return true;
+}
+
+async function fetchData(){
+  if(!validateDates()){mgrToast('Fix the date range first','warn');return;}
+  if(!selectedTags.length){mgrToast('Add at least one loop','warn');return;}
+  const btn=document.getElementById('fetchBtn'),prog=document.getElementById('fetchProgress');
+  prog.classList.add('visible');btn.disabled=true;btn.innerHTML='<div class="fetch-spinner"></div> Fetching…';
+  const steps=[['fp1','fpi1'],['fp2','fpi2'],['fp3','fpi3'],['fp4','fpi4'],['fp5','fpi5']];
+  for(let i=0;i<steps.length;i++){const[r,ico]=steps[i];document.getElementById(r).className='fp-row active';document.getElementById(ico).textContent='⟳';await sleep(400+Math.random()*300);document.getElementById(r).className='fp-row done';document.getElementById(ico).textContent='✓';}
+  await sleep(200);
+  btn.disabled=false;btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg> Re-fetch';
+  const start=document.getElementById('startDt').value,end=document.getElementById('endDt').value;
+  const fs=document.getElementById('fetchStatus');fs.className='fetch-status ok';
+  fs.innerHTML='&#10003; '+selectedTags.length+' loop'+(selectedTags.length>1?'s':'')+' loaded &middot; '+start.slice(0,10)+' &rarr; '+end.slice(0,10)+' &middot; <b>'+currentResolution+'</b>';
+  dataFetched=true;populateOverview(start,end);mgrToast('Data fetched — '+selectedTags.length+' loops, '+currentResolution+' resolution');
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+function populateOverview(start,end){
+  document.getElementById('overviewLocked').style.display='none';document.getElementById('overviewLoaded').style.display='block';
+  const plant=document.getElementById('infoPlant').value.trim()||'Plant';
+  document.getElementById('overviewTitle').textContent='Plant overview — '+plant;
+  document.getElementById('overviewSub').textContent=selectedTags.length+' loops · '+start.slice(0,10)+' → '+end.slice(0,10)+' · '+currentResolution+' resolution';
+  const meta=selectedTags.map(l=>{const s=l.base.split('.').pop();return LOOP_META[s]||{unit:'Unknown',type:'Unknown',uom:'—',pts:0,status:'na'};});
+  const flow=meta.filter(m=>m.type==='Flow').length,level=meta.filter(m=>m.type==='Level').length,pressure=meta.filter(m=>m.type==='Pressure').length;
+  document.getElementById('kpiGrid').innerHTML=`<div class="gbox"><div class="kpi-lbl">Total loops</div><div class="kpi-val">${selectedTags.length}</div><div class="kpi-sub">fetched from DB</div></div><div class="gbox"><div class="kpi-lbl">Flow loops</div><div class="kpi-val" style="color:#0f6e56">${flow}</div><div class="kpi-sub">FC / FFC tags</div></div><div class="gbox"><div class="kpi-lbl">Level loops</div><div class="kpi-val" style="color:#185fa5">${level}</div><div class="kpi-sub">LC tags</div></div><div class="gbox"><div class="kpi-lbl">Pressure loops</div><div class="kpi-val" style="color:#854f0b">${pressure}</div><div class="kpi-sub">PC tags</div></div>`;
+  const typeBadge={Flow:'b-flow',Level:'b-level',Pressure:'b-pressure',Unknown:'b-unknown'};
+  document.getElementById('loopTbody').innerHTML=selectedTags.map((l,i)=>{const sh=l.base.split('.').pop();const m=LOOP_META[sh]||{unit:'Unknown',type:'Unknown',uom:'—',pts:'—',status:'na'};const dot=m.status==='ok'?'dok':m.status==='warn'?'dwarn':'dna';const st=m.status==='ok'?'Active':m.status==='warn'?'Review':'Unmapped';return `<tr style="animation:fadeIn .2s ease ${i*40}ms both"><td><span class="tag-mono">${l.base}</span></td><td>${m.unit}</td><td><span class="badge ${typeBadge[m.type]||'b-unknown'}">${m.type}</span></td><td>${m.uom}</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px">${typeof m.pts==='number'?m.pts.toLocaleString():m.pts}</td><td><span class="sdot ${dot}"></span>${st}</td></tr>`;}).join('');
+}
+
+function renderThresholds(){document.getElementById('thrBody').innerHTML=THRESHOLDS.map((t,i)=>`<tr><td><div class="tbl-tag-name">${t.p}</div></td><td><div class="tbl-desc">${t.desc}</div></td><td><div class="thr-slider"><button class="reset-btn" onclick="resetThreshold(${i})">reset</button><div class="def-lbl">def: ${t.def}</div><input type="number" step="any" value="${t.v}" data-def="${t.def}" data-i="${i}" class="fi-num${t.v!==t.def?' changed':''}" oninput="onThrChange(this,${i})"/></div></td></tr>`).join('');updateThrSubtitle();}
+function onThrChange(el,i){const v=parseFloat(el.value);if(!isNaN(v))THRESHOLDS[i].v=v;el.classList.toggle('changed',String(el.value)!==String(el.dataset.def));updateThrSubtitle();}
+function resetThreshold(i){THRESHOLDS[i].v=THRESHOLDS[i].def;renderThresholds();mgrToast('Reset '+THRESHOLDS[i].p+' to '+THRESHOLDS[i].def);}
+function resetAllThresholds(){THRESHOLDS.forEach(t=>t.v=t.def);renderThresholds();mgrToast('All thresholds reset to defaults');}
+function updateThrSubtitle(){const n=THRESHOLDS.filter(t=>String(t.v)!==String(t.def)).length;document.getElementById('thrSubtitle').textContent='Numeric limits — '+(n?n+' changed from defaults':'no changes from defaults');}
+
+function renderMethods(){
+  const loops=selectedTags.map(t=>t.base).filter((v,i,a)=>a.indexOf(v)===i);
+  const q=(document.getElementById('meth-search')?.value||'').toLowerCase().trim();
+  const filtered=q?loops.filter(l=>l.toLowerCase().includes(q)):loops;
+  const thead=document.getElementById('meth-thead');
+  const tbody=document.getElementById('meth-tbody');
+  if(!thead||!tbody)return;
+  if(!loops.length){
+    tbody.innerHTML='<tr><td colspan="99" style="padding:16px;text-align:center;color:#9a9994">No loops added yet — add loops in Step 1 first</td></tr>';
+    thead.innerHTML='';return;
+  }
+  thead.innerHTML=`<tr>
+    <th class="excl-tbl-hdr" style="text-align:left;min-width:200px;width:200px;position:sticky;left:0;z-index:3">Loop</th>
+    ${METHODS.map(m=>`<th class="excl-tbl-hdr" title="${m.name}">${m.name}</th>`).join('')}
+  </tr>
+  <tr style="background:#e8f0fe">
+    <td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1e40af;white-space:nowrap;position:sticky;left:0;background:#e8f0fe;z-index:2">Global Select</td>
+    ${METHODS.map((m,mi)=>{
+      const allOn=loops.every(l=>methIsEnabled(mi,l));
+      return `<td style="text-align:center;padding:3px 2px;border-left:1px solid rgba(0,0,0,.08)">
+        <button class="excl-toggle ${allOn?'ticked':''}" onclick="methToggleAll(${mi})" title="Toggle all: ${m.name}">✓</button>
+      </td>`;
+    }).join('')}
+  </tr>`;
+  tbody.innerHTML=filtered.length?filtered.map(loop=>`
+    <tr>
+      <td class="excl-tbl-loop" style="position:sticky;left:0;z-index:1">${loop}</td>
+      ${METHODS.map((m,mi)=>`
+        <td class="excl-tbl-cell">
+          <button class="excl-toggle ${methIsEnabled(mi,loop)?'ticked':''}" onclick="methToggle(${mi},'${loop.replace(/'/g,"\'")}')">✓</button>
+        </td>`).join('')}
+    </tr>`).join(''):'<tr><td colspan="99" style="padding:12px;text-align:center;color:#9a9994;font-size:11px">No loops match search</td></tr>';
+}
+function methIsEnabled(mi,loop){
+  if(!window.METH_OVERRIDES)window.METH_OVERRIDES={};
+  return window.METH_OVERRIDES[mi+'|'+loop]!==false;
+}
+function methToggle(mi,loop){
+  if(!window.METH_OVERRIDES)window.METH_OVERRIDES={};
+  window.METH_OVERRIDES[mi+'|'+loop]=!methIsEnabled(mi,loop);
+  renderMethods();
+}
+function methToggleAll(mi){
+  if(!window.METH_OVERRIDES)window.METH_OVERRIDES={};
+  const loops=selectedTags.map(t=>t.base).filter((v,i,a)=>a.indexOf(v)===i);
+  const allOn=loops.every(l=>methIsEnabled(mi,l));
+  loops.forEach(l=>{window.METH_OVERRIDES[mi+'|'+l]=!allOn;});
+  renderMethods();
+}
+function methReset(){window.METH_OVERRIDES={};renderMethods();mgrToast('All method overrides cleared');}
+function setAllMethods(val){METHODS.forEach(m=>m.enabled=val);renderMethods();}
+
+function renderExclusions(){
+  const allLoops=selectedTags.map(t=>t.base).filter((v,i,a)=>a.indexOf(v)===i);
+  const _eq=(document.getElementById('excl-search')?.value||'').toLowerCase().trim();
+  const loops=_eq?allLoops.filter(l=>l.toLowerCase().includes(_eq)):allLoops;
+  if(!allLoops.length){
+    document.getElementById('excl-tbody').innerHTML='<tr><td colspan="99" style="padding:16px;text-align:center;color:#9a9994">No loops added yet — add loops in Step 1 first</td></tr>';
+    document.getElementById('excl-thead').innerHTML='';
+    return;
+  }
+  if(!loops.length){document.getElementById('excl-tbody').innerHTML='<tr><td colspan="99" style="padding:12px;text-align:center;color:#9a9994;font-size:11px">No loops match search</td></tr>';return;}
+  document.getElementById('excl-thead').innerHTML=`<tr><th class="excl-tbl-hdr" style="text-align:left;min-width:200px;width:200px">Loop</th>${PROBLEMS.map(p=>`<th class="excl-tbl-hdr" title="${p.label}">${p.label}</th>`).join('')}</tr><tr style="background:#e8f0fe"><td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1e40af;white-space:nowrap;position:sticky;left:0;background:#e8f0fe;z-index:1">Global Select</td>${PROBLEMS.map(p=>{const allLoops=selectedTags.map(t=>t.base).filter((v,i,a)=>a.indexOf(v)===i);const allExcl=allLoops.every(l=>(excl[p.id]||[]).includes(l));return `<td style="text-align:center;padding:3px 2px;border-left:1px solid rgba(0,0,0,.08)"><button class="excl-toggle ${allExcl?'':'ticked'}" onclick="exclToggleAll('${p.id}')" title="Toggle all loops for ${p.label}">✓</button></td>`;}).join('')}</tr>`;
+  document.getElementById('excl-tbody').innerHTML=loops.map(loop=>{
+    const cells=PROBLEMS.map(p=>{
+      const isExcl=(excl[p.id]||[]).includes(loop);
+      return `<td class="excl-tbl-cell"><button class="excl-toggle ${isExcl?'':'ticked'}" onclick="exclToggle('${p.id}','${loop.replace(/'/g,"\'")}')">✓</button></td>`;
+    }).join('');
+    return `<tr><td class="excl-tbl-loop">${loop}</td>${cells}</tr>`;
+  }).join('');
+}
+function exclToggle(pid,loop){
+  if(!excl[pid])excl[pid]=[];
+  const idx=excl[pid].indexOf(loop);
+  if(idx>=0)excl[pid].splice(idx,1);
+  else excl[pid].push(loop);
+  renderExclusions();
+  const exclCount=Object.values(excl).reduce((s,a)=>s+a.length,0);
+  const el=document.getElementById('rv-excl');if(el)el.textContent=exclCount;
+}
+function exclToggleAll(pid){
+  const allLoops=selectedTags.map(t=>t.base).filter((v,i,a)=>a.indexOf(v)===i);
+  if(!excl[pid])excl[pid]=[];
+  const allExcl=allLoops.every(l=>(excl[pid]||[]).includes(l));
+  if(allExcl){excl[pid]=[];}
+  else{excl[pid]=[...allLoops];}
+  renderExclusions();
+}
+function clearAllExclusions(){PROBLEMS.forEach(p=>excl[p.id]=[]);renderExclusions();mgrToast('All exclusions cleared');}
+
+function renderReview(){
+  const loops=dataFetched?selectedTags.length:'—',changed=THRESHOLDS.filter(t=>String(t.v)!==String(t.def)).length,enabled=METHODS.filter(m=>m.enabled).length,exclCount=Object.values(excl).reduce((s,a)=>s+a.length,0);
+  document.getElementById('rv-loops').textContent=loops;document.getElementById('rv-loops-sub').textContent=dataFetched?'tags fetched':'not yet fetched';
+  document.getElementById('rv-thr').textContent=changed;document.getElementById('rv-meth').textContent=enabled;document.getElementById('rv-excl').textContent=exclCount;
+  const plant=document.getElementById('infoPlant').value.trim(),aff=document.getElementById('infoAffiliate').value.trim(),loc=document.getElementById('infoLocation').value.trim();
+  const start=document.getElementById('startDt').value,end=document.getElementById('endDt').value;
+  document.getElementById('rv-session').innerHTML=[plant&&`<div class="rev-row"><span class="rev-key">Plant</span><span>${plant}</span></div>`,aff&&`<div class="rev-row"><span class="rev-key">Affiliate</span><span>${aff}</span></div>`,loc&&`<div class="rev-row"><span class="rev-key">Location</span><span>${loc}</span></div>`,start&&`<div class="rev-row"><span class="rev-key">Date range</span><span>${start.replace('T',' ')} → ${end.replace('T',' ')}</span></div>`].filter(Boolean).join('')||'<div style="font-size:12px;color:#9a9994;font-style:italic">No session details entered.</div>';
+  const cl=THRESHOLDS.filter(t=>String(t.v)!==String(t.def));document.getElementById('rv-thr-wrap').style.display=cl.length?'block':'none';document.getElementById('rv-thr-list').innerHTML=cl.map(t=>`<div class="rev-row"><span class="rev-key">${t.p}</span><span><span class="rev-old">${t.def}</span><span class="rev-new">${t.v}</span></span></div>`).join('');
+  const exclItems=PROBLEMS.filter(p=>excl[p.id]?.length);document.getElementById('rv-excl-wrap').style.display=exclItems.length?'block':'none';document.getElementById('rv-excl-list').innerHTML=exclItems.map(p=>`<div class="rev-row"><span class="rev-key">${p.label}</span><span>${excl[p.id].map(l=>l.split('.').pop()).join(', ')}</span></div>`).join('');
+}
+
+async function mgrSaveAll(){
+  const payload={session:{affiliate:document.getElementById('infoAffiliate').value.trim(),plant:document.getElementById('infoPlant').value.trim(),location:document.getElementById('infoLocation').value.trim(),start:document.getElementById('startDt').value,end:document.getElementById('endDt').value,loops:selectedTags.map(t=>t.base),suffix_map:tagFormat?.suffixes||{pv:['PV'],sp:['SP'],op:['OP'],mode:['MODE']}},diagnostic_config:THRESHOLDS.map(t=>({parameter:t.p,value:t.v,description:t.desc})),diagnostic_selection:METHODS.map(m=>({diagnostic:m.name,enabled:m.enabled?1:0,indent:m.sub?1:0})),detection_exclusions:excl};
+  try{const r=await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(r.ok)onMgrSaved();else mgrToast('Server error — check console','warn');}catch(e){onMgrSaved();}
+}
+function onMgrSaved(){
+  const s=document.getElementById('mgrSaveBtn');s.className='btn-save saved';s.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Saved';
+  setTimeout(()=>{s.className='btn-save';s.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save &amp; apply';},3500);
+  const fs=document.getElementById('finalSave');if(fs){fs.style.background='#0f6e56';fs.innerHTML='✓ Configuration saved';}
+  mgrToast('Configuration saved successfully');
+}
+
+let mgrToastTimer;
+function mgrToast(msg,type='ok'){
+  clearTimeout(mgrToastTimer);const t=document.getElementById('mgr-toast'),ico=document.getElementById('mgr-toast-ico');document.getElementById('mgr-toast-msg').textContent=msg;
+  if(type==='warn'){t.style.background='#5c3a0a';ico.innerHTML='<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" fill="none" stroke-width="2"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2"/>';}
+  else{t.style.background='var(--navy)';ico.innerHTML='<polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5"/>';}
+  t.classList.add('show');mgrToastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+renderThresholds();
 </script>
 </body>
 </html>
