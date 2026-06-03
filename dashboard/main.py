@@ -73,6 +73,19 @@ static_dir = DASHBOARD_DIR / "static"
 static_dir.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
+SAMPLE_FILE = static_dir / "sample_plant_data.xlsx"
+
+
+@app.get("/download/sample")
+async def download_sample():
+    if not SAMPLE_FILE.exists():
+        raise HTTPException(status_code=404, detail="Sample file not found")
+    return FileResponse(
+        str(SAMPLE_FILE),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename="sample_plant_data.xlsx",
+    )
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 

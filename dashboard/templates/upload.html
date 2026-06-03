@@ -74,6 +74,8 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .drop-hint{font-size:13px;color:var(--text3)}
 .drop-hint b{color:var(--blue)}
 .drop-types{display:inline-block;margin-top:12px;font-size:11px;color:var(--text3);background:#f0f4f8;padding:4px 12px;border-radius:20px;font-family:'IBM Plex Mono',monospace}
+.sample-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:11px;color:var(--blue);text-decoration:none;font-weight:600;position:relative;z-index:10}
+.sample-link:hover{text-decoration:underline}
 #file-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
 .file-pill{display:none;margin-top:16px;background:var(--blue-pale);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;align-items:center;gap:12px}
 .file-pill.show{display:flex}
@@ -285,8 +287,20 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
 .res-btn{padding:7px 18px;font-size:12px;font-weight:600;color:#5f5e5a;background:#f9f8f5;border:none;cursor:pointer;transition:all .15s;font-family:inherit;border-right:.5px solid rgba(0,0,0,.1)}
 .res-btn:last-child{border-right:none}
 .res-btn:hover:not(.active){background:#e8f1fb;color:#0c447c}
+.res-btn{padding:7px 18px 5px;display:flex;flex-direction:column;align-items:center;gap:2px}
 .res-btn.active{background:#3b82f6;color:#fff}
+.res-btn-label{font-size:12px;font-weight:600;line-height:1}
+.res-btn-sub{font-size:9px;font-weight:500;opacity:.7;font-family:'IBM Plex Mono',monospace;line-height:1}
+.res-btn.active .res-btn-sub{opacity:.85}
+.res-time-inp{width:70px;height:18px;padding:0 5px;border:.5px solid rgba(255,255,255,.25);border-radius:4px;font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:500;text-align:center;background:rgba(255,255,255,.12);color:inherit;outline:none;cursor:text;transition:all .15s}
+.res-btn:not(.active) .res-time-inp{border-color:rgba(0,0,0,.15);background:rgba(0,0,0,.04);color:#5f5e5a}
+.res-time-inp:focus{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5)}
+.res-btn:not(.active) .res-time-inp:focus{background:#fff;border-color:#3b82f6}
 .res-hint{font-size:10px;color:#9a9994;font-style:italic}
+.info-btn{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e8f1fb;border:.5px solid #b5d4f4;color:#185fa5;font-size:9px;font-weight:700;cursor:pointer;flex-shrink:0;position:relative;vertical-align:middle;margin-left:4px;font-family:'IBM Plex Sans',sans-serif;line-height:1}
+.info-btn:hover{background:#185fa5;color:#fff}
+.info-popup{display:none;position:fixed;z-index:9999;background:#1e293b;color:#e2e8f0;font-size:11px;line-height:1.6;padding:10px 13px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.25);width:260px;font-weight:400;white-space:normal;pointer-events:none}
+.info-btn:hover .info-popup,.info-btn:focus .info-popup{display:block}
 
 /* ── TAG FORMAT SETUP ── */
 .fmt-box{background:#f0f7ff;border:1px solid #b5d4f4;border-radius:var(--r);padding:14px 16px;margin-bottom:4px}
@@ -372,6 +386,10 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
         <div class="drop-title">Drag &amp; drop your Excel file here</div>
         <div class="drop-hint">or <b>click to browse</b></div>
         <div class="drop-types">.xlsx &nbsp;/&nbsp; .xls</div>
+        <a href="/download/sample" download class="sample-link" onclick="event.stopPropagation()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download sample file
+        </a>
       </div>
       <div class="file-pill" id="file-pill">
         <div class="file-pill-icon">
@@ -404,11 +422,7 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
       <span class="step-sep">›</span>
       <div class="step" id="s2" onclick="mgrShow(2)"><span class="step-num">2</span><span class="step-lbl">Thresholds</span></div>
       <span class="step-sep">›</span>
-      <div class="step" id="s3" onclick="mgrShow(3)"><span class="step-num">3</span><span class="step-lbl">Detection methods</span></div>
-      <span class="step-sep">›</span>
-      <div class="step" id="s4" onclick="mgrShow(4)"><span class="step-num">4</span><span class="step-lbl">Loop exclusions</span></div>
-      <span class="step-sep">›</span>
-      <div class="step" id="s5" onclick="mgrShow(5)"><span class="step-num">5</span><span class="step-lbl">Review &amp; save</span></div>
+      <div class="step" id="s3" onclick="mgrShow(3)"><span class="step-num">3</span><span class="step-lbl">Review &amp; save</span></div>
     </div>
     <div class="step-prog"><div class="step-prog-bar" id="mgrProgBar"></div></div>
     <div class="mgr-page">
@@ -442,10 +456,16 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
             <!-- DATA RESOLUTION -->
             <div class="field">
               <label>Data resolution</label>
-              <div class="res-toggle">
-                <button class="res-btn active" data-res="minute" onclick="setResolution('minute')">Minute</button>
-                <button class="res-btn" data-res="hourly" onclick="setResolution('hourly')">Hourly</button>
-                <button class="res-btn" data-res="daily" onclick="setResolution('daily')">Daily</button>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="res-toggle">
+                  <button class="res-btn active" data-res="minute" onclick="setResolution('minute')"><span class="res-btn-label">Minute</span></button>
+                  <button class="res-btn" data-res="hourly" onclick="setResolution('hourly')"><span class="res-btn-label">Hourly</span></button>
+                  <button class="res-btn" data-res="daily" onclick="setResolution('daily')"><span class="res-btn-label">Daily</span></button>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                  <input id="resTimeInp" type="number" min="1" value="1" style="width:58px;height:34px;padding:0 8px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:600;text-align:center;background:#f9f8f5;color:var(--text);outline:none" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='rgba(0,0,0,.14)'"/>
+                  <span id="resTimeUnit" style="font-size:11px;color:#5f5e5a;white-space:nowrap">min avg pull</span>
+                </div>
               </div>
               <div class="res-hint" id="resHint">Minute-level data — full fidelity, larger dataset</div>
             </div>
@@ -504,7 +524,7 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
                     autocomplete="off"/>
                   <button onclick="addTagFromInput()" style="height:36px;padding:0 16px;background:#3b82f6;border:none;border-radius:var(--r);font-size:12px;font-weight:600;color:#fff;white-space:nowrap">+ Add loop</button>
                   <input type="file" id="tagExcelInput" accept=".xlsx,.xls" style="display:none" onchange="importTagsFromExcel(event)"/>
-                  <button onclick="document.getElementById('tagExcelInput').click()" style="height:36px;padding:0 14px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:12px;color:#5f5e5a;background:#f9f8f5;white-space:nowrap">Import from Excel</button>
+                  <button onclick="document.getElementById('tagExcelInput').click()" style="height:36px;padding:0 14px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:12px;color:#5f5e5a;background:#f9f8f5;white-space:nowrap">Import from Excel</button><span class="info-btn" tabindex="0">i<span class="info-popup above">Upload an Excel file with a <b>loop_name</b> column (loop IDs) and an optional <b>unit</b> column. All loops in the file will be added at once — much faster than adding them one by one.</span></span>
                   <button onclick="downloadSampleExcel()" style="height:36px;padding:0 12px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:12px;color:#185fa5;background:#f0f7ff;white-space:nowrap" title="Download sample Excel template">⬇ Sample</button>
                 </div>
               </div>
@@ -543,49 +563,18 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
           <div class="card-hdr"><div class="card-icon" style="background:#faeeda">⚙️</div><div><div class="card-title">Diagnostic thresholds</div><div class="card-sub" id="thrSubtitle">Numeric limits — 0 changed from defaults</div></div><div style="margin-left:auto"><button onclick="resetAllThresholds()" style="font-size:11px;color:#9a9994;border:.5px solid rgba(0,0,0,.14);padding:5px 11px;border-radius:var(--r);background:#f9f8f5">Reset all to defaults</button></div></div>
           <table class="tbl"><thead><tr><th style="width:220px">Parameter</th><th>Description</th><th style="width:200px;text-align:right">Value</th></tr></thead><tbody id="thrBody"></tbody></table>
         </div>
-        <div class="nav"><button class="btn-prev" onclick="mgrShow(1)">← Back</button><button class="btn-next" onclick="mgrShow(3)">Next: Detection methods →</button></div>
+        <div class="nav"><button class="btn-prev" onclick="mgrShow(1)">← Back</button><button class="btn-next" onclick="mgrShow(3)">Next: Review &amp; save →</button></div>
       </div>
 
       <!-- SCREEN 3 -->
       <div class="scr" id="scr3">
-        <div class="card">
-          <div class="card-hdr"><div class="card-icon" style="background:#e1f5ee">🔬</div><div><div class="card-title">Detection Methods</div><div class="card-sub">Untick a method to disable it for that loop</div></div><div style="margin-left:auto"><button onclick="methReset()" style="font-size:11px;color:#dc2626;border:.5px solid rgba(0,0,0,.14);padding:5px 11px;border-radius:var(--r);background:#f9f8f5">↺ Reset all</button></div></div>
-          <div style="margin-bottom:8px"><input id="meth-search" type="text" placeholder="🔍  Search loops…" oninput="renderMethods()" style="width:100%;box-sizing:border-box;padding:7px 12px;border:1px solid rgba(0,0,0,.12);border-radius:7px;font-size:12px;background:#fff;outline:none"/></div>
-          <div style="overflow:auto;max-height:340px;border:.5px solid rgba(0,0,0,.1);border-radius:8px">
-            <table id="meth-tbl" style="width:100%;border-collapse:collapse;font-size:11px">
-              <thead id="meth-thead"></thead>
-              <tbody id="meth-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="nav"><button class="btn-prev" onclick="mgrShow(2)">← Back</button><button class="btn-next" onclick="mgrShow(4)">Next: Loop exclusions →</button></div>
-      </div>
-
-      <!-- SCREEN 4 -->
-      <div class="scr" id="scr4">
-        <div class="card">
-          <div class="card-hdr"><div class="card-icon" style="background:#fde8e8">🚫</div><div><div class="card-title">Required Diagnostics</div><div class="card-sub">Untick to suppress a detection for that loop. Takes effect when saved.</div></div><div style="margin-left:auto"><button onclick="clearAllExclusions()" style="font-size:11px;color:#dc2626;border:.5px solid rgba(0,0,0,.14);padding:5px 11px;border-radius:var(--r);background:#f9f8f5">↺ Reset all</button></div></div>
-          <div style="margin-bottom:8px"><input id="excl-search" type="text" placeholder="🔍  Search loops…" oninput="renderExclusions()" style="width:100%;box-sizing:border-box;padding:7px 12px;border:1px solid rgba(0,0,0,.12);border-radius:7px;font-size:12px;background:#fff;outline:none"/></div>
-          <div style="overflow:auto;max-height:340px;border:.5px solid rgba(0,0,0,.1);border-radius:8px;margin-top:4px">
-            <table id="excl-table" style="width:100%;border-collapse:collapse;font-size:11px">
-              <thead id="excl-thead"></thead>
-              <tbody id="excl-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="nav"><button class="btn-prev" onclick="mgrShow(3)">← Back</button><button class="btn-next" onclick="mgrShow(5)">Next: Review &amp; save →</button></div>
-      </div>
-
-      <!-- SCREEN 5 -->
-      <div class="scr" id="scr5">
         <div class="card">
           <div class="card-hdr"><div class="card-icon" style="background:#e1f5ee">✅</div><div><div class="card-title">Review &amp; save</div><div class="card-sub">Summary of your configuration — verify then click Save &amp; apply</div></div></div>
           <div class="card-body">
             <div class="rev-grid">
               <div class="rev-box"><div class="rev-lbl">Loops</div><div class="rev-val" id="rv-loops">—</div><div class="rev-sub" id="rv-loops-sub">fetched tags</div></div>
               <div class="rev-box"><div class="rev-lbl">Thresholds changed</div><div class="rev-val" id="rv-thr">0</div><div class="rev-sub">from defaults</div></div>
-              <div class="rev-box"><div class="rev-lbl">Methods enabled</div><div class="rev-val" id="rv-meth">—</div><div class="rev-sub">of 18 algorithms</div></div>
-              <div class="rev-box"><div class="rev-lbl">Exclusions</div><div class="rev-val" id="rv-excl">0</div><div class="rev-sub">loop-problem overrides</div></div>
+              <div class="rev-box"><div class="rev-lbl">Date range</div><div class="rev-val" id="rv-daterange" style="font-size:13px">—</div><div class="rev-sub">selected period</div></div>
             </div>
             <div class="rev-section" id="rv-session-wrap"><div class="rev-section-title">Session</div><div id="rv-session"></div></div>
             <div class="rev-section" id="rv-thr-wrap" style="display:none"><div class="rev-section-title">Changed thresholds</div><div id="rv-thr-list"></div></div>
@@ -593,7 +582,7 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
           </div>
         </div>
         <div class="nav">
-          <button class="btn-prev" onclick="mgrShow(4)">← Back</button>
+          <button class="btn-prev" onclick="mgrShow(2)">← Back</button>
           <button class="btn-next" id="finalSave" onclick="mgrSaveAll()" style="background:#0f6e56">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
             Save &amp; apply configuration
@@ -729,10 +718,12 @@ PROBLEMS.forEach(p=>excl[p.id]=[]);
 
 /* ── RESOLUTION ── */
 const RES_HINTS={minute:'Minute-level data — full fidelity, larger dataset',hourly:'Hourly averages — good balance of detail and speed',daily:'Daily averages — fast fetch, long-range trends'};
+const RES_UNIT={minute:'min avg pull',hourly:'hr avg pull',daily:'day avg pull'};
 function setResolution(r){
   currentResolution=r;
   document.querySelectorAll('.res-btn').forEach(b=>b.classList.toggle('active',b.dataset.res===r));
   document.getElementById('resHint').textContent=RES_HINTS[r];
+  const u=document.getElementById('resTimeUnit');if(u)u.textContent=RES_UNIT[r];
 }
 
 /* ── TAG FORMAT STATE ── */
@@ -1087,8 +1078,8 @@ function mgrShow(n){
   document.querySelectorAll('.scr').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.step').forEach((s,i)=>{s.classList.remove('active','done');if(i+1<n)s.classList.add('done');if(i+1===n)s.classList.add('active');s.querySelector('.step-num').textContent=s.classList.contains('done')?'✓':(i+1);});
   document.getElementById('scr'+n).classList.add('active');
-  document.getElementById('mgrProgBar').style.width=((n-1)/4*100)+'%';
-  if(n===3)renderMethods();if(n===4)renderExclusions();if(n===5)renderReview();
+  document.getElementById('mgrProgBar').style.width=((n-1)/2*100)+'%';
+  if(n===3)renderReview();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1152,7 +1143,25 @@ function populateOverview(start,end){
   document.getElementById('loopTbody').innerHTML=selectedTags.map((l,i)=>{const sh=l.base.split('.').pop();const m=LOOP_META[sh]||{unit:'Unknown',type:'Unknown',uom:'—',pts:'—',status:'na'};const dot=m.status==='ok'?'dok':m.status==='warn'?'dwarn':'dna';const st=m.status==='ok'?'Active':m.status==='warn'?'Review':'Unmapped';return `<tr style="animation:fadeIn .2s ease ${i*40}ms both"><td><span class="tag-mono">${l.base}</span></td><td>${m.unit}</td><td><span class="badge ${typeBadge[m.type]||'b-unknown'}">${m.type}</span></td><td>${m.uom}</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px">${typeof m.pts==='number'?m.pts.toLocaleString():m.pts}</td><td><span class="sdot ${dot}"></span>${st}</td></tr>`;}).join('');
 }
 
-function renderThresholds(){document.getElementById('thrBody').innerHTML=THRESHOLDS.map((t,i)=>`<tr><td><div class="tbl-tag-name">${t.p}</div></td><td><div class="tbl-desc">${t.desc}</div></td><td><div class="thr-slider"><button class="reset-btn" onclick="resetThreshold(${i})">reset</button><div class="def-lbl">def: ${t.def}</div><input type="number" step="any" value="${t.v}" data-def="${t.def}" data-i="${i}" class="fi-num${t.v!==t.def?' changed':''}" oninput="onThrChange(this,${i})"/></div></td></tr>`).join('');updateThrSubtitle();}
+const THR_PLAIN={
+  AMP_THRESHOLD:'If the PV swings more than this value up and down repeatedly, the loop is flagged as oscillating too much.',
+  OP_ACTIVITY_THRESHOLD:'If the valve output is changing too frequently on average, the loop is flagged as having high output activity — usually a sign of aggressive tuning.',
+  IAE_PER_HOUR_THRESHOLD:'Measures how far the PV is from SP over time. If this score is too high per hour, the loop is flagged as tracking poorly.',
+  STICT_CONF_HIGH:'If the stiction detection algorithm is this confident (%) or more, the valve is flagged as HIGH stiction.',
+  STICT_CONF_MED:'If stiction confidence is between this and the HIGH threshold, the valve is flagged as MEDIUM stiction.',
+  PROP_CONF_MIN:'Minimum confidence (%) for the engine to record a cross-loop propagation link at all.',
+  PROP_CONF_STRONG:'If propagation confidence reaches this level (%), the link is classified as STRONG.',
+  SERVICE_FACTOR_MIN_PCT:'A loop is only analysed if it spent at least this % of the time in automatic or cascade mode. Loops mostly in manual are skipped.',
+  SS_DETECTION_WINDOW:'Number of data samples used to check if the process is in steady state before running stiction tests.',
+  SS_STD_THRESHOLD:'If PV variability (standard deviation) is below this during the window, the engine treats it as steady state.',
+  FROZEN_SAMPLES_MIN:'If the PV reads the exact same value for this many consecutive samples, the sensor is flagged as frozen or stuck.',
+  QUANTISATION_UNIQUE_VALS_MAX:'If the PV only takes fewer than this many distinct values, it may be over-quantised — the sensor resolution is too low.',
+  COMPRESSION_FLAT_FRACTION_MAX:'If more than this fraction of the PV data points are flat (unchanged), the signal may be compressed by the historian.',
+  OSCILLATION_REGULARITY_MIN:'How regular the oscillation pattern needs to be (0–1 scale) before it is flagged. Higher = stricter.',
+  STICTION_S_MIN_PCT:'The minimum sticky band size (% of range) to count as physically meaningful stiction. Smaller values are treated as noise.',
+  HARRIS_INDEX_THRESHOLD:'Harris Index measures how close to ideal the controller is performing (0–1). Below this threshold the loop is flagged as underperforming.',
+};
+function renderThresholds(){document.getElementById('thrBody').innerHTML=THRESHOLDS.map((t,i)=>`<tr><td><div style="display:flex;align-items:center;gap:4px"><div class="tbl-tag-name">${t.p}</div><span class="info-btn" tabindex="0">i<span class="info-popup below" style="width:260px">${THR_PLAIN[t.p]||t.desc}</span></span></div></td><td><div class="tbl-desc">${t.desc}</div></td><td><div class="thr-slider"><button class="reset-btn" onclick="resetThreshold(${i})">reset</button><div class="def-lbl">def: ${t.def}</div><input type="number" step="any" value="${t.v}" data-def="${t.def}" data-i="${i}" class="fi-num${t.v!==t.def?' changed':''}" oninput="onThrChange(this,${i})"/></div></td></tr>`).join('');updateThrSubtitle();}
 function onThrChange(el,i){const v=parseFloat(el.value);if(!isNaN(v))THRESHOLDS[i].v=v;el.classList.toggle('changed',String(el.value)!==String(el.dataset.def));updateThrSubtitle();}
 function resetThreshold(i){THRESHOLDS[i].v=THRESHOLDS[i].def;renderThresholds();mgrToast('Reset '+THRESHOLDS[i].p+' to '+THRESHOLDS[i].def);}
 function resetAllThresholds(){THRESHOLDS.forEach(t=>t.v=t.def);renderThresholds();mgrToast('All thresholds reset to defaults');}
@@ -1249,14 +1258,14 @@ function exclToggleAll(pid){
 function clearAllExclusions(){PROBLEMS.forEach(p=>excl[p.id]=[]);renderExclusions();mgrToast('All exclusions cleared');}
 
 function renderReview(){
-  const loops=dataFetched?selectedTags.length:'—',changed=THRESHOLDS.filter(t=>String(t.v)!==String(t.def)).length,enabled=METHODS.filter(m=>m.enabled).length,exclCount=Object.values(excl).reduce((s,a)=>s+a.length,0);
+  const loops=dataFetched?selectedTags.length:'—',changed=THRESHOLDS.filter(t=>String(t.v)!==String(t.def)).length;
   document.getElementById('rv-loops').textContent=loops;document.getElementById('rv-loops-sub').textContent=dataFetched?'tags fetched':'not yet fetched';
-  document.getElementById('rv-thr').textContent=changed;document.getElementById('rv-meth').textContent=enabled;document.getElementById('rv-excl').textContent=exclCount;
-  const plant=document.getElementById('infoPlant').value.trim(),aff=document.getElementById('infoAffiliate').value.trim(),loc=document.getElementById('infoLocation').value.trim();
+  document.getElementById('rv-thr').textContent=changed;
   const start=document.getElementById('startDt').value,end=document.getElementById('endDt').value;
+  const drEl=document.getElementById('rv-daterange');if(drEl)drEl.textContent=(start&&end)?start.slice(0,10)+' → '+end.slice(0,10):'—';
+  const plant=document.getElementById('infoPlant').value.trim(),aff=document.getElementById('infoAffiliate').value.trim(),loc=document.getElementById('infoLocation').value.trim();
   document.getElementById('rv-session').innerHTML=[plant&&`<div class="rev-row"><span class="rev-key">Plant</span><span>${plant}</span></div>`,aff&&`<div class="rev-row"><span class="rev-key">Affiliate</span><span>${aff}</span></div>`,loc&&`<div class="rev-row"><span class="rev-key">Location</span><span>${loc}</span></div>`,start&&`<div class="rev-row"><span class="rev-key">Date range</span><span>${start.replace('T',' ')} → ${end.replace('T',' ')}</span></div>`].filter(Boolean).join('')||'<div style="font-size:12px;color:#9a9994;font-style:italic">No session details entered.</div>';
   const cl=THRESHOLDS.filter(t=>String(t.v)!==String(t.def));document.getElementById('rv-thr-wrap').style.display=cl.length?'block':'none';document.getElementById('rv-thr-list').innerHTML=cl.map(t=>`<div class="rev-row"><span class="rev-key">${t.p}</span><span><span class="rev-old">${t.def}</span><span class="rev-new">${t.v}</span></span></div>`).join('');
-  const exclItems=PROBLEMS.filter(p=>excl[p.id]?.length);document.getElementById('rv-excl-wrap').style.display=exclItems.length?'block':'none';document.getElementById('rv-excl-list').innerHTML=exclItems.map(p=>`<div class="rev-row"><span class="rev-key">${p.label}</span><span>${excl[p.id].map(l=>l.split('.').pop()).join(', ')}</span></div>`).join('');
 }
 
 async function mgrSaveAll(){
@@ -1277,6 +1286,22 @@ function mgrToast(msg,type='ok'){
   else{t.style.background='var(--navy)';ico.innerHTML='<polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5"/>';}
   t.classList.add('show');mgrToastTimer=setTimeout(()=>t.classList.remove('show'),2800);
 }
+/* ── INFO BUTTON POSITIONING ── */
+document.addEventListener('mouseover',e=>{
+  const btn=e.target.closest('.info-btn');
+  if(!btn)return;
+  const popup=btn.querySelector('.info-popup');
+  if(!popup)return;
+  const r=btn.getBoundingClientRect();
+  const pw=260,ph=130;
+  let top=r.bottom+6;
+  let left=r.left+r.width/2-pw/2;
+  if(top+ph>window.innerHeight-10)top=r.top-ph-6;
+  if(left+pw>window.innerWidth-10)left=window.innerWidth-pw-10;
+  if(left<8)left=8;
+  popup.style.top=top+'px';
+  popup.style.left=left+'px';
+});
 
 renderThresholds();
 </script>
