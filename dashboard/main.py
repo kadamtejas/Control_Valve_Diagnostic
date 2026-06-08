@@ -1440,7 +1440,7 @@ async def get_tune_timeseries(loop_name: str, current_user: dict = Depends(get_c
     """Return PV, OP, SP arrays for the tuning tool, sampled to max 1440 points."""
     rd = _get_user_results_dir(current_user)
     try:
-        data = read_loop_timeseries(rd, loop_name)
+        data = read_loop_timeseries(rd, loop_name, base_dir=str(BASE_DIR))
     except (FileNotFoundError, ValueError) as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:

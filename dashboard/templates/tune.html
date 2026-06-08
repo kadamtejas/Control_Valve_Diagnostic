@@ -104,21 +104,21 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 
 /* ── PARAMETER TABLE ── */
 .param-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.param-tbl th{padding:7px 12px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2);background:var(--bg2)}
+.param-tbl th{padding:5px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2);background:var(--bg2)}
 .param-tbl th:not(:first-child){text-align:center}
-.param-tbl td{padding:9px 12px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.param-tbl td{padding:8px 10px;border-bottom:1px solid var(--border2);vertical-align:middle}
 .param-tbl tr:last-child td{border-bottom:none}
 .param-tbl tr:hover td{background:var(--bg2)}
-.oval{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--crit)}
-.nval{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--ok)}
-.why-pct{font-size:11px;font-weight:700;color:var(--ok)}
+.oval{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text)}
+.nval{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--blue-lt)}
+.why-pct{font-size:11px;font-weight:700;color:var(--text2)}
 .why-txt{font-size:10px;color:var(--text3);line-height:1.4;margin-top:1px}
 
 /* ── OUTCOME TABLE ── */
 .out-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.out-tbl th{padding:7px 12px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2);background:var(--bg2)}
+.out-tbl th{padding:3px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2);background:var(--bg2)}
 .out-tbl th:not(:first-child){text-align:center}
-.out-tbl td{padding:8px 12px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.out-tbl td{padding:6px 8px;border-bottom:1px solid var(--border2);vertical-align:middle}
 .out-tbl tr:last-child td{border-bottom:none}
 
 /* ── ACTION ITEMS ── */
@@ -164,6 +164,15 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 /* ── INFO BUTTON ── */
 .ibt{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:var(--border2);color:var(--text3);font-size:8px;font-weight:400;cursor:pointer;flex-shrink:0;border:1px solid var(--border);font-style:italic;line-height:1;position:relative}
 #ibtTip{display:none;position:fixed;background:#0f2744;color:#e8f3fd;font-size:11px;padding:8px 12px;border-radius:7px;z-index:99999;font-family:'IBM Plex Sans',sans-serif;line-height:1.5;max-width:220px;white-space:normal;pointer-events:none;font-weight:400;box-shadow:0 4px 16px rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.1)}
+
+
+/* ── COLLAPSIBLE CARD ── */
+.card-collapsible .ch{cursor:pointer;user-select:none}
+.card-collapsible .ch:hover{background:var(--bg2)}
+.collapse-chevron{transition:transform .25s;flex-shrink:0;color:var(--text4)}
+.card-collapsible.collapsed .collapse-chevron{transform:rotate(-90deg)}
+.card-body-collapse{overflow:hidden;transition:max-height .3s ease,opacity .25s ease;max-height:2000px;opacity:1}
+.card-collapsible.collapsed .card-body-collapse{max-height:0;opacity:0}
 
 /* ── SEC HEADER ── */
 .sec-hdr{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text4);padding-bottom:5px;border-bottom:1px solid var(--border2);margin-bottom:8px}
@@ -225,164 +234,90 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
     <div id="ltWarnTxt"></div>
   </div>
 
-  <!-- ── BODY TWO COLUMNS ── -->
+  <!-- ── ROW 1: PARAMETER COMPARISON + EXPECTED OUTCOMES ── -->
   <div class="body-cols">
 
-    <!-- ══ LEFT COLUMN ══ -->
-    <div style="display:flex;flex-direction:column;gap:14px">
+    <!-- Parameter Comparison -->
+    <div class="card">
+      <div class="ch"><span class="cht">PARAMETER COMPARISON</span></div>
+      <table class="param-tbl">
+        <thead>
+          <tr><th>Parameter</th><th>Current (Estimated)</th><th>Recommended</th><th>Change</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div style="font-size:11px;font-weight:600;color:var(--navy)">Kp <span class="ibt" data-tip="Proportional gain: controller output change per unit error. Higher Kp = faster but more oscillatory response.">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">Proportional gain</div></div></td>
+            <td style="text-align:center"><span class="oval" id="cmp-kp-old">—</span></td>
+            <td style="text-align:center"><span class="nval" id="cmp-kp-new">—</span></td>
+            <td><div class="why-pct" id="cmp-kp-pct">—</div><div class="why-txt" id="cmp-kp-why">—</div></td>
+          </tr>
+          <tr>
+            <td><div style="font-size:11px;font-weight:600;color:var(--navy)">Ti <span class="ibt" data-tip="Integral time: how quickly accumulated error is corrected. Smaller Ti = faster integral action but risk of windup.">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">Integral time (min)</div></div></td>
+            <td style="text-align:center"><span class="oval" id="cmp-ti-old">—</span></td>
+            <td style="text-align:center"><span class="nval" id="cmp-ti-new">—</span></td>
+            <td><div class="why-pct" id="cmp-ti-pct">—</div><div class="why-txt" id="cmp-ti-why">—</div></td>
+          </tr>
+          <tr>
+            <td><div style="font-size:11px;font-weight:600;color:var(--navy)">λ <span class="ibt" data-tip="Lambda (IMC speed): desired closed-loop response time. Larger λ = slower, more conservative. Calculated as max(2θ, 0.6·Tu, 0.5·τ, 3).">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">IMC speed target</div></div></td>
+            <td style="text-align:center"><span style="font-size:11px;color:var(--text4)">—</span></td>
+            <td style="text-align:center"><span class="nval" id="cmp-lam-new">—</span></td>
+            <td><div class="why-txt">max(2θ, 0.6·Tu, 3)</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <!-- Parameter Comparison -->
-      <div class="card">
-        <div class="ch"><span class="cht">PARAMETER COMPARISON</span></div>
-        <table class="param-tbl">
-          <thead>
-            <tr><th>Parameter</th><th>Current</th><th>Recommended</th><th>Change</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">Kp <span class="ibt" data-tip="Proportional gain: controller output change per unit error. Higher Kp = faster but more oscillatory response.">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">Proportional gain</div></div></td>
-              <td style="text-align:center"><span class="oval" id="cmp-kp-old">—</span></td>
-              <td style="text-align:center"><span class="nval" id="cmp-kp-new">—</span></td>
-              <td><div class="why-pct" id="cmp-kp-pct">—</div><div class="why-txt" id="cmp-kp-why">—</div></td>
-            </tr>
-            <tr>
-              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">Ti <span class="ibt" data-tip="Integral time: how quickly accumulated error is corrected. Smaller Ti = faster integral action but risk of windup.">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">Integral time (min)</div></div></td>
-              <td style="text-align:center"><span class="oval" id="cmp-ti-old">—</span></td>
-              <td style="text-align:center"><span class="nval" id="cmp-ti-new">—</span></td>
-              <td><div class="why-pct" id="cmp-ti-pct">—</div><div class="why-txt" id="cmp-ti-why">—</div></td>
-            </tr>
-            <tr>
-              <td><div style="font-size:11px;font-weight:600;color:var(--navy)">λ <span class="ibt" data-tip="Lambda (IMC speed): desired closed-loop response time. Larger λ = slower, more conservative. Calculated as max(2θ, 0.6·Tu, 0.5·τ, 3).">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">IMC speed target</div></div></td>
-              <td style="text-align:center"><span style="font-size:11px;color:var(--text4)">—</span></td>
-              <td style="text-align:center"><span class="nval" id="cmp-lam-new">—</span></td>
-              <td><div class="why-txt">max(2θ, 0.6·Tu, 3)</div></td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- Expected Outcomes -->
+    <div class="card">
+      <div class="ch"><span class="cht">EXPECTED OUTCOMES</span> <span class="ibt" data-tip="Simulated comparison between current and recommended tuning. Based on a closed-loop model using identified K, τ, θ. Not a guarantee — verify on plant.">i</span></div>
+      <table class="out-tbl">
+        <thead>
+          <tr><th rowspan="2">Metric</th><th rowspan="2">Before</th><th rowspan="2">Auto Optimised (AO)</th><th rowspan="2">User Optimised (UO)</th><th colspan="2" style="text-align:center">Improvement</th></tr>
+          <tr><th style="text-align:center;font-size:9px;color:var(--ok)">AO</th><th style="text-align:center;font-size:9px;color:var(--blue)">UO</th></tr>
+        </thead>
+        <tbody id="outcome-rows"></tbody>
+      </table>
+    </div>
+
+  </div><!-- /row-1 -->
+
+  <!-- ── ACTUAL VS OPTIMISED PLOT ── -->
+  <div class="card" id="card-plot">
+    <div class="ch" style="flex-wrap:wrap;gap:6px">
+      <span class="cht">ACTUAL VS OPTIMISED — PV &amp; OP OVERLAY</span>
+      <span class="ibt" data-tip="Simulated overlay comparing current tuning (red/orange) vs recommended tuning (green/teal). Uses the identified FOPDT model. Not real plant data — use as a directional guide only.">i</span>
+      <!-- Legend pills inline in header -->
+      <div id="ovl-legend" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:4px">
+        <div class="chart-legend-item" data-idx="0" onclick="toggleOvlSeries(0)" style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3)"><div style="width:16px;height:2.5px;background:#a81c1c;border-radius:1px"></div>PV Actual</div>
+        <div class="chart-legend-item" data-idx="1" onclick="toggleOvlSeries(1)" style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3)"><div style="width:16px;border-top:2.5px dashed #f28b8b;height:0"></div>PV Opt</div>
+        <div class="chart-legend-item" data-idx="2" onclick="toggleOvlSeries(2)" style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3)"><div style="width:16px;border-top:2px dashed #f5c518;height:0"></div>SP</div>
+        <div class="chart-legend-item" data-idx="3" onclick="toggleOvlSeries(3)" style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3)"><div style="width:16px;height:2px;background:#1a7a40;border-radius:1px"></div>OP Actual</div>
+        <div class="chart-legend-item" data-idx="4" onclick="toggleOvlSeries(4)" style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3)"><div style="width:16px;border-top:2px dashed #6fcf97;height:0"></div>OP Opt</div>
       </div>
-
-      <!-- Expected Outcomes -->
-      <div class="card">
-        <div class="ch"><span class="cht">EXPECTED OUTCOMES</span> <span class="ibt" data-tip="Simulated comparison between current and recommended tuning. Based on a closed-loop model using identified K, τ, θ. Not a guarantee — verify on plant.">i</span></div>
-        <table class="out-tbl">
-          <thead>
-            <tr><th rowspan="2">Metric</th><th rowspan="2">Before</th><th rowspan="2">Auto Optimised (AO)</th><th rowspan="2">User Optimised (UO)</th><th colspan="2" style="text-align:center">Improvement</th></tr>
-            <tr><th style="text-align:center;font-size:9px;color:var(--ok)">AO</th><th style="text-align:center;font-size:9px;color:var(--blue)">UO</th></tr>
-          </thead>
-          <tbody id="outcome-rows"></tbody>
-        </table>
+      <div style="display:flex;align-items:center;gap:6px;margin-left:auto">
+        <button id="btn-auto-opt" onclick="switchOvlMode('auto')" style="font-size:10px;padding:3px 9px;border-radius:5px;border:1px solid var(--blue);background:#dbeafe;color:#1d4ed8;font-weight:700;cursor:pointer">Auto</button>
+        <button id="btn-user-opt" onclick="switchOvlMode('user')" style="font-size:10px;padding:3px 9px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);font-weight:600;cursor:pointer" title="Run validation first">User</button>
+        <button onclick="if(ovlChart)ovlChart.resetZoom()" style="font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">&#8635;</button>
       </div>
+    </div>
+    <div style="padding:12px 14px 8px;height:340px;position:relative">
+      <canvas id="ovl-cv" style="width:100%;height:100%"></canvas>
+    </div>
+    <div class="chart-hint" style="text-align:right">Drag to zoom &middot; Scroll &middot; Ctrl+drag to pan</div>
+  </div>
 
-      <!-- Action Plan -->
-      <div class="card">
-        <div class="ch"><span class="cht">ACTION PLAN</span></div>
-        <div class="cb" id="actions-list"></div>
+
+  <!-- ── ROW 3: HOLDOUT (left) + FOPDT (right), both collapsible ── -->
+  <div class="body-cols" style="align-items:start">
+
+    <div class="card card-collapsible collapsed" id="card-holdout">
+      <div class="ch" onclick="toggleCard('card-holdout')">
+        <span class="cht">HOLD-OUT CROSS-VALIDATION</span>
+        <span class="ibt" data-tip="Splits data into two sets and estimates K on each. If K_train and K_validate agree within 10%, the model is reliable. Large difference means the process is non-stationary — run a step test.">i</span>
+        <svg class="collapse-chevron" style="margin-left:auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-
-      <!-- Notes + Save -->
-      <div class="notes-wrap">
-        <label for="notesTA">Engineer notes (optional)</label>
-        <textarea class="notes-ta" id="notesTA" placeholder="Add observations, site conditions, or approvals…" rows="3"></textarea>
-      </div>
-      <div class="save-panel">
-        <div>
-          <div class="sp-title">✓ Ready to accept this tuning recommendation</div>
-          <div class="sp-sub">Clicking "Accept &amp; Save" records Kp_new and Ti_new against this loop.</div>
-          <div class="sp-saved" id="spSaved"></div>
-        </div>
-        <button class="save-btn" onclick="saveRec()" id="savePanelBtn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Accept &amp; Save
-        </button>
-      </div>
-
-    </div><!-- /left col -->
-
-    <!-- ══ RIGHT COLUMN ══ -->
-    <div style="display:flex;flex-direction:column;gap:14px">
-
-      <!-- Model Parameters + Split Comparison (side by side) -->
-      <div class="card">
-        <div class="ch"><span class="cht">FOPDT MODEL PARAMETERS</span><span style="font-size:10px;color:var(--text4);margin-left:8px">| K/θ/τ/Tu vs split comparison →</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;border-top:none">
-
-          <!-- Left half: model params -->
-          <div style="border-right:1px solid var(--border2)">
-            <table class="mp-tbl">
-              <thead><tr><th>Param</th><th>Value</th><th>Confidence</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td><span class="mp-param" style="color:var(--blue)">K</span> <span class="ibt" data-tip="Process gain: steady-state PV change per 1% OP change. Estimated via step detection (ΔPV/ΔOP) or windowed OLS. Used to calculate Kp.">i</span><div class="mp-sub">Process Gain</div></td>
-                  <td><span class="mp-val" id="kpi-K">—</span><div class="mp-sub">OP→PV</div></td>
-                  <td>
-                    <div class="mp-conf-wrap">
-                      <div class="mp-conf-track"><div class="mp-conf-fill" id="kconf-fill" style="background:var(--blue)"></div></div>
-                      <span class="mp-conf-pct" id="kconf-pct">—</span>
-                      <span class="mp-badge" id="k-badge">—</span>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td><span class="mp-param" style="color:#0891b2">θ</span> <span class="ibt" data-tip="Dead time: samples of delay before PV responds to an OP change. Estimated from the peak of the OP→PV cross-correlation. In sample units — multiply by sampling interval for real time.">i</span><div class="mp-sub">Dead Time</div></td>
-                  <td><span class="mp-val" id="kpi-theta">—</span><div class="mp-sub">min</div></td>
-                  <td>
-                    <div class="mp-conf-wrap">
-                      <div class="mp-conf-track"><div class="mp-conf-fill" style="width:88%;background:#0891b2"></div></div>
-                      <span class="mp-conf-pct">88%</span>
-                      <span class="mp-badge sb-ok">High</span>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td><span class="mp-param" style="color:#7c3aed">τ</span> <span class="ibt" data-tip="Time constant: time for PV to reach 63.2% of its final value after a step. Estimated via step 63% method, ACF decay, or variance ratio depending on loop type and data available.">i</span><div class="mp-sub">Time Const</div></td>
-                  <td><span class="mp-val" id="kpi-tau">—</span><div class="mp-sub">min est.</div></td>
-                  <td>
-                    <div class="mp-conf-wrap">
-                      <div class="mp-conf-track"><div class="mp-conf-fill" id="tauconf-fill" style="background:#7c3aed"></div></div>
-                      <span class="mp-conf-pct" id="tauconf-pct">—</span>
-                      <span class="mp-badge" id="tau-badge">—</span>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td><span class="mp-param" style="color:var(--warn)">Tu</span> <span class="ibt" data-tip="Ultimate/oscillation period: estimated from first peak of error ACF. Used to set λ. Only reliable when the loop is oscillating. Defaults to 7 samples for stable loops.">i</span><div class="mp-sub">Osc Period</div></td>
-                  <td><span class="mp-val" id="kpi-Tu">—</span><div class="mp-sub">min ACF</div></td>
-                  <td>
-                    <div class="mp-conf-wrap">
-                      <div class="mp-conf-track"><div class="mp-conf-fill" id="tuconf-fill" style="background:var(--warn)"></div></div>
-                      <span class="mp-conf-pct" id="tuconf-pct">—</span>
-                      <span class="mp-badge" id="tu-badge">—</span>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Right half: split comparison table -->
-          <div>
-            <table class="sc-tbl">
-              <thead>
-                <tr>
-                  <th>Param</th>
-                  <th style="color:var(--blue)">Original K</th>
-                  <th style="color:var(--ok)" id="sc-th-train">K_train</th>
-                  <th style="color:#7c3aed" id="sc-th-validate">K_validate</th>
-                </tr>
-              </thead>
-              <tbody id="sc-tbody">
-                <tr><td colspan="4" class="sc-empty">Run validation to see split comparison</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Hold-out Cross Validation -->
-      <div class="card">
-        <div class="ch"><span class="cht">HOLD-OUT CROSS-VALIDATION</span> <span class="ibt" data-tip="Splits data into two sets and estimates K on each. If K_train and K_validate agree within 10%, the model is reliable. Large difference means the process is non-stationary — run a step test.">i</span></div>
-        <div class="cb" style="padding-bottom:10px">
+      <div class="card-body-collapse">
+        <div class="cb" style="padding:10px 14px 8px">
           <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.6">Recalculates K on two halves of the data. Checks that K is consistent — a key test of model reliability. <b style="color:var(--text2)">Linear</b> splits by time order. <b style="color:var(--text2)">Random</b> shuffles first, so both halves contain data from throughout the timeline.</div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <button class="ho-run-btn" onclick="runHoldout()">&#9654; Run validation</button>
@@ -395,7 +330,6 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
               / <span id="hvValPct">40</span>% validate
             </div>
           </div>
-
           <div id="ho-results" style="display:none;margin-top:12px">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
               <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)">
@@ -419,31 +353,85 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Actual vs Optimised Chart -->
-      <div class="card">
-        <div class="ch">
-          <span class="cht">ACTUAL VS OPTIMISED &mdash; PV &amp; OP OVERLAY</span>
-          <span class="ibt" data-tip="Simulated overlay comparing current tuning (red/orange) vs recommended tuning (green/teal). Uses the identified FOPDT model. Not real plant data — use as a directional guide only.">i</span>
-          <div style="display:flex;align-items:center;gap:6px;margin-left:12px">
-            <button id="btn-auto-opt" onclick="switchOvlMode('auto')" style="font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--blue);background:#dbeafe;color:#1d4ed8;font-weight:700;cursor:pointer">Auto Optimised</button>
-            <button id="btn-user-opt" onclick="switchOvlMode('user')" style="font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);font-weight:600;cursor:pointer" title="Run validation first">User Optimised</button>
-          </div>
-          <button onclick="if(ovlChart)ovlChart.resetZoom()" style="margin-left:auto;font-size:10px;padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">&#8635; Reset zoom</button>
-        </div>
-        <div class="chart-legend" id="ovl-legend">
-          <div class="chart-legend-item" data-idx="0" onclick="toggleOvlSeries(0)" style="cursor:pointer"><div style="width:18px;height:2.5px;background:#e24b4a;border-radius:1px"></div>PV Actual</div>
-          <div class="chart-legend-item" data-idx="1" onclick="toggleOvlSeries(1)" style="cursor:pointer"><div style="width:18px;height:2.5px;background:#1a9e5a;border-radius:1px"></div>PV Optimised</div>
-          <div class="chart-legend-item" data-idx="2" onclick="toggleOvlSeries(2)" style="cursor:pointer"><div style="width:18px;border-top:2px dashed #9ab0c4;height:0"></div>SP</div>
-          <div class="chart-legend-item" data-idx="3" onclick="toggleOvlSeries(3)" style="cursor:pointer"><div style="width:18px;border-top:2px dashed #f5b84a;height:0"></div>OP Actual</div>
-          <div class="chart-legend-item" data-idx="4" onclick="toggleOvlSeries(4)" style="cursor:pointer"><div style="width:18px;height:2px;background:#0891b2;border-radius:1px"></div>OP Optimised</div>
-        </div>
-        <div style="padding:10px 14px 0;height:280px;position:relative"><canvas id="ovl-cv" style="width:100%;height:100%"></canvas></div>
-        <div class="chart-hint">Drag to zoom &middot; Scroll &middot; Ctrl+drag to pan</div>
+    <div class="card card-collapsible collapsed" id="card-fopdt">
+      <div class="ch" onclick="toggleCard('card-fopdt')">
+        <span class="cht">FOPDT MODEL PARAMETERS</span>
+        <span style="font-size:10px;color:var(--text4);margin-left:8px">| K/θ/τ/Tu vs split comparison</span>
+        <svg class="collapse-chevron" style="margin-left:auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
+      <div class="card-body-collapse">
+        <div style="display:grid;grid-template-columns:1fr 1fr;border-top:none">
+          <div style="border-right:1px solid var(--border2)">
+            <table class="mp-tbl">
+              <thead><tr><th>Param</th><th>Value</th><th>Confidence</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="mp-param" style="color:var(--blue)">K</span> <span class="ibt" data-tip="Process gain: steady-state PV change per 1% OP change. Estimated via step detection (ΔPV/ΔOP) or windowed OLS. Used to calculate Kp.">i</span><div class="mp-sub">Process Gain</div></td>
+                  <td><span class="mp-val" id="kpi-K">—</span><div class="mp-sub">OP→PV</div></td>
+                  <td><div class="mp-conf-wrap"><div class="mp-conf-track"><div class="mp-conf-fill" id="kconf-fill" style="background:var(--blue)"></div></div><span class="mp-conf-pct" id="kconf-pct">—</span><span class="mp-badge" id="k-badge">—</span></div></td>
+                </tr>
+                <tr>
+                  <td><span class="mp-param" style="color:#0891b2">θ</span> <span class="ibt" data-tip="Dead time: samples of delay before PV responds to an OP change.">i</span><div class="mp-sub">Dead Time</div></td>
+                  <td><span class="mp-val" id="kpi-theta">—</span><div class="mp-sub">min</div></td>
+                  <td><div class="mp-conf-wrap"><div class="mp-conf-track"><div class="mp-conf-fill" style="width:88%;background:#0891b2"></div></div><span class="mp-conf-pct">88%</span><span class="mp-badge sb-ok">High</span></div></td>
+                </tr>
+                <tr>
+                  <td><span class="mp-param" style="color:#7c3aed">τ</span> <span class="ibt" data-tip="Time constant: time for PV to reach 63.2% of its final value after a step.">i</span><div class="mp-sub">Time Const</div></td>
+                  <td><span class="mp-val" id="kpi-tau">—</span><div class="mp-sub">min est.</div></td>
+                  <td><div class="mp-conf-wrap"><div class="mp-conf-track"><div class="mp-conf-fill" id="tauconf-fill" style="background:#7c3aed"></div></div><span class="mp-conf-pct" id="tauconf-pct">—</span><span class="mp-badge" id="tau-badge">—</span></div></td>
+                </tr>
+                <tr>
+                  <td><span class="mp-param" style="color:var(--warn)">Tu</span> <span class="ibt" data-tip="Ultimate/oscillation period: estimated from first peak of error ACF.">i</span><div class="mp-sub">Osc Period</div></td>
+                  <td><span class="mp-val" id="kpi-Tu">—</span><div class="mp-sub">min ACF</div></td>
+                  <td><div class="mp-conf-wrap"><div class="mp-conf-track"><div class="mp-conf-fill" id="tuconf-fill" style="background:var(--warn)"></div></div><span class="mp-conf-pct" id="tuconf-pct">—</span><span class="mp-badge" id="tu-badge">—</span></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <table class="sc-tbl">
+              <thead><tr><th>Param</th><th style="color:var(--blue)">Original K</th><th style="color:var(--ok)" id="sc-th-train">K_train</th><th style="color:#7c3aed" id="sc-th-validate">K_validate</th></tr></thead>
+              <tbody id="sc-tbody"><tr><td colspan="4" class="sc-empty">Run validation to see split comparison</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    </div><!-- /right col -->
-  </div><!-- /body-cols -->
+  </div><!-- /row-3 -->
+
+  <!-- ── ROW 4: ACTION PLAN (left) + ENGINEER NOTES + SAVE (right) ── -->
+  <div class="body-cols" style="align-items:start">
+
+    <!-- Left: Action Plan -->
+    <div class="card">
+      <div class="ch"><span class="cht">ACTION PLAN</span></div>
+      <div class="cb" id="actions-list"></div>
+    </div>
+
+    <!-- Right: Engineer Notes + Accept & Save -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="notes-wrap">
+        <label for="notesTA">Engineer notes (optional)</label>
+        <textarea class="notes-ta" id="notesTA" placeholder="Add observations, site conditions, or approvals…" rows="3"></textarea>
+      </div>
+      <div class="save-panel">
+        <div>
+          <div class="sp-title">✓ Ready to accept this tuning recommendation</div>
+          <div class="sp-sub">Clicking "Accept &amp; Save" records Kp_new and Ti_new against this loop.</div>
+          <div class="sp-saved" id="spSaved"></div>
+        </div>
+        <button class="save-btn" onclick="saveRec()" id="savePanelBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Accept &amp; Save
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /row-4 -->
+
 </div><!-- /page-wrap -->
 
 <div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f2744;color:#e8f3fd;font-size:12px;padding:10px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.12);box-shadow:0 4px 16px rgba(15,39,68,.3);opacity:0;transition:opacity .4s,transform .4s;pointer-events:none;z-index:9999;white-space:nowrap"></div>
@@ -529,20 +517,24 @@ function identify(pv, op, sp){
     // simulate with nominal tau for chart
     const tau_sim=5.0;
     const K_sim=Ki;
-    const {pvs:pvb,ops:opb}=simLoop(pv,op,sp,N,Kp_old,Ti_old,K_sim,theta,tau_sim,false);
+    // BEFORE: use actual recorded PV vs SP for a true baseline IAE
+    const iae_b_real=pv.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
+    const op_std_b_real=std(op);
+    // AO: simulate with new tuning params
     const {pvs:pva,ops:opa}=simLoop(pv,op,sp,N,Kp_new,Ti_new,K_sim,theta,tau_sim,(typeof CFG!=='undefined'?CFG.antiWindup:true));
-    const iae_b=pvb.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
     const iae_a=pva.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
+    // keep pvb/opb as real data for chart overlay
+    const pvb=pv.slice(); const opb=op.slice();
     return{K:rnd(Ki,4),K_method:'integrating',tau:null,tau_method:'n/a',tau_conf:0,
       theta:rnd(theta,1),Tu,conf_Tu,lambda:rnd(lam,2),
       Kp_old,Ti_old,Kp_new,Ti_new,
       Ki_old:rnd(Kp_old/Ti_old,4),Ki_new:rnd(Kp_new/Ti_new,4),
       r2_K:0,conf_K:0.4,isIntegrating:true,
       pv_b:pvb,op_b:opb,pv_a:pva,op_a:opa,
-      iae_b:Math.round(iae_b),iae_a:Math.round(iae_a),
-      iae_pct:Math.max(0,rnd((1-iae_a/iae_b)*100,1)),
-      op_std_b:rnd(std(opb),4),op_std_a:rnd(std(opa),4),
-      op_wear_pct:rnd((1-std(opa)/std(opb))*100,1),
+      iae_b:Math.round(iae_b_real),iae_a:Math.round(iae_a),
+      iae_pct:rnd((1-iae_a/iae_b_real)*100,1),
+      op_std_b:rnd(op_std_b_real,4),op_std_a:rnd(std(opa),4),
+      op_wear_pct:rnd((1-std(opa)/op_std_b_real)*100,1),
       pv_std:rnd(std(pv),3)};
   }
 
@@ -668,10 +660,14 @@ function identify(pv, op, sp){
   const Ti_old=rnd(Tu/1.2,2);
 
   // ── 9. Simulate for IAE/chart comparison ─────────────────────────────
-  const {pvs:pvb,ops:opb}=simLoop(pv,op,sp,N,Kp_old,Ti_old,K,theta,tau,false);
+  // BEFORE: use actual recorded PV vs SP — true real-world baseline
+  const iae_b_real=pv.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
+  const op_std_b_real=std(op);
+  // AO: only simulate the optimised side
   const {pvs:pva,ops:opa}=simLoop(pv,op,sp,N,Kp_new,Ti_new,K,theta,tau,(typeof CFG!=='undefined'?CFG.antiWindup:true));
-  const iae_b=pvb.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
   const iae_a=pva.reduce((s,v,i)=>s+Math.abs(v-sp[i]),0);
+  // keep pvb/opb as real data for chart overlay
+  const pvb=pv.slice(); const opb=op.slice();
 
   return{
     K:rnd(K,3), K_method,
@@ -685,10 +681,10 @@ function identify(pv, op, sp){
     r2_K, conf_K,
     isIntegrating:false,
     pv_b:pvb, op_b:opb, pv_a:pva, op_a:opa,
-    iae_b:Math.round(iae_b), iae_a:Math.round(iae_a),
-    iae_pct:Math.max(0,rnd((1-iae_a/iae_b)*100,1)),
-    op_std_b:rnd(std(opb),4), op_std_a:rnd(std(opa),4),
-    op_wear_pct:rnd((1-std(opa)/(std(opb)||1))*100,1),
+    iae_b:Math.round(iae_b_real), iae_a:Math.round(iae_a),
+    iae_pct:rnd((1-iae_a/iae_b_real)*100,1),
+    op_std_b:rnd(op_std_b_real,4), op_std_a:rnd(std(opa),4),
+    op_wear_pct:rnd((1-std(opa)/(op_std_b_real||1))*100,1),
     pv_std:rnd(std(pv),3)
   };
 }
@@ -758,19 +754,30 @@ function populate(){
   s('cmp-ti-why',M.Ti_new>M.Ti_old?'Slower reset \u2014 reduces integral windup':'Faster reset \u2014 tighter SP tracking');
   s('cmp-lam-new',M.lambda+' min');
   const outcomes=[
-    ['IAE (total error)','Integrated Absolute Error: total area between PV and SP over time. Lower = better setpoint tracking.',M.iae_b.toLocaleString(),M.iae_a.toLocaleString(),'\u2212'+M.iae_pct+'%','Less deviation from setpoint'],
-    ['OP activity \u03c3','Standard deviation of controller output. Lower = less valve movement = reduced mechanical wear.',M.op_std_b+'%',M.op_std_a+'%','\u2212'+M.op_wear_pct+'%','Reduced valve wear'],
-    ['PV noise \u03c3','Standard deviation of process variable. This is a plant/sensor property — tuning cannot reduce it.',M.pv_std,'~'+M.pv_std,'Unchanged','Noise floor is a plant property'],
+    ['IAE (total error)','Integrated Absolute Error: total area between PV and SP over time. Lower = better setpoint tracking.',M.iae_b.toLocaleString(),M.iae_a.toLocaleString(),M.iae_pct,'Less deviation from setpoint'],
+    ['OP activity \u03c3','Standard deviation of controller output. Lower = less valve movement = reduced mechanical wear.',M.op_std_b+'%',M.op_std_a+'%',M.op_wear_pct,'Reduced valve wear'],
+    ['PV noise \u03c3','Standard deviation of process variable. This is a plant/sensor property — tuning cannot reduce it.',M.pv_std,'~'+M.pv_std,null,'Noise floor is a plant property'],
   ];
-  document.getElementById('outcome-rows').innerHTML=outcomes.map(([nm,tip,bv,av,pct,why])=>`
+  document.getElementById('outcome-rows').innerHTML=outcomes.map(([nm,tip,bv,av,pct,why])=>{
+    // pct is a signed number; null means unchanged (PV noise)
+    let pctTxt, pctColor;
+    if(pct===null){
+      pctTxt='Unchanged'; pctColor='var(--text2)';
+    } else {
+      const better=pct>0;
+      pctTxt=(better?'\u2212':'+')+(Math.abs(pct))+'%';
+      pctColor='var(--text2)';
+    }
+    const aoColor='var(--text2)';
+    return `
     <tr>
       <td style="font-size:11px;color:var(--text2);font-weight:600">${nm} <span class="ibt" data-tip="${tip}">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">${why}</div></td>
-      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--crit)">${bv}</td>
-      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--ok)">${av}</td>
+      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text)">${bv}</td>
+      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--blue-lt)">${av}</td>
       <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text4)" class="user-opt-col">—</td>
-      <td style="text-align:center;font-size:11px;font-weight:700;color:var(--ok);font-family:'IBM Plex Mono',monospace">${pct}</td>
+      <td style="text-align:center;font-size:11px;font-weight:700;color:${pctColor};font-family:'IBM Plex Mono',monospace">${pctTxt}</td>
       <td style="text-align:center;font-size:11px;font-weight:700;color:var(--text4);font-family:'IBM Plex Mono',monospace" class="user-diff-col">—</td>
-    </tr>`).join('');
+    </tr>`;}).join('');
   const actions=[
     ['r','\u26a0',`<b>Set Kp = ${M.Kp_new}</b>`,` (current estimated: ${M.Kp_old}) \u2014 reduce proportional gain to eliminate oscillation`],
     ['a','\u23f1',`<b>Set Ti = ${M.Ti_new} min</b>`,` (current estimated: ${M.Ti_old} min) \u2014 adjust integral time`],
@@ -827,11 +834,11 @@ function buildOvl(){
     data:{
       labels:D.labels,
       datasets:[
-        {label:'SP',data:D.sp,borderColor:'#9ab0c4',borderWidth:1.5,borderDash:[7,5],pointRadius:0,tension:.15,yAxisID:'y'},
-        {label:'PV Actual',data:D.pv,borderColor:'#e24b4a',borderWidth:2,pointRadius:0,tension:.15,yAxisID:'y'},
-        {label:'PV Opt',data:M.pv_a,borderColor:'#1a9e5a',borderWidth:2,pointRadius:0,tension:.15,yAxisID:'y'},
-        {label:'OP Actual',data:D.op,borderColor:'#f5b84a',borderWidth:1.5,borderDash:[4,4],pointRadius:0,tension:.15,yAxisID:'y1'},
-        {label:'OP Opt',data:M.op_a,borderColor:'#0891b2',borderWidth:1.5,pointRadius:0,tension:.15,yAxisID:'y1'},
+        {label:'SP',data:D.sp,borderColor:'#f5c518',borderWidth:1.5,borderDash:[7,5],pointRadius:0,tension:.15,yAxisID:'y'},
+        {label:'PV Actual',data:D.pv,borderColor:'#a81c1c',borderWidth:2,pointRadius:0,tension:.15,yAxisID:'y'},
+        {label:'PV Opt',data:M.pv_a,borderColor:'#f28b8b',borderWidth:2,borderDash:[5,4],pointRadius:0,tension:.15,yAxisID:'y'},
+        {label:'OP Actual',data:D.op,borderColor:'#1a7a40',borderWidth:1.5,pointRadius:0,tension:.15,yAxisID:'y1'},
+        {label:'OP Opt',data:M.op_a,borderColor:'#6fcf97',borderWidth:1.5,borderDash:[4,4],pointRadius:0,tension:.15,yAxisID:'y1'},
       ]
     },
     options:{
@@ -843,9 +850,9 @@ function buildOvl(){
       zoom:{pan:{enabled:true,mode:'x',modifierKey:'ctrl'},zoom:{drag:{enabled:true,backgroundColor:'rgba(46,134,222,.07)',borderColor:'#2e86de',borderWidth:1},wheel:{enabled:true,speed:.08},mode:'x'}}
       },
       scales:{
-        x:{ticks:{color:tc,font:{size:9},maxTicksLimit:12},grid:{color:gc}},
-        y:{position:'left',ticks:{color:tc,font:{size:9}},grid:{color:gc},title:{display:true,text:'PV / SP',color:tc,font:{size:9}}},
-        y1:{position:'right',ticks:{color:'rgba(180,120,23,.7)',font:{size:9}},grid:{display:false},title:{display:true,text:'OP (%)',color:'rgba(180,120,23,.7)',font:{size:9}}}
+        x:{ticks:{color:tc,font:{size:9},maxTicksLimit:16,maxRotation:0},grid:{color:gc}},
+        y:{position:'left',ticks:{color:tc,font:{size:9},maxTicksLimit:8},grid:{color:gc},title:{display:true,text:'PV / SP',color:tc,font:{size:9}},grace:'5%'},
+        y1:{position:'right',ticks:{color:'rgba(180,120,23,.7)',font:{size:9},maxTicksLimit:8},grid:{display:false},title:{display:true,text:'OP (%)',color:'rgba(180,120,23,.7)',font:{size:9}},grace:'5%'}
       }
     }
   });
@@ -974,16 +981,15 @@ function runHoldout(){
   // populate User Optimised column in outcome table
   const userVals=[iae_user.toLocaleString(), op_std_user+'%', '~'+M.pv_std];
   const userDiffs=[
-    '\u2212'+Math.max(0,rnd((1-iae_user/M.iae_b)*100,1))+'%',
-    '\u2212'+Math.max(0,rnd((1-op_std_user/(parseFloat(M.op_std_b)||1))*100,1))+'%',
+    rnd((1-iae_user/M.iae_b)*100,1)>0 ? '\u2212'+rnd((1-iae_user/M.iae_b)*100,1)+'%' : '+'+rnd((iae_user/M.iae_b-1)*100,1)+'%',
+    rnd((1-op_std_user/(parseFloat(M.op_std_b)||1))*100,1)>0 ? '\u2212'+rnd((1-op_std_user/(parseFloat(M.op_std_b)||1))*100,1)+'%' : '+'+rnd((op_std_user/(parseFloat(M.op_std_b)||1)-1)*100,1)+'%',
     'Unchanged'
   ];
   document.querySelectorAll('#outcome-rows tr').forEach((tr,i)=>{
     const valCell=tr.querySelector('.user-opt-col');
-    if(valCell&&userVals[i]!==undefined){valCell.textContent=userVals[i];valCell.style.color='var(--blue)';}
+    if(valCell&&userVals[i]!==undefined){valCell.textContent=userVals[i];valCell.style.color='var(--blue-lt)';}
     const diffCell=tr.querySelector('.user-diff-col');
-    if(diffCell&&userDiffs[i]!==undefined){diffCell.textContent=userDiffs[i];diffCell.style.color='var(--blue)';}
-  });
+    if(diffCell&&userDiffs[i]!==undefined){diffCell.textContent=userDiffs[i];diffCell.style.color='var(--text2)';}})
   // switch chart to user optimised and highlight button
   switchOvlMode('user');
 }
@@ -1004,6 +1010,19 @@ async function saveRec(){
     const sp=document.getElementById('spSaved');sp.style.display='block';sp.textContent='\u2713 Saved at '+now;
     toast('\u2713 Tuning recommendation saved');
   }catch(e){toast('\u2717 Save failed \u2014 '+e.message);}
+}
+
+
+function toggleCard(id){
+  const card=document.getElementById(id);
+  if(card) card.classList.toggle('collapsed');
+}
+function toggleLinkedCards(){
+  const h=document.getElementById('card-holdout');
+  const f=document.getElementById('card-fopdt');
+  const isCollapsed=h.classList.contains('collapsed');
+  if(isCollapsed){h.classList.remove('collapsed');f.classList.remove('collapsed');}
+  else{h.classList.add('collapsed');f.classList.add('collapsed');}
 }
 
 (async function init(){
