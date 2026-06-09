@@ -255,7 +255,7 @@ function renderDiagSelection(){
     <div class="sel-item ${row.indent===1?'indent-1':''} ${row.indent===0?'is-parent':''}">
       <span class="sel-name">${row.diagnostic}</span>
       <label class="toggle">
-        <input type="checkbox" ${row.enabled?'checked':''} onchange="CONFIG.diagnostic_selection[${i}].enabled=this.checked?1:0"/>
+        <input type="checkbox" ${(row.enabled===1||row.enabled===true||(typeof row.enabled==='string'&&!['0','no','false','off','n',''].includes(row.enabled.trim().toLowerCase())))?'checked':''} onchange="CONFIG.diagnostic_selection[${i}].enabled=this.checked?1:0"/>
         <div class="toggle-track"></div><div class="toggle-thumb"></div>
       </label>
     </div>`).join('');

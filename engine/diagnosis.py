@@ -10,6 +10,7 @@ This is the single largest piece of "business logic" in the engine,
 and is the most likely place future plant-specific tweaks will land.
 """
 
+import re
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -435,7 +436,8 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
                   service_factor: float, capabilities: Capabilities,
                   config: dict, tc: TimeContext,
                   selection=None,
-                  detection_exclusions: set = None) -> Diagnosis:
+                  detection_exclusions: set = None,
+                  loop_name: str = "") -> Diagnosis:
     """
     Multi-class diagnosis using priority-ordered checks. The first matching
     rule wins for `primary`, but other observed issues are listed as
@@ -642,9 +644,23 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
     # Sluggish = controller is barely moving (OP activity low) but performance
     # is bad (Harris low, IAE high). Whether the resulting PV looks oscillatory
     # because of disturbances is irrelevant — the cause is the same.
+    # IAE check: absolute IAE/hr OR normalised IAE (% of PV range).
+    # Normalised IAE applies to all loop types — a well-controlled level loop
+    # (e.g. 15LC095 at 7.5%) will naturally stay below 15%, so the threshold
+    # is safe across FC, LC, PC, TC loops.
+    iae_norm_thr = safe_float(config.get("IAE_NORM_THRESHOLD_PCT", 15.0))
+    iae_high = (
+        metrics.iae_per_hour > iae_thr
+        or metrics.iae_per_hour_norm > iae_norm_thr
+    )
+    # Harris may be NaN when OP is nearly static (invalidated in engine.py).
+    # In that case, still allow sluggish diagnosis if IAE norm is clearly high
+    # (>30%) — static OP + high IAE is itself a sluggish signature.
+    harris_bad = (not np.isnan(hi) and hi < hi_thr) or \
+                 (np.isnan(hi) and metrics.iae_per_hour_norm > iae_norm_thr * 2)
     if (sluggish_enabled
-            and not np.isnan(hi) and hi < hi_thr
-            and metrics.iae_per_hour > iae_thr
+            and harris_bad
+            and iae_high
             and metrics.op_activity < op_act_thr):
         diag.primary = "Sluggish tuning"
         diag.severity = "WARN"
@@ -652,7 +668,8 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
         diag.health_score = 45.0
         diag.rationale = (
             f"Harris Index {hi:.2f} indicates poor variance reduction; IAE/hr "
-            f"{metrics.iae_per_hour:.0f} > {iae_thr:.0f}. OP activity is low "
+            f"{metrics.iae_per_hour:.0f} (normalised {metrics.iae_per_hour_norm:.1f}%). "
+            f"OP activity is low "
             f"({metrics.op_activity:.2f}) — the controller is too detuned to "
             "reject disturbances or follow setpoint changes."
         )
@@ -670,7 +687,6 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
     # This catches loops where Harris is NaN (invalidated due to static OP)
     # or unreliable, and the absolute IAE threshold is too high for the
     # scale. Uses the normalised IAE (% of PV operating range) instead.
-    iae_norm_thr = safe_float(config.get("IAE_NORM_THRESHOLD_PCT", 15.0))
     if (metrics.op_activity < op_act_thr * 0.05        # OP essentially static
             and metrics.pv_std > 0.3                   # PV is varying
             and metrics.pv_amplitude_pct > 3.0):       # meaningful PV swing relative to scale
@@ -706,10 +722,21 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
     diag.primary = "Healthy"
     diag.severity = "OK"
     diag.confidence = 90.0
+    # Penalise health if IAE norm is elevated even though no fault was triggered.
+    # Graded: 15-30% of PV range → -15pts; 30-50% → -25pts; >50% → -35pts.
+    iae_norm_thr = safe_float(config.get("IAE_NORM_THRESHOLD_PCT", 15.0))
+    iae_n = metrics.iae_per_hour_norm
+    if iae_n > iae_norm_thr * 3.33:   # > ~50% of PV range/hr
+        health -= 35
+    elif iae_n > iae_norm_thr * 2.0:  # > ~30% of PV range/hr
+        health -= 25
+    elif iae_n > iae_norm_thr:        # > 15% of PV range/hr
+        health -= 15
     diag.health_score = max(50.0, health)
     hi_str = f"{hi:.2f}" if not np.isnan(hi) else "N/A"
     diag.rationale = (
-        f"Harris {hi_str}, IAE/hr {metrics.iae_per_hour:.0f}, OP activity "
+        f"Harris {hi_str}, IAE/hr {metrics.iae_per_hour:.0f} "
+        f"(normalised {metrics.iae_per_hour_norm:.1f}% of PV range), OP activity "
         f"{metrics.op_activity:.2f}. No fault signature triggered."
     )
     diag.recommended_action = "Continue routine monitoring."

@@ -116,7 +116,8 @@ def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True) -> d
 
             diag = diagnose_loop(metrics, sr, hi, osc_reg, osc_period, dq, sf,
                                  capabilities, config, tc, selection,
-                                 detection_exclusions=detection_exclusions.get(name, set()))
+                                 detection_exclusions=detection_exclusions.get(name, set()),
+                                 loop_name=name)
             # Per-loop plot
             plot_path = os.path.join(plot_dir, f"{name}.png")
             try:

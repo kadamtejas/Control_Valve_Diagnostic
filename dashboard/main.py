@@ -207,6 +207,14 @@ def _is_custom_config(email: str) -> bool:
 
 
 def _save_config(email: str, config: dict):
+    # Normalise diagnostic_selection enabled values to int (1/0).
+    # Guards against stale "Yes"/"No" strings that survive without being toggled.
+    for row in config.get("diagnostic_selection", []):
+        v = row.get("enabled")
+        if isinstance(v, str):
+            row["enabled"] = 0 if v.strip().lower() in ("0", "no", "false", "off", "n", "") else 1
+        elif isinstance(v, bool):
+            row["enabled"] = 1 if v else 0
     path = _get_user_config_path(email)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2)

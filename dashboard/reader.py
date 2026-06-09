@@ -534,6 +534,7 @@ def _read_summary(wb) -> list:
             "confidence": _safe_float(d.get("Confidence")),
             "service_factor": _safe_float(d.get("Service Factor %")),
             "iae_per_hour": _safe_float(d.get("IAE/hr")),
+            "iae_per_hour_norm": _safe_float(d.get("IAE/hr normalised %")),
             "pv_amplitude": _safe_float(d.get("PV amplitude")),
             "op_activity": _safe_float(d.get("OP activity")),
             "harris_index": _safe_float(d.get("Harris Index")),
