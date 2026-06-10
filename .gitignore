@@ -8,6 +8,7 @@ uploads/
 *.pdf
 *.zip
 user_configs/
+users.json
 diagnostic_heatmap.png
 plant_dashboard.png
 plots/
