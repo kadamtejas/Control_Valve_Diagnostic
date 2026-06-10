@@ -26,7 +26,7 @@ from fastapi.responses import (
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from auth import authenticate_user, create_access_token, get_current_user
+from auth import authenticate_user, create_access_token, get_current_user, register_user
 from reader import (
     read_all_loop_names,
     read_dashboard_data,
@@ -102,22 +102,12 @@ async def download_sample():
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _results_dir_for(email: str) -> str | None:
-    """Return the absolute results folder path for this user, or None.
-    Falls back to the most recently modified results_* folder so the
-    dashboard still works after a server restart.
-    """
+    """Return the absolute results folder path for this user, or None."""
     folder = user_results.get(email)
     if folder:
         full = BASE_DIR / folder
         if full.exists():
             return str(full)
-    # Fallback: auto-detect latest results folder
-    from reader import find_latest_results_dir
-    latest = find_latest_results_dir(str(BASE_DIR))
-    if latest:
-        # Register it so subsequent calls are fast
-        user_results[email] = os.path.basename(latest)
-        return latest
     return None
 
 
@@ -349,6 +339,47 @@ async def logout():
     return response
 
 
+
+@app.get("/register", response_class=HTMLResponse)
+async def register_page(request: Request):
+    return templates.TemplateResponse(request, "register.html", {"error": None, "success": None})
+
+
+@app.post("/register")
+async def register_submit(request: Request):
+    form     = await request.form()
+    name     = form.get("name", "").strip()
+    email    = form.get("email", "").strip()
+    password = form.get("password", "")
+    confirm  = form.get("confirm_password", "")
+
+    if password != confirm:
+        return templates.TemplateResponse(
+            request, "register.html",
+            {"error": "Passwords do not match.", "success": None},
+            status_code=400,
+        )
+    if len(password) < 6:
+        return templates.TemplateResponse(
+            request, "register.html",
+            {"error": "Password must be at least 6 characters.", "success": None},
+            status_code=400,
+        )
+
+    success, message = register_user(email, password, name)
+    if not success:
+        return templates.TemplateResponse(
+            request, "register.html",
+            {"error": message, "success": None},
+            status_code=400,
+        )
+
+    return templates.TemplateResponse(
+        request, "register.html",
+        {"error": None, "success": "Account created! You can now sign in."},
+    )
+
+
 # ── Upload endpoints ──────────────────────────────────────────────────────────
 
 @app.get("/upload", response_class=HTMLResponse)
@@ -383,15 +414,18 @@ async def upload_file(
     # Validate: all 4 must be non-empty strings
     tag_suffixes = raw_suffixes if all(raw_suffixes) else ["PV", "SP", "OP", "MODE"]
 
-    # ── Save to POC root using ORIGINAL filename (engine derives results folder from it)
+    # ── Save to user-specific subfolder to prevent cross-user file collisions
+    safe_email = current_user["sub"].replace("@", "_at_").replace(".", "_")
+    user_upload_dir = BASE_DIR / "uploads" / safe_email
+    user_upload_dir.mkdir(parents=True, exist_ok=True)
     original_name = Path(file.filename).name
-    dest_path     = BASE_DIR / original_name
+    dest_path     = user_upload_dir / original_name
     with open(dest_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
-    # ── Derive results folder name exactly like the bat files do
-    basename       = Path(original_name).stem          # e.g. "My_plant_data_1"
-    results_folder = f"results_{basename}" if mode == "auto" else f"results_{basename}_manual"
+    # ── Derive results folder name namespaced by user email
+    basename       = Path(original_name).stem
+    results_folder = f"results_{safe_email}_{basename}" if mode == "auto" else f"results_{safe_email}_{basename}_manual"
 
     # ── Load default/user config and write it into the Excel
     config = _load_config(current_user["sub"])
@@ -526,15 +560,18 @@ async def rerun_with_config(request: Request, current_user: dict = Depends(get_c
         rd = _results_dir_for(current_user["sub"])
         if rd:
             folder_name = os.path.basename(rd)
+            safe_email  = current_user["sub"].replace("@", "_at_").replace(".", "_")
             is_manual   = folder_name.endswith("_manual")
-            stem        = folder_name.removeprefix("results_").removesuffix("_manual")
+            # Strip leading results_<safe_email>_ prefix
+            prefix = f"results_{safe_email}_"
+            stem = folder_name.removeprefix(prefix).removesuffix("_manual")
             mode        = "manual" if is_manual else "auto"
             results_folder = folder_name
-            # Look for matching .xlsx in BASE_DIR
-            input_path = BASE_DIR / f"{stem}.xlsx"
+            # Look for matching .xlsx in user upload dir
+            user_upload_dir = BASE_DIR / "uploads" / safe_email
+            input_path = user_upload_dir / f"{stem}.xlsx"
             if not input_path.exists():
-                # Try .xls
-                input_path = BASE_DIR / f"{stem}.xls"
+                input_path = user_upload_dir / f"{stem}.xls"
             if not input_path.exists():
                 raise HTTPException(
                     status_code=400,
@@ -716,8 +753,11 @@ async def save_unit_mapping(request: Request, current_user: dict = Depends(get_c
     # ── Find the input Excel for this user's current results folder ──────────
     rd = _get_user_results_dir(current_user)
     folder_name = os.path.basename(rd)
-    stem = folder_name.removeprefix("results_").removesuffix("_manual")
-    input_path = BASE_DIR / f"{stem}.xlsx"
+    safe_email  = current_user["sub"].replace("@", "_at_").replace(".", "_")
+    prefix = f"results_{safe_email}_"
+    stem = folder_name.removeprefix(prefix).removesuffix("_manual")
+    user_upload_dir = BASE_DIR / "uploads" / safe_email
+    input_path = user_upload_dir / f"{stem}.xlsx"
 
     if not input_path.exists():
         raise HTTPException(
@@ -1522,33 +1562,23 @@ async def get_tune_timeseries(loop_name: str, current_user: dict = Depends(get_c
         loop_type = 'unknown'
 
     # ── Pull diagnosis from the Summary sheet so the tuning page knows
-    # ── what fault was detected and can give contextually correct advice.
-    # Search ALL results_* folders so the correct diagnosis is always found
-    # regardless of which folder was most recently modified.
+    # Look up diagnosis from this user's own results folder only
     diag_primary  = "unknown"
     diag_severity = "unknown"
     try:
-        import glob as _glob
         import pandas as _pd
         from pathlib import Path as _Path
         _target = loop_name.strip()
-        # Collect all results dirs, most-recently-modified first
-        _all_dirs = sorted(
-            _glob.glob(str(BASE_DIR / "results_*")),
-            key=lambda f: _Path(f).stat().st_mtime,
-            reverse=True
-        )
-        for _rdir in _all_dirs:
-            _xl = _Path(_rdir) / "Loop_diagnostics_v2.xlsx"
-            if not _xl.exists():
-                continue
-            _sum = _pd.read_excel(str(_xl), sheet_name="Summary")
-            _sum["Loop"] = _sum["Loop"].astype(str).str.strip()
-            _row = _sum[_sum["Loop"] == _target]
-            if not _row.empty:
-                diag_primary  = str(_row.iloc[0].get("Diagnosis",  "unknown") or "unknown").strip()
-                diag_severity = str(_row.iloc[0].get("Severity",   "unknown") or "unknown").strip()
-                break  # found in this results dir — stop searching
+        _rd = _results_dir_for(current_user["sub"])
+        if _rd:
+            _xl = _Path(_rd) / "Loop_diagnostics_v2.xlsx"
+            if _xl.exists():
+                _sum = _pd.read_excel(str(_xl), sheet_name="Summary")
+                _sum["Loop"] = _sum["Loop"].astype(str).str.strip()
+                _row = _sum[_sum["Loop"] == _target]
+                if not _row.empty:
+                    diag_primary  = str(_row.iloc[0].get("Diagnosis",  "unknown") or "unknown").strip()
+                    diag_severity = str(_row.iloc[0].get("Severity",   "unknown") or "unknown").strip()
     except Exception:
         pass  # non-fatal — tuning page degrades gracefully if lookup fails
 

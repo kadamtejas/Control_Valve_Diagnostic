@@ -477,7 +477,7 @@ const rnd=(v,d=2)=>Math.round(v*10**d)/10**d;
 const LT_WARN={
   pressure:'Pressure loop detected. tau may differ from estimate — verify with a step test before applying tuning.',
   temperature:'Temperature loop detected. tau is highly uncertain for thermal processes — run a step test before applying any tuning.',
-  level:'Level loop detected. Level processes are integrating — FOPDT does not apply. These tuning recommendations are NOT valid. Use an integrating process tuning method.',
+  level:'Level loop detected. Integrating process tuning formula applied (Skogestad IMC). Ki is estimated from closed-loop historian data — reliability depends on OP excitation in the data. A dedicated open-loop step test is recommended before applying any values.',
   unknown:'Loop type could not be determined. Review model parameters carefully before applying changes.',
 };
 
@@ -521,7 +521,8 @@ function identify(pv, op, sp){
     const dpv=pv.slice(1).map((v,i)=>v-pv[i]);
     const opDev=op.map(v=>v-mn(op));
     const validPairs=dpv.map((d,i)=>({d,o:opDev[i]})).filter(({o})=>Math.abs(o)>2);
-    const Ki=validPairs.length>=10
+    const ki_fallback=validPairs.length<10;
+    const Ki=!ki_fallback
       ? Math.max(0.001, Math.abs(med(validPairs.map(({d,o})=>d/o))))
       : 0.01;
     const lam=Math.max(3*theta, 5.0);
@@ -547,7 +548,7 @@ function identify(pv, op, sp){
       theta:rnd(theta,1),Tu,conf_Tu,lambda:rnd(lam,2),
       Kp_old,Ti_old,Kp_new,Ti_new,
       Ki_old:rnd(Kp_old/Ti_old,4),Ki_new:rnd(Kp_new/Ti_new,4),
-      r2_K:0,conf_K:0.4,isIntegrating:true,
+      r2_K:0,conf_K:ki_fallback?0.15:0.4,isIntegrating:true,ki_fallback,
       pv_b:pvb,op_b:opb,pv_a:pva,op_a:opa,
       iae_b:Math.round(iae_b_real),iae_a:Math.round(iae_a),
       iae_pct:rnd((1-iae_a/iae_b_real)*100,1),
@@ -882,48 +883,87 @@ function populate(){
   document.getElementById('tu-badge').className='mp-badge '+(M.conf_Tu>0.6?'sb-ok':'sb-warn');
   document.getElementById('tuconf-fill').style.width=confTuPct+'%';
   document.getElementById('tuconf-pct').textContent=confTuPct+'%';
-  s('cmp-kp-old',M.Kp_old);s('cmp-kp-new',M.Kp_new);
-  const kpChg=rnd(Math.abs(M.Kp_new-M.Kp_old)/(M.Kp_old||1)*100,0);
-  s('cmp-kp-pct',(M.Kp_new<M.Kp_old?'\u2193':'\u2191')+kpChg+'%');
-  s('cmp-kp-why',M.Kp_new<M.Kp_old?'Reduce gain \u2014 current tuning too aggressive':'Increase gain \u2014 more responsive loop needed');
-  s('cmp-ti-old',M.Ti_old+' min');s('cmp-ti-new',M.Ti_new+' min');
-  const tiChg=rnd(Math.abs(M.Ti_new-M.Ti_old)/(M.Ti_old||1)*100,0);
-  s('cmp-ti-pct',(M.Ti_new>M.Ti_old?'\u2191':'\u2193')+tiChg+'%');
-  s('cmp-ti-why',M.Ti_new>M.Ti_old?'Slower reset \u2014 reduces integral windup':'Faster reset \u2014 tighter SP tracking');
+  const kiFallback=isInteg&&M.ki_fallback;
+  s('cmp-kp-old',M.Kp_old);
+  if(kiFallback){
+    document.getElementById('cmp-kp-new').textContent='\u2014';
+    document.getElementById('cmp-kp-new').style.color='var(--text4)';
+    s('cmp-kp-pct','\u2014');
+    s('cmp-kp-why','Ki could not be estimated \u2014 insufficient OP excitation in data');
+  } else {
+    s('cmp-kp-new',M.Kp_new);
+    document.getElementById('cmp-kp-new').style.color='';
+    const kpChg=rnd(Math.abs(M.Kp_new-M.Kp_old)/(M.Kp_old||1)*100,0);
+    s('cmp-kp-pct',(M.Kp_new<M.Kp_old?'\u2193':'\u2191')+kpChg+'%');
+    s('cmp-kp-why',M.Kp_new<M.Kp_old?'Reduce gain \u2014 current tuning too aggressive':'Increase gain \u2014 more responsive loop needed');
+  }
+  s('cmp-ti-old',M.Ti_old+' min');
+  if(kiFallback){
+    document.getElementById('cmp-ti-new').textContent='\u2014';
+    document.getElementById('cmp-ti-new').style.color='var(--text4)';
+    s('cmp-ti-pct','\u2014');
+    s('cmp-ti-why','Provide Ki from a step test to get valid Ti recommendation');
+  } else {
+    s('cmp-ti-new',M.Ti_new+' min');
+    document.getElementById('cmp-ti-new').style.color='';
+    const tiChg=rnd(Math.abs(M.Ti_new-M.Ti_old)/(M.Ti_old||1)*100,0);
+    s('cmp-ti-pct',(M.Ti_new>M.Ti_old?'\u2191':'\u2193')+tiChg+'%');
+    s('cmp-ti-why',M.Ti_new>M.Ti_old?'Slower reset \u2014 reduces integral windup':'Faster reset \u2014 tighter SP tracking');
+  }
   s('cmp-lam-new',M.lambda+' min');
-  const outcomes=[
-    ['IAE (total error)','Integrated Absolute Error: total area between PV and SP over time. Lower = better setpoint tracking.',M.iae_b.toLocaleString(),M.iae_a.toLocaleString(),M.iae_pct,'Less deviation from setpoint'],
-    ['OP activity \u03c3','Standard deviation of controller output. Lower = less valve movement = reduced mechanical wear.',M.op_std_b+'%',M.op_std_a+'%',M.op_wear_pct,'Reduced valve wear'],
-    ['PV noise \u03c3','Standard deviation of process variable. This is a plant/sensor property — tuning cannot reduce it.',M.pv_std,'~'+M.pv_std,null,'Noise floor is a plant property'],
-  ];
-  document.getElementById('outcome-rows').innerHTML=outcomes.map(([nm,tip,bv,av,pct,why])=>{
-    // pct is a signed number; null means unchanged (PV noise)
-    let pctTxt, pctColor;
-    if(pct===null){
-      pctTxt='Unchanged'; pctColor='var(--text2)';
+  if(isInteg){
+    document.getElementById('outcome-rows').innerHTML='<tr><td colspan="6" style="text-align:center;padding:18px 10px;font-size:11px;color:var(--text4);font-style:italic">Predicted improvement simulation not available for integrating (level) processes.<br>Outcome figures require a proper integrating process model \u2014 not applicable here.</td></tr>';
+  } else {
+    const outcomes=[
+      ['IAE (total error)','Integrated Absolute Error: total area between PV and SP over time. Lower = better setpoint tracking.',M.iae_b.toLocaleString(),M.iae_a.toLocaleString(),M.iae_pct,'Less deviation from setpoint'],
+      ['OP activity \u03c3','Standard deviation of controller output. Lower = less valve movement = reduced mechanical wear.',M.op_std_b+'%',M.op_std_a+'%',M.op_wear_pct,'Reduced valve wear'],
+      ['PV noise \u03c3','Standard deviation of process variable. This is a plant/sensor property \u2014 tuning cannot reduce it.',M.pv_std,'~'+M.pv_std,null,'Noise floor is a plant property'],
+    ];
+    document.getElementById('outcome-rows').innerHTML=outcomes.map(([nm,tip,bv,av,pct,why])=>{
+      let pctTxt, pctColor;
+      if(pct===null){
+        pctTxt='Unchanged'; pctColor='var(--text2)';
+      } else {
+        const better=pct>0;
+        pctTxt=(better?'\u2212':'+')+(Math.abs(pct))+'%';
+        pctColor='var(--text2)';
+      }
+      return `
+      <tr>
+        <td style="font-size:11px;color:var(--text2);font-weight:600">${nm} <span class="ibt" data-tip="${tip}">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">${why}</div></td>
+        <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text)">${bv}</td>
+        <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--blue-lt)">${av}</td>
+        <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text4)" class="user-opt-col">\u2014</td>
+        <td style="text-align:center;font-size:11px;font-weight:700;color:${pctColor};font-family:'IBM Plex Mono',monospace">${pctTxt}</td>
+        <td style="text-align:center;font-size:11px;font-weight:700;color:var(--text4);font-family:'IBM Plex Mono',monospace" class="user-diff-col">\u2014</td>
+      </tr>`;}).join('');
+  }
+  let actions;
+  if(isInteg){
+    if(kiFallback){
+      actions=[
+        ['r','\u26a0','<b>Ki estimation failed</b>',' \u2014 insufficient OP excitation in historian data. A dedicated open-loop step test is required.'],
+        ['a','\ud83d\udcca',`<b>Dead time \u03b8 = ${M.theta} min, Tu = ${M.Tu} min</b>`,' are estimated from data and can be used as a starting point.'],
+        ['b','\ud83d\udccb','<b>Perform an open-loop step test</b>',' \u2014 manually step OP by 5\u201310% and record PV ramp rate. Ki = \u0394PV / (\u0394t \u00d7 \u0394OP).'],
+        ['g','\u2139',`<b>Once Ki is known</b>`,' apply: Kp = 1/(Ki\u00d7\u03bb\u00b2), Ti = 2\u03bb, where \u03bb = max(3\u03b8, 5) min.'],
+      ];
     } else {
-      const better=pct>0;
-      pctTxt=(better?'\u2212':'+')+(Math.abs(pct))+'%';
-      pctColor='var(--text2)';
+      actions=[
+        ['a','\u26a0',`<b>Set Kp = ${M.Kp_new}</b>`,` (current estimated: ${M.Kp_old}) \u2014 integrating tuning formula applied (Kp = 1/(Ki\u00d7\u03bb\u00b2))`],
+        ['a','\u23f1',`<b>Set Ti = ${M.Ti_new} min</b>`,` (current estimated: ${M.Ti_old} min) \u2014 Ti = 2\u03bb for integrating process`],
+        ['b','\ud83d\udccb','<b>Monitor closely for 2\u20134 hours</b>',' after change. Level loops are sensitive to integral windup.'],
+        ['g','\u2713',`<b>Ki confidence: ${Math.round(M.conf_K*100)}%</b>`,' \u2014 estimated from closed-loop data. Verify with a step test before commissioning.'],
+      ];
     }
-    const aoColor='var(--text2)';
-    return `
-    <tr>
-      <td style="font-size:11px;color:var(--text2);font-weight:600">${nm} <span class="ibt" data-tip="${tip}">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">${why}</div></td>
-      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text)">${bv}</td>
-      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--blue-lt)">${av}</td>
-      <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text4)" class="user-opt-col">—</td>
-      <td style="text-align:center;font-size:11px;font-weight:700;color:${pctColor};font-family:'IBM Plex Mono',monospace">${pctTxt}</td>
-      <td style="text-align:center;font-size:11px;font-weight:700;color:var(--text4);font-family:'IBM Plex Mono',monospace" class="user-diff-col">—</td>
-    </tr>`;}).join('');
-  const actions=[
-    ['r','\u26a0',`<b>Set Kp = ${M.Kp_new}</b>`,` (current estimated: ${M.Kp_old}) \u2014 reduce proportional gain to eliminate oscillation`],
-    ['a','\u23f1',`<b>Set Ti = ${M.Ti_new} min</b>`,` (current estimated: ${M.Ti_old} min) \u2014 adjust integral time`],
-    ['b','\ud83d\udccb',`<b>Monitor for 2\u20134 hours</b>`,` after change. PV \u03c3 should drop below ${rnd(M.pv_std*0.85,2)}`],
-    ['g','\u2713',`<b>Confidence: ${Math.round(M.conf_K*100)}% on K</b>`,` \u2014 ${M.conf_K>0.7?'strong basis for tuning change':'moderate \u2014 consider step test before applying'}`],
-  ];
-  if(lt==='temperature')actions.unshift(['r','\u26a0','<b>WARNING: Temperature loop</b>',' \u2014 run a dedicated SP step test before applying any tuning.']);
-  if(lt==='level')actions.unshift(['r','\ud83d\udeab','<b>LEVEL LOOP: Do not apply these values</b>',' \u2014 integrating process requires a different tuning method.']);
+  } else {
+    actions=[
+      ['r','\u26a0',`<b>Set Kp = ${M.Kp_new}</b>`,` (current estimated: ${M.Kp_old}) \u2014 reduce proportional gain to eliminate oscillation`],
+      ['a','\u23f1',`<b>Set Ti = ${M.Ti_new} min</b>`,` (current estimated: ${M.Ti_old} min) \u2014 adjust integral time`],
+      ['b','\ud83d\udccb',`<b>Monitor for 2\u20134 hours</b>`,` after change. PV \u03c3 should drop below ${rnd(M.pv_std*0.85,2)}`],
+      ['g','\u2713',`<b>Confidence: ${Math.round(M.conf_K*100)}% on K</b>`,` \u2014 ${M.conf_K>0.7?'strong basis for tuning change':'moderate \u2014 consider step test before applying'}`],
+    ];
+    if(lt==='temperature')actions.unshift(['r','\u26a0','<b>WARNING: Temperature loop</b>',' \u2014 run a dedicated SP step test before applying any tuning.']);
+  }
   document.getElementById('actions-list').innerHTML=actions.map(([t,ic,b,sp])=>`<div class="ai ai-${t}"><span class="ic">${ic}</span><div>${b}<span>${sp}</span></div></div>`).join('');
   buildOvl();
   document.getElementById('saveBtn').disabled=false;
