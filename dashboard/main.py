@@ -76,6 +76,18 @@ app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 SAMPLE_FILE = static_dir / "sample_plant_data.xlsx"
 
 
+@app.get("/download/manual")
+async def download_manual():
+    manual = BASE_DIR / "Valve_Diagnostic_Tool_Manual_2.docx"
+    if not manual.exists():
+        raise HTTPException(status_code=404, detail="Manual not found")
+    return FileResponse(
+        str(manual),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename="Valve_Diagnostic_Tool_Manual.docx",
+    )
+
+
 @app.get("/download/sample")
 async def download_sample():
     if not SAMPLE_FILE.exists():
@@ -221,37 +233,49 @@ def _save_config(email: str, config: dict):
 
 
 def _write_config_to_excel(input_path: Path, config: dict):
-    """Overwrite DIAGNOSTIC_CONFIG, DIAGNOSTIC_SELECTION, MODE_MAPPING sheets."""
+    """Overwrite DIAGNOSTIC_CONFIG, DIAGNOSTIC_SELECTION, MODE_MAPPING sheets.
+    If any required sheet is missing from the Excel, it is created from the
+    default/user config so the health check never fails on a missing sheet.
+    """
     import openpyxl
     wb = openpyxl.load_workbook(str(input_path))
 
-    # DIAGNOSTIC_CONFIG
-    if "DIAGNOSTIC_CONFIG" in wb.sheetnames:
+    # DIAGNOSTIC_CONFIG — create if missing
+    if "DIAGNOSTIC_CONFIG" not in wb.sheetnames:
+        ws = wb.create_sheet("DIAGNOSTIC_CONFIG")
+        ws.cell(1, 1, "Parameter"); ws.cell(1, 2, "Value"); ws.cell(1, 3, "Description")
+    else:
         ws = wb["DIAGNOSTIC_CONFIG"]
-        for i, row in enumerate(config.get("diagnostic_config", []), start=2):
-            ws.cell(i, 1, row["parameter"])
-            ws.cell(i, 2, row["value"])
-            ws.cell(i, 3, row.get("description", ""))
+    for i, row in enumerate(config.get("diagnostic_config", []), start=2):
+        ws.cell(i, 1, row["parameter"])
+        ws.cell(i, 2, row["value"])
+        ws.cell(i, 3, row.get("description", ""))
 
-    # DIAGNOSTIC_SELECTION — write with leading spaces preserved
-    if "DIAGNOSTIC_SELECTION" in wb.sheetnames:
+    # DIAGNOSTIC_SELECTION — create if missing
+    if "DIAGNOSTIC_SELECTION" not in wb.sheetnames:
+        ws = wb.create_sheet("DIAGNOSTIC_SELECTION")
+        ws.cell(1, 1, "Diagnostic"); ws.cell(1, 2, "Enabled")
+    else:
         ws = wb["DIAGNOSTIC_SELECTION"]
-        for i, row in enumerate(config.get("diagnostic_selection", []), start=2):
-            indent = row.get("indent", 0)
-            name = ("    " * indent) + row["diagnostic"]
-            ws.cell(i, 1, name)
-            ws.cell(i, 2, row["enabled"])
+    for i, row in enumerate(config.get("diagnostic_selection", []), start=2):
+        indent = row.get("indent", 0)
+        name = ("    " * indent) + row["diagnostic"]
+        ws.cell(i, 1, name)
+        ws.cell(i, 2, row["enabled"])
 
-    # MODE_MAPPING
-    if "MODE_MAPPING" in wb.sheetnames:
+    # MODE_MAPPING — create if missing
+    if "MODE_MAPPING" not in wb.sheetnames:
+        ws = wb.create_sheet("MODE_MAPPING")
+        ws.cell(1, 1, "Category"); ws.cell(1, 2, "Value")
+    else:
         ws = wb["MODE_MAPPING"]
-        # Clear existing data rows
+        # Clear existing data rows before rewriting
         for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
             for cell in row:
                 cell.value = None
-        for i, row in enumerate(config.get("mode_mapping", []), start=2):
-            ws.cell(i, 1, row["category"])
-            ws.cell(i, 2, row["value"])
+    for i, row in enumerate(config.get("mode_mapping", []), start=2):
+        ws.cell(i, 1, row["category"])
+        ws.cell(i, 2, row["value"])
 
     # DETECTION_EXCLUSIONS — write {problem_id: [loop1, loop2, ...]} as a flat table
     excl = config.get("detection_exclusions", {})
@@ -1497,6 +1521,37 @@ async def get_tune_timeseries(loop_name: str, current_user: dict = Depends(get_c
     else:
         loop_type = 'unknown'
 
+    # ── Pull diagnosis from the Summary sheet so the tuning page knows
+    # ── what fault was detected and can give contextually correct advice.
+    # Search ALL results_* folders so the correct diagnosis is always found
+    # regardless of which folder was most recently modified.
+    diag_primary  = "unknown"
+    diag_severity = "unknown"
+    try:
+        import glob as _glob
+        import pandas as _pd
+        from pathlib import Path as _Path
+        _target = loop_name.strip()
+        # Collect all results dirs, most-recently-modified first
+        _all_dirs = sorted(
+            _glob.glob(str(BASE_DIR / "results_*")),
+            key=lambda f: _Path(f).stat().st_mtime,
+            reverse=True
+        )
+        for _rdir in _all_dirs:
+            _xl = _Path(_rdir) / "Loop_diagnostics_v2.xlsx"
+            if not _xl.exists():
+                continue
+            _sum = _pd.read_excel(str(_xl), sheet_name="Summary")
+            _sum["Loop"] = _sum["Loop"].astype(str).str.strip()
+            _row = _sum[_sum["Loop"] == _target]
+            if not _row.empty:
+                diag_primary  = str(_row.iloc[0].get("Diagnosis",  "unknown") or "unknown").strip()
+                diag_severity = str(_row.iloc[0].get("Severity",   "unknown") or "unknown").strip()
+                break  # found in this results dir — stop searching
+    except Exception:
+        pass  # non-fatal — tuning page degrades gracefully if lookup fails
+
     return JSONResponse(content={
         "loop": loop_name,
         "loop_type": loop_type,
@@ -1505,6 +1560,8 @@ async def get_tune_timeseries(loop_name: str, current_user: dict = Depends(get_c
         "op":  op,
         "sp":  sp,
         "labels": lbl,
+        "diag_primary":  diag_primary,
+        "diag_severity": diag_severity,
     })
 
 

@@ -364,6 +364,53 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
     <div class="upload-card">
       <div class="card-title">Upload Diagnostic Data</div>
       <div class="card-sub">Choose a run mode, upload your plant Excel file, then review settings before running.</div>
+
+      <!-- How to Use -->
+      <div style="margin-bottom:20px;border:.5px solid rgba(0,0,0,.09);border-radius:10px;overflow:hidden">
+        <button onclick="toggleHowto()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f7f9fc;border:none;cursor:pointer;text-align:left">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:13px">ℹ️</span>
+            <span style="font-size:12px;font-weight:700;color:#0c447c">How to use this tool</span>
+          </div>
+          <svg id="howto-chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;transition:transform .2s;color:#9a9994"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="howto-body" style="display:none;padding:12px 14px 14px;background:#fff;border-top:.5px solid rgba(0,0,0,.07)">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="width:20px;height:20px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div>
+              <div style="font-size:12px;color:#374151;line-height:1.55"><b>Prepare your Excel file</b> — must include sheets: Sheet1 (time-series), DIAGNOSTIC_CONFIG, DIAGNOSTIC_SELECTION, UNIT_MAPPING, MODE_MAPPING.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="width:20px;height:20px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div>
+              <div style="font-size:12px;color:#374151;line-height:1.55"><b>Choose run mode</b> — <b>AUTO</b> runs with calibrated defaults (recommended). <b>MANUAL</b> lets engineers adjust thresholds first.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="width:20px;height:20px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div>
+              <div style="font-size:12px;color:#374151;line-height:1.55"><b>Upload &amp; fill session details</b> — plant name, date range (optional). In MANUAL mode, review thresholds on the Thresholds tab.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="width:20px;height:20px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div>
+              <div style="font-size:12px;color:#374151;line-height:1.55"><b>Review &amp; run</b> — confirm settings on the Review tab then click <b>Run Diagnostics</b>. Takes 10–30 sec.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="width:20px;height:20px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">5</div>
+              <div style="font-size:12px;color:#374151;line-height:1.55"><b>Read the dashboard</b> — each loop shows a severity badge &amp; primary finding. Click any loop to see signals, diagnosis, and action steps.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="width:20px;height:20px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">6</div>
+              <div style="font-size:12px;color:#374151;line-height:1.55"><b>Tune flagged loops</b> — for sluggish/aggressive loops, click <b>Tune</b> to open the Controller Tuning page and review IMC parameter recommendations.</div>
+            </div>
+            <div style="margin-top:4px;padding:8px 10px;background:#fff8e1;border:.5px solid #fcd34d;border-radius:7px;font-size:11px;color:#92400e;line-height:1.6">
+              📝 <b>Note:</b> Use ≥24h of 1-minute interval data &middot; Controller should be in AUTO &middot; Avoid shutdown periods &middot; PV, SP &amp; OP tags must all be present
+            </div>
+            <a href="/download/manual" download style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:#0c447c;color:#fff;border-radius:7px;font-size:11px;font-weight:600;text-decoration:none">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download Full User Manual (.docx)
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div class="mode-label">Run Mode</div>
       <div class="mode-toggle">
         <button class="mode-btn active" id="btn-auto" onclick="setMode('auto')">
@@ -1304,6 +1351,14 @@ document.addEventListener('mouseover',e=>{
 });
 
 renderThresholds();
+
+function toggleHowto(){
+  const b=document.getElementById('howto-body');
+  const c=document.getElementById('howto-chevron');
+  const open=b.style.display==='none';
+  b.style.display=open?'block':'none';
+  c.style.transform=open?'rotate(180deg)':'';
+}
 </script>
 </body>
 </html>
