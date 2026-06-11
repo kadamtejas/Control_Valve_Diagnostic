@@ -33,6 +33,8 @@ from reader import (
     read_loop_timeseries,
     read_unit_mapping,
 )
+from dotenv import load_dotenv
+from groq import Groq
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 # When running as a PyInstaller .exe, VALVE_BASE_DIR is set by launcher.py
@@ -50,6 +52,31 @@ UPLOADS_DIR.mkdir(exist_ok=True)
 DEFAULT_CONFIG_PATH = BASE_DIR / "dashboard" / "default_config.json"
 USER_CONFIG_DIR = BASE_DIR / "user_configs"
 USER_CONFIG_DIR.mkdir(exist_ok=True)
+
+# ── Chatbot (Groq) ────────────────────────────────────────────────────────────
+load_dotenv(BASE_DIR / ".env")
+KNOWLEDGE_PATH = BASE_DIR / "chatbot_knowledge.md"
+GROQ_MODEL = "llama-3.3-70b-versatile"
+CHAT_HISTORY_LIMIT = 10
+_groq_client = None
+
+
+def _get_groq_client():
+    global _groq_client
+    if _groq_client is None:
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            raise RuntimeError("GROQ_API_KEY not found — check the .env file in the POC root.")
+        _groq_client = Groq(api_key=api_key)
+    return _groq_client
+
+
+def _load_chatbot_knowledge() -> str:
+    """Read the knowledge file fresh on every request so it can be edited live."""
+    try:
+        return KNOWLEDGE_PATH.read_text(encoding="utf-8")
+    except Exception:
+        return "(Knowledge file not available.)"
 
 # ── In-memory state ───────────────────────────────────────────────────────────
 # { email: "results_My_plant_data_1" }          — active results folder per user
@@ -657,6 +684,119 @@ async def get_latest(current_user: dict = Depends(get_current_user)):
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error reading results: {e}")
+
+
+def _fmt_num(v, d=2):
+    try:
+        return f"{float(v):.{d}f}"
+    except (TypeError, ValueError):
+        return "-"
+
+
+def _build_results_summary(email: str) -> str:
+    """Compact per-loop summary of the user's latest diagnostic run for the chatbot prompt."""
+    rd = _results_dir_for(email)
+    if not rd:
+        return "The user has NOT run a diagnostic yet. No results are available. Tell them to upload a plant data file on the Upload page first if they ask about results."
+    try:
+        data = read_dashboard_data(rd, base_dir=str(BASE_DIR))
+    except Exception as e:
+        return f"Results exist but could not be loaded ({e})."
+
+    lines = [f"Run folder: {data.get('run_folder', Path(rd).name)}"]
+
+    plant = data.get("plant") or {}
+    kv = plant.get("kv") if isinstance(plant, dict) else None
+    if isinstance(kv, dict) and kv:
+        plant_bits = ", ".join(f"{k}: {v}" for k, v in list(kv.items())[:8])
+        lines.append(f"Plant summary: {plant_bits}")
+
+    loops = data.get("loops") or []
+    lines.append(f"Loops analysed: {len(loops)}")
+    for lp in loops:
+        parts = [
+            f"{lp.get('loop', '?')}:",
+            f"health={_fmt_num(lp.get('health'), 0)}",
+            f"severity={lp.get('severity') or '-'}",
+            f"diagnosis={lp.get('diagnosis') or '-'}",
+            f"stiction={lp.get('stiction_label') or '-'}",
+            f"service%={_fmt_num(lp.get('service_factor'), 0)}",
+            f"IAE/hr={_fmt_num(lp.get('iae_per_hour'))}",
+            f"IAEnorm%={_fmt_num(lp.get('iae_per_hour_norm'))}",
+            f"harris={_fmt_num(lp.get('harris_index'))}",
+            f"OPact={_fmt_num(lp.get('op_activity'))}",
+            f"hagglund={_fmt_num(lp.get('hagglund_regularity'))}",
+            f"dataQ={lp.get('data_quality_status') or '-'}",
+        ]
+        if lp.get("recommended_action"):
+            parts.append(f"action={lp['recommended_action']}")
+        lines.append(" ".join(parts))
+
+    prop = data.get("propagation") or []
+    if prop:
+        plines = []
+        for p in prop[:10]:
+            if isinstance(p, dict):
+                plines.append(" ".join(f"{k}={v}" for k, v in p.items()))
+        if plines:
+            lines.append("Propagation (cross-loop): " + "; ".join(plines))
+
+    return "\n".join(lines)
+
+
+CHATBOT_ROLE = (
+    "You are the built-in assistant of the Control Valve Diagnostic Tool by Ingenero Technologies. "
+    "You help plant operators, control engineers, and plant managers understand the tool, their "
+    "diagnostic results, and general process control concepts (PID tuning, stiction, oscillation, etc.). "
+    "Use the KNOWLEDGE section for questions about the tool and the LATEST RESULTS section for "
+    "questions about the user's own loops. Be concise and practical. Use plain text, no markdown "
+    "headers. If asked something unrelated to the tool or process control, politely decline and "
+    "steer back to the tool. Never invent loop names or values that are not in the results."
+)
+
+
+@app.post("/api/chat")
+async def api_chat(payload: dict, current_user: dict = Depends(get_current_user)):
+    messages = payload.get("messages") or []
+    if not isinstance(messages, list) or not messages:
+        raise HTTPException(status_code=400, detail="messages list required")
+
+    # keep only the last N well-formed user/assistant turns
+    history = [
+        {"role": m.get("role"), "content": str(m.get("content", ""))[:4000]}
+        for m in messages
+        if isinstance(m, dict) and m.get("role") in ("user", "assistant") and m.get("content")
+    ][-CHAT_HISTORY_LIMIT:]
+    if not history:
+        raise HTTPException(status_code=400, detail="no valid messages")
+
+    system_prompt = (
+        CHATBOT_ROLE
+        + "\n\n===== KNOWLEDGE =====\n"
+        + _load_chatbot_knowledge()
+        + "\n\n===== LATEST RESULTS (this user) =====\n"
+        + _build_results_summary(current_user["sub"])
+    )
+
+    try:
+        client = _get_groq_client()
+        resp = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[{"role": "system", "content": system_prompt}] + history,
+            max_tokens=700,
+            temperature=0.3,
+        )
+        reply = resp.choices[0].message.content
+        return JSONResponse(content={"reply": reply})
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        msg = str(e)
+        if "rate limit" in msg.lower() or "429" in msg:
+            detail = "The chatbot is rate-limited right now. Please wait a minute and try again."
+        else:
+            detail = f"Chatbot service unavailable: {msg[:200]}"
+        raise HTTPException(status_code=503, detail=detail)
 
 
 @app.get("/api/plots")

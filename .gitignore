@@ -22,3 +22,4 @@ dist/
 launcher.py 
 "Untitled video*/" 
 Untitled video*/ 
+.env

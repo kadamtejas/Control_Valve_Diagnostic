@@ -393,5 +393,115 @@ async function pollJob(jobId){
 
 loadConfig();
 </script>
+
+<!-- ══ Chatbot Widget ══════════════════════════════════════════════ -->
+<style>
+#vdtChatBtn{position:fixed;bottom:22px;right:22px;width:54px;height:54px;border-radius:50%;background:#2563eb;color:#fff;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,.4);font-size:24px;display:flex;align-items:center;justify-content:center;z-index:9998;transition:transform .15s,background .15s}
+#vdtChatBtn:hover{transform:scale(1.07);background:#1d4ed8}
+#vdtChatPanel{position:fixed;bottom:88px;right:22px;width:380px;height:520px;max-height:calc(100vh - 110px);background:#fff;border:1px solid #dbeafe;border-radius:14px;box-shadow:0 12px 40px rgba(15,23,42,.22);display:none;flex-direction:column;overflow:hidden;z-index:9999;font-family:'IBM Plex Sans',sans-serif}
+#vdtChatPanel.open{display:flex}
+.vdt-ch-head{background:#2563eb;color:#fff;padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
+.vdt-ch-title{font-size:13px;font-weight:700;letter-spacing:.03em}
+.vdt-ch-sub{font-size:10px;opacity:.85;margin-top:1px}
+.vdt-ch-close{background:none;border:none;color:#fff;font-size:16px;cursor:pointer;padding:2px 6px;border-radius:6px}
+.vdt-ch-close:hover{background:rgba(255,255,255,.15)}
+.vdt-ch-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f8fafc}
+.vdt-ch-msg{max-width:85%;padding:8px 11px;border-radius:12px;font-size:12.5px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
+.vdt-ch-msg.user{align-self:flex-end;background:#2563eb;color:#fff;border-bottom-right-radius:4px}
+.vdt-ch-msg.bot{align-self:flex-start;background:#fff;color:#0f172a;border:1px solid #e2e8f0;border-bottom-left-radius:4px}
+.vdt-ch-msg.sys{align-self:center;background:#f1f5f9;color:#64748b;font-size:11px;border-radius:8px}
+.vdt-ch-typing{align-self:flex-start;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:9px 13px;font-size:13px;color:#94a3b8;letter-spacing:2px}
+.vdt-ch-inrow{display:flex;gap:7px;padding:10px;border-top:1px solid #e2e8f0;background:#fff}
+#vdtChatInput{flex:1;border:1px solid #cbd5e1;border-radius:9px;padding:8px 11px;font-size:12.5px;font-family:inherit;outline:none;resize:none}
+#vdtChatInput:focus{border-color:#2563eb}
+#vdtChatSend{background:#2563eb;color:#fff;border:none;border-radius:9px;padding:0 14px;font-size:15px;cursor:pointer;transition:background .15s}
+#vdtChatSend:hover{background:#1d4ed8}
+#vdtChatSend:disabled{background:#93c5fd;cursor:default}
+</style>
+
+<button id="vdtChatBtn" title="Ask the assistant" onclick="vdtChatToggle()">💬</button>
+<div id="vdtChatPanel">
+  <div class="vdt-ch-head">
+    <div>
+      <div class="vdt-ch-title">Ingenero Assistant</div>
+      <div class="vdt-ch-sub">Ask about the tool, your results, or process control</div>
+    </div>
+    <button class="vdt-ch-close" onclick="vdtChatToggle()">✕</button>
+  </div>
+  <div class="vdt-ch-msgs" id="vdtChatMsgs">
+    <div class="vdt-ch-msg bot">Hi! I can explain the dashboard, your diagnostic results, or general process control concepts. What would you like to know?</div>
+  </div>
+  <div class="vdt-ch-inrow">
+    <textarea id="vdtChatInput" rows="1" placeholder="Type a question…"></textarea>
+    <button id="vdtChatSend" onclick="vdtChatSend()">➤</button>
+  </div>
+</div>
+
+<script>
+const VDT_CHAT_KEY='vdtChatHistory';
+let vdtChatHistory=[];
+try{vdtChatHistory=JSON.parse(localStorage.getItem(VDT_CHAT_KEY)||'[]');}catch(e){vdtChatHistory=[];}
+function vdtChatSave(){
+  if(vdtChatHistory.length>30)vdtChatHistory=vdtChatHistory.slice(-30);
+  try{localStorage.setItem(VDT_CHAT_KEY,JSON.stringify(vdtChatHistory));}catch(e){}
+}
+function vdtChatToggle(){
+  const p=document.getElementById('vdtChatPanel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open'))document.getElementById('vdtChatInput').focus();
+}
+function vdtChatAppend(role,text){
+  const box=document.getElementById('vdtChatMsgs');
+  const d=document.createElement('div');
+  d.className='vdt-ch-msg '+role;
+  d.textContent=text;
+  box.appendChild(d);
+  box.scrollTop=box.scrollHeight;
+  return d;
+}
+async function vdtChatSend(){
+  const inp=document.getElementById('vdtChatInput');
+  const btn=document.getElementById('vdtChatSend');
+  const text=inp.value.trim();
+  if(!text||btn.disabled)return;
+  inp.value='';
+  vdtChatAppend('user',text);
+  vdtChatHistory.push({role:'user',content:text});
+  vdtChatSave();
+  btn.disabled=true;
+  const box=document.getElementById('vdtChatMsgs');
+  const typing=document.createElement('div');
+  typing.className='vdt-ch-typing';typing.textContent='●●●';
+  box.appendChild(typing);box.scrollTop=box.scrollHeight;
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:vdtChatHistory})});
+    const data=await r.json();
+    typing.remove();
+    if(r.ok&&data.reply){
+      vdtChatAppend('bot',data.reply);
+      vdtChatHistory.push({role:'assistant',content:data.reply});
+      vdtChatSave();
+    }else{
+      vdtChatAppend('sys',data.detail||'Something went wrong. Please try again.');
+    }
+  }catch(e){
+    typing.remove();
+    vdtChatAppend('sys','Could not reach the server. Is it running?');
+  }
+  btn.disabled=false;
+  inp.focus();
+}
+document.getElementById('vdtChatInput').addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();vdtChatSend();}
+});
+// restore previous conversation on page load
+vdtChatHistory.forEach(m=>vdtChatAppend(m.role==='assistant'?'bot':'user',m.content));
+// clear stored chat on sign out
+document.addEventListener('click',function(e){
+  const a=e.target.closest('a[href="/logout"]');
+  if(a){try{localStorage.removeItem(VDT_CHAT_KEY);}catch(err){}}
+});
+</script>
 </body>
 </html>
