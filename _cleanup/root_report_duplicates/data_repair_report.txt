@@ -1,8 +1,0 @@
-
-═════════════════════════════════════════════════════════════════
-  DATA REPAIRS APPLIED — automatic
-═════════════════════════════════════════════════════════════════
-
-The tool repaired or worked around missing data on the loops below before running diagnostics. The original file was NOT modified.
-
-  No repairs needed — input data was clean.

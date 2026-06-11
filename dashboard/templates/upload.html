@@ -51,7 +51,6 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 .card-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px}
 .card-sub{font-size:13px;color:var(--text3);margin-bottom:32px}
 .mode-label{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px}
-.mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:28px}
 .mode-btn{padding:14px 16px;cursor:pointer;transition:background .2s,color .2s;border:none;font-family:inherit;background:var(--surface)}
 .mode-btn:first-child{border-right:1px solid var(--border)}
 .mode-btn.active{background:var(--navy);color:#fff}
@@ -98,7 +97,6 @@ button{cursor:pointer;border:none;background:none;font-family:inherit}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-title{font-size:18px;font-weight:600;margin-bottom:8px}
 .loading-sub{font-size:13px;color:#7aaccf;text-align:center;line-height:1.7;max-width:320px}
-.loading-mode-badge{display:inline-block;margin-top:10px;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;font-family:'IBM Plex Mono',monospace}
 .lmb-auto{background:rgba(46,134,222,.25);color:#7fd3ff;border:1px solid rgba(78,168,248,.3)}
 .lmb-manual{background:rgba(124,58,237,.25);color:#c4b5fd;border:1px solid rgba(196,181,253,.3)}
 .loading-steps{margin-top:28px;display:flex;flex-direction:column;gap:10px;width:280px}
@@ -382,11 +380,11 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
             </div>
             <div style="display:flex;gap:10px;align-items:flex-start">
               <div style="width:20px;height:20px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div>
-              <div style="font-size:12px;color:#374151;line-height:1.55"><b>Choose run mode</b> — <b>AUTO</b> runs with calibrated defaults (recommended). <b>MANUAL</b> lets engineers adjust thresholds first.</div>
+              <div style="font-size:12px;color:#374151;line-height:1.55"><b>Upload your Excel file</b> — drag and drop or click to browse.</div>
             </div>
             <div style="display:flex;gap:10px;align-items:flex-start">
               <div style="width:20px;height:20px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div>
-              <div style="font-size:12px;color:#374151;line-height:1.55"><b>Upload &amp; fill session details</b> — plant name, date range (optional). In MANUAL mode, review thresholds on the Thresholds tab.</div>
+              <div style="font-size:12px;color:#374151;line-height:1.55"><b>Upload &amp; fill session details</b> — plant name, date range (optional). Review thresholds on the Thresholds tab if needed.</div>
             </div>
             <div style="display:flex;gap:10px;align-items:flex-start">
               <div style="width:20px;height:20px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div>
@@ -411,19 +409,6 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
         </div>
       </div>
 
-      <div class="mode-label">Run Mode</div>
-      <div class="mode-toggle">
-        <button class="mode-btn active" id="btn-auto" onclick="setMode('auto')">
-          <div class="mode-badge badge-auto">AUTO</div>
-          <div class="mode-name">Auto Calibration</div>
-          <div class="mode-desc">Engine calibrates thresholds from your data. Recommended for first-time runs.</div>
-        </button>
-        <button class="mode-btn" id="btn-manual" onclick="setMode('manual')">
-          <div class="mode-badge badge-manual">MANUAL</div>
-          <div class="mode-name">Manual Config</div>
-          <div class="mode-desc">Uses your DIAGNOSTIC_CONFIG values exactly. Same as v2 diagnostics engine.</div>
-        </button>
-      </div>
 
       <div class="drop-zone" id="drop-zone">
         <input type="file" id="file-input" accept=".xlsx,.xls"/>
@@ -646,7 +631,6 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
   <div class="spinner"></div>
   <div class="loading-title" id="ltxt">Uploading file…</div>
   <div class="loading-sub">Please wait while your file is uploaded.</div>
-  <div id="loading-mode-badge" class="loading-mode-badge lmb-auto">AUTO MODE</div>
   <div class="loading-steps">
     <div class="lstep" id="lstep-1"><span class="lstep-dot"></span>Uploading file to server</div>
     <div class="lstep" id="lstep-2"><span class="lstep-dot"></span>Validating file format</div>
@@ -672,7 +656,6 @@ function switchSrc(src){
 /* ── EXCEL UPLOAD LOGIC ── */
 (function(){
   let selectedFile=null,currentMode='auto',pollTimer=null;
-  window.setMode=function(mode){currentMode=mode;document.getElementById('btn-auto').classList.toggle('active',mode==='auto');document.getElementById('btn-manual').classList.toggle('active',mode==='manual');};
   function formatBytes(b){if(b<1024)return b+'B';if(b<1048576)return (b/1024).toFixed(1)+'KB';return (b/1048576).toFixed(1)+'MB';}
   function setFile(f){const ext=f.name.split('.').pop().toLowerCase();if(!['xlsx','xls'].includes(ext)){showErr('Only .xlsx and .xls files are accepted.');return;}selectedFile=f;document.getElementById('pill-name').textContent=f.name;document.getElementById('pill-size').textContent=formatBytes(f.size);document.getElementById('file-pill').classList.add('show');document.getElementById('btn-run').disabled=false;hideErr();}
   function clearFile(){selectedFile=null;document.getElementById('file-pill').classList.remove('show');document.getElementById('btn-run').disabled=true;document.getElementById('file-input').value='';}
@@ -688,13 +671,10 @@ function switchSrc(src){
   document.getElementById('btn-run').addEventListener('click',async()=>{
     if(!selectedFile){showErr('Please select a file first.');return;}
     hideErr();
-    const badge=document.getElementById('loading-mode-badge');
-    badge.textContent=currentMode==='auto'?'AUTO MODE':'MANUAL MODE';
-    badge.className='loading-mode-badge '+(currentMode==='auto'?'lmb-auto':'lmb-manual');
     document.getElementById('loading-overlay').classList.add('show');
     document.getElementById('btn-run').disabled=true;
     startSteps();
-    const fd=new FormData();fd.append('file',selectedFile);fd.append('mode',currentMode);
+    const fd=new FormData();fd.append('file',selectedFile);fd.append('mode','auto');
 
     try{
       const res=await fetch('/upload',{method:'POST',body:fd});

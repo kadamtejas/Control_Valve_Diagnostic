@@ -619,13 +619,17 @@ function identify(pv, op, sp){
 
   // ── 4. K — process gain ───────────────────────────────────────────────
   // Method A: step-based ΔPV/ΔOP (most accurate)
+  // Adaptive threshold: scales with OP variability so sluggish loops
+  // (tiny OP movements) are not penalised by a hardcoded 3% threshold.
+  const op_std_val=std(op);
+  const stepThr=Math.max(Math.min(3, 2*op_std_val), 0.5);
   let K=null, K_method='ols';
   const steps=[];
   for(let i=2;i<op.length-2;i++){
     const dop=op[i]-op[i-1];
-    if(Math.abs(dop)>=3){
+    if(Math.abs(dop)>=stepThr){
       const prevStd=std(op.slice(Math.max(0,i-5),i));
-      if(prevStd<1.5) steps.push({idx:i,dop});
+      if(prevStd<stepThr*0.5) steps.push({idx:i,dop});
     }
   }
   if(steps.length>=2){
@@ -639,7 +643,11 @@ function identify(pv, op, sp){
       const dpv=pvAfter-pvBefore;
       if(Math.abs(dop)>(typeof CFG!=='undefined'?CFG.minDop:0.5)) gains.push(Math.abs(dpv/dop));
     });
-    if(gains.length>=2){K=rnd(med(gains),3);K_method='step_dPVdOP';}
+    if(gains.length>=2){
+      const gainsSpread=Math.max(...gains)/Math.min(...gains);
+      if(gainsSpread<=3){K=rnd(med(gains),3);K_method='step_dPVdOP';}
+      // else: gains too inconsistent — fall through to OLS
+    }
   }
   // Method B: windowed OLS of PV~OP (fallback)
   if(!K||K<0.05){
@@ -790,6 +798,8 @@ function identify(pv, op, sp){
     Ki_old:rnd(Kp_old/(Ti_old||1),4),
     Ki_new:rnd(Kp_new/(Ti_new||1),4),
     r2_K, conf_K,
+    op_range:rnd(Math.max(...op)-Math.min(...op),2),
+    no_excitation: steps.length===0||(K_method!=='step_dPVdOP'&&steps.length>0),
     isIntegrating:false,
     pv_b:pvb, op_b:opb, pv_a:pva, op_a:opa,
     iae_b:Math.round(iae_b_real), iae_a:Math.round(iae_a),
@@ -885,24 +895,25 @@ function populate(){
   document.getElementById('tuconf-pct').textContent=confTuPct+'%';
   const kiFallback=isInteg&&M.ki_fallback;
   s('cmp-kp-old',M.Kp_old);
-  if(kiFallback){
+  const noExcit = !isInteg && (M.no_excitation || M.conf_K < CFG.confMed);
+  if(kiFallback || noExcit){
     document.getElementById('cmp-kp-new').textContent='\u2014';
     document.getElementById('cmp-kp-new').style.color='var(--text4)';
     s('cmp-kp-pct','\u2014');
-    s('cmp-kp-why','Ki could not be estimated \u2014 insufficient OP excitation in data');
+    s('cmp-kp-why', noExcit ? 'Insufficient OP excitation \u2014 step test required' : 'Ki could not be estimated \u2014 insufficient OP excitation in data');
   } else {
     s('cmp-kp-new',M.Kp_new);
     document.getElementById('cmp-kp-new').style.color='';
     const kpChg=rnd(Math.abs(M.Kp_new-M.Kp_old)/(M.Kp_old||1)*100,0);
     s('cmp-kp-pct',(M.Kp_new<M.Kp_old?'\u2193':'\u2191')+kpChg+'%');
-    s('cmp-kp-why',M.Kp_new<M.Kp_old?'Reduce gain \u2014 current tuning too aggressive':'Increase gain \u2014 more responsive loop needed');
+    s('cmp-kp-why',M.Kp_new<M.Kp_old?'Reduce gain \u2014 current tuning too aggressive':'Increase gain \u2014 controller too detuned');
   }
   s('cmp-ti-old',M.Ti_old+' min');
-  if(kiFallback){
+  if(kiFallback || noExcit){
     document.getElementById('cmp-ti-new').textContent='\u2014';
     document.getElementById('cmp-ti-new').style.color='var(--text4)';
     s('cmp-ti-pct','\u2014');
-    s('cmp-ti-why','Provide Ki from a step test to get valid Ti recommendation');
+    s('cmp-ti-why', noExcit ? 'Cannot estimate Ti without valid process model' : 'Provide Ki from a step test to get valid Ti recommendation');
   } else {
     s('cmp-ti-new',M.Ti_new+' min');
     document.getElementById('cmp-ti-new').style.color='';
@@ -956,16 +967,43 @@ function populate(){
       ];
     }
   } else {
-    actions=[
-      ['r','\u26a0',`<b>Set Kp = ${M.Kp_new}</b>`,` (current estimated: ${M.Kp_old}) \u2014 reduce proportional gain to eliminate oscillation`],
-      ['a','\u23f1',`<b>Set Ti = ${M.Ti_new} min</b>`,` (current estimated: ${M.Ti_old} min) \u2014 adjust integral time`],
-      ['b','\ud83d\udccb',`<b>Monitor for 2\u20134 hours</b>`,` after change. PV \u03c3 should drop below ${rnd(M.pv_std*0.85,2)}`],
-      ['g','\u2713',`<b>Confidence: ${Math.round(M.conf_K*100)}% on K</b>`,` \u2014 ${M.conf_K>0.7?'strong basis for tuning change':'moderate \u2014 consider step test before applying'}`],
-    ];
-    if(lt==='temperature')actions.unshift(['r','\u26a0','<b>WARNING: Temperature loop</b>',' \u2014 run a dedicated SP step test before applying any tuning.']);
+    if(noExcit){
+      actions=[
+        ['r','\u26a0','<b>Insufficient OP excitation</b>',` \u2014 OP range was only ${M.op_range}% over the data window. Process gain K cannot be reliably estimated.`],
+        ['r','\ud83d\udcca','<b>Tuning recommendation suppressed</b>',' \u2014 applying an unreliable Kp/Ti could worsen control or cause instability.'],
+        ['b','\ud83d\udccb','<b>Perform an open-loop step test</b>',' \u2014 manually step OP by 5\u201310%, hold until PV settles, record K = \u0394PV/\u0394OP.'],
+        ['g','\u2139','<b>Once K is known from step test</b>',' \u2014 re-run this tool. IMC tuning will give a reliable Kp and Ti recommendation.'],
+      ];
+    } else {
+      const kpDir = M.Kp_new < M.Kp_old ? 'Reduce proportional gain \u2014 current tuning too aggressive' : 'Increase proportional gain \u2014 controller too detuned';
+      const tiDir = M.Ti_new > M.Ti_old ? 'Slower reset \u2014 reduces integral windup' : 'Faster reset \u2014 tighter SP tracking';
+      actions=[
+        ['r','\u26a0',`<b>Set Kp = ${M.Kp_new}</b>`,` (current estimated: ${M.Kp_old}) \u2014 ${kpDir}`],
+        ['a','\u23f1',`<b>Set Ti = ${M.Ti_new} min</b>`,` (current estimated: ${M.Ti_old} min) \u2014 ${tiDir}`],
+        ['b','\ud83d\udccb',`<b>Monitor for 2\u20134 hours</b>`,` after change. PV \u03c3 should drop below ${rnd(M.pv_std*0.85,2)}`],
+        ['g','\u2713',`<b>Confidence: ${Math.round(M.conf_K*100)}% on K</b>`,` \u2014 ${M.conf_K>0.7?'strong basis for tuning change':'moderate \u2014 consider step test before applying'}`],
+      ];
+      if(lt==='temperature')actions.unshift(['r','\u26a0','<b>WARNING: Temperature loop</b>',' \u2014 run a dedicated SP step test before applying any tuning.']);
+    }
   }
   document.getElementById('actions-list').innerHTML=actions.map(([t,ic,b,sp])=>`<div class="ai ai-${t}"><span class="ic">${ic}</span><div>${b}<span>${sp}</span></div></div>`).join('');
   buildOvl();
+  // disable holdout when no OP excitation
+  const hoBtn=document.getElementById('ho-run-btn') || document.querySelector('.ho-run-btn');
+  const hoNote=document.getElementById('ho-no-excit-note');
+  if(M.no_excitation){
+    if(hoBtn){hoBtn.disabled=true;hoBtn.style.opacity='0.4';hoBtn.style.cursor='not-allowed';hoBtn.title='Not available — insufficient OP excitation';}
+    if(!hoNote){
+      const note=document.createElement('div');
+      note.id='ho-no-excit-note';
+      note.style.cssText='margin-top:10px;padding:9px 12px;background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:7px;font-size:11px;color:var(--amber);line-height:1.5';
+      note.innerHTML='<b>Validation not available</b> — '+(M.K_method!=='step_dPVdOP'&&M.op_range<2?'OP range is only '+M.op_range+'% with no detectable steps.':'Step gains are inconsistent (spread >3×) — detected steps are noise, not true process responses.')+' Splitting unreliable data produces meaningless K estimates. Perform a step test first.';
+      hoBtn && hoBtn.parentElement.appendChild(note);
+    }
+  } else {
+    if(hoBtn){hoBtn.disabled=false;hoBtn.style.opacity='';hoBtn.style.cursor='';hoBtn.title='';}
+    const old=document.getElementById('ho-no-excit-note');if(old)old.remove();
+  }
   document.getElementById('saveBtn').disabled=false;
   document.getElementById('savePanelBtn').disabled=false;
   fetch(`/api/tune/recommendation/${encodeURIComponent(LOOP)}`)
@@ -1005,6 +1043,12 @@ function buildOvl(){
   if(ovlChart){ovlChart.destroy();ovlChart=null;}
   // reset legend state when rebuilding
   document.querySelectorAll('#ovl-legend .chart-legend-item').forEach(el=>el.classList.remove('hidden'));
+  // hide PV Opt and OP Opt legend pills when model is unreliable
+  const _noExcit=!M.isIntegrating&&(M.no_excitation||M.conf_K<(CFG.confMed||0.5));
+  [1,4].forEach(idx=>{
+    const el=document.querySelector('#ovl-legend .chart-legend-item[data-idx="'+idx+'"]');
+    if(el) el.style.display=_noExcit?'none':'';
+  });
   const ctx=document.getElementById('ovl-cv').getContext('2d');
   const gc='rgba(216,226,236,.5)',tc='rgba(107,130,153,.8)';
   ovlChart=new Chart(ctx,{
@@ -1014,9 +1058,9 @@ function buildOvl(){
       datasets:[
         {label:'SP',data:D.sp,borderColor:'#f5c518',borderWidth:1.5,borderDash:[7,5],pointRadius:0,tension:.15,yAxisID:'y'},
         {label:'PV Actual',data:D.pv,borderColor:'#a81c1c',borderWidth:2,pointRadius:0,tension:.15,yAxisID:'y'},
-        {label:'PV Opt',data:M.pv_a,borderColor:'#f28b8b',borderWidth:2,borderDash:[5,4],pointRadius:0,tension:.15,yAxisID:'y'},
+        {label:'PV Opt',data:M.pv_a,borderColor:'#f28b8b',borderWidth:2,borderDash:[5,4],pointRadius:0,tension:.15,yAxisID:'y',hidden:_noExcit},
         {label:'OP Actual',data:D.op,borderColor:'#1a7a40',borderWidth:1.5,pointRadius:0,tension:.15,yAxisID:'y1'},
-        {label:'OP Opt',data:M.op_a,borderColor:'#6fcf97',borderWidth:1.5,borderDash:[4,4],pointRadius:0,tension:.15,yAxisID:'y1'},
+        {label:'OP Opt',data:M.op_a,borderColor:'#6fcf97',borderWidth:1.5,borderDash:[4,4],pointRadius:0,tension:.15,yAxisID:'y1',hidden:_noExcit},
       ]
     },
     options:{
@@ -1313,7 +1357,7 @@ function toggleLinkedCards(){
         <div><div class="cfg-sec-title">Model Identification Settings</div><div class="cfg-sec-sub">Controls how K, &tau;, &theta; are estimated from your data</div></div>
       </div>
       <div class="cfg-row">
-        <div class="cfg-lbl"><div class="cfg-lbl-name">Min &Delta;OP threshold <span class="ibt" data-tip="Minimum OP change to count as a valid step for gain estimation. Lower = more sensitive but noisier.">i</span></div><div class="cfg-lbl-default">default: 0.5 %</div></div>
+        <div class="cfg-lbl"><div class="cfg-lbl-name">Min &Delta;OP threshold <span class="ibt" data-tip="Minimum OP change to count as a valid step for gain estimation. Adaptive formula: max(min(3, 2×OPσ), 0.5). Scales down automatically for sluggish loops (tiny OP movements), capped at 3% for normal/active loops.">i</span></div><div class="cfg-lbl-default">default: 0.5 %</div></div>
         <input class="cfg-inp" id="cfg-min-dop" type="number" step="0.1" min="0.1" max="5" value="0.5" data-default="0.5" oninput="onCfgInputChange(this)"/>
       </div>
       <div class="cfg-row">
