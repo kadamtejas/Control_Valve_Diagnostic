@@ -1763,12 +1763,21 @@ async function vdtChatSend(){
 document.getElementById('vdtChatInput').addEventListener('keydown',function(e){
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();vdtChatSend();}
 });
-// restore previous conversation on page load
-vdtChatHistory.forEach(m=>vdtChatAppend(m.role==='assistant'?'bot':'user',m.content));
+// reset chat when a new diagnostic run exists, else restore conversation
+(async function(){
+  let rid=null;
+  try{const r=await fetch('/api/chat/runid');if(r.ok)rid=(await r.json()).run_id||null;}catch(e){}
+  if(rid!==null){
+    const stored=localStorage.getItem('vdtChatRunId');
+    if(stored!==null&&stored!==rid){vdtChatHistory=[];try{localStorage.removeItem(VDT_CHAT_KEY);}catch(e){}}
+    try{localStorage.setItem('vdtChatRunId',rid);}catch(e){}
+  }
+  vdtChatHistory.forEach(m=>vdtChatAppend(m.role==='assistant'?'bot':'user',m.content));
+})();
 // clear stored chat on sign out
 document.addEventListener('click',function(e){
   const a=e.target.closest('a[href="/logout"]');
-  if(a){try{localStorage.removeItem(VDT_CHAT_KEY);}catch(err){}}
+  if(a){try{localStorage.removeItem(VDT_CHAT_KEY);localStorage.removeItem('vdtChatRunId');}catch(err){}}
 });
 </script>
 </body>

@@ -799,6 +799,22 @@ async def api_chat(payload: dict, current_user: dict = Depends(get_current_user)
         raise HTTPException(status_code=503, detail=detail)
 
 
+@app.get("/api/chat/runid")
+async def api_chat_runid(current_user: dict = Depends(get_current_user)):
+    """Lightweight id of the user's current diagnostic run — used by the chat
+    widget to reset the conversation when a new run appears."""
+    rd = _results_dir_for(current_user["sub"])
+    if not rd:
+        return JSONResponse(content={"run_id": "none"})
+    p = Path(rd)
+    f = p / "Loop_diagnostics_v2.xlsx"
+    try:
+        mtime = int((f if f.exists() else p).stat().st_mtime)
+    except OSError:
+        mtime = 0
+    return JSONResponse(content={"run_id": f"{p.name}|{mtime}"})
+
+
 @app.get("/api/plots")
 async def get_plots(current_user: dict = Depends(get_current_user)):
     rd = _get_user_results_dir(current_user)
