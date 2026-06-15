@@ -65,7 +65,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 /* ══════════════════════════════════════════
    NEW HERO ROW — 4 tiles full width
    ══════════════════════════════════════════ */
-.hero-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;padding:14px 24px 10px;background:var(--bg)}
+.hero-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:10px;padding:14px 24px 10px;background:var(--bg)}
 
 /* Base hero card — full gradient, vertical layout */
 .hero-card{border-radius:14px;color:#fff;cursor:pointer;transition:transform .18s,box-shadow .18s;position:relative;overflow:hidden;min-height:140px;display:flex;flex-direction:column;box-shadow:0 4px 18px rgba(0,0,0,.18)}
@@ -107,6 +107,16 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .hc-valve{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
 .hc-tuning{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
 .hc-ops{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
+.hc-prop{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
+.hc-prop .grp-right{background:#eff6ff;border-left:1px solid #bfdbfe}
+.prop-link-row{display:flex;align-items:center;gap:4px;padding:2px 0;border-bottom:1px solid #bfdbfe;cursor:pointer;transition:opacity .15s}
+.prop-link-row:last-child{border-bottom:none}
+.prop-link-row:hover{opacity:.75}
+.prop-src{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0f2744;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62px}
+.prop-tgt{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:#0f2744;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62px}
+.prop-arrow{font-size:9px;color:#2e86de;flex-shrink:0}
+.prop-score{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0f2744;white-space:nowrap;margin-left:auto}
+.prop-lag{font-size:8px;color:#6b7280;white-space:nowrap;margin-left:3px}
 .grp-left{flex:0 0 48%;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px}
 .grp-right{flex:1;border-left:1px solid #bfdbfe;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;background:#eff6ff;overflow:hidden}
 .grp-top-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
@@ -222,6 +232,29 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .ind-ratio{font-size:13px;font-weight:700}
 .ind-arr{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .grp-modal-note{font-size:10px;color:var(--text4);text-align:center;padding:4px 0 0}
+/* ── Prop Link Modal ── */
+.plm{position:fixed;inset:0;background:rgba(15,39,68,.55);z-index:400;display:none;align-items:center;justify-content:center;padding:20px}
+.plm.open{display:flex}
+.plm-box{background:var(--surface);border-radius:var(--rl);width:100%;max-width:680px;max-height:88vh;display:flex;flex-direction:column;border:1px solid var(--border);box-shadow:var(--shadow-lg)}
+.plm-hdr{padding:14px 20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.plm-title{font-size:14px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px}
+.plm-cls{width:28px;height:28px;border-radius:7px;background:var(--bg2);border:1px solid var(--border);color:var(--text3);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.plm-cls:hover{background:var(--crit-bg);color:var(--crit)}
+.plm-body{padding:16px 20px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px}
+.plm-pair{display:flex;align-items:stretch;gap:10px}
+.plm-loop-card{flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:9px;padding:10px 13px;display:flex;flex-direction:column;gap:3px}
+.plm-loop-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--navy)}
+.plm-loop-diag{font-size:11px;color:var(--text2)}
+.plm-arrow-col{display:flex;align-items:center;justify-content:center;flex-shrink:0;gap:4px;flex-direction:column}
+.plm-stats{display:flex;gap:8px;flex-wrap:wrap}
+.plm-stat{background:var(--bg2);border:1px solid var(--border2);border-radius:7px;padding:6px 12px;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:70px}
+.plm-stat-val{font-size:14px;font-weight:700;color:var(--navy);font-family:'IBM Plex Mono',monospace}
+.plm-stat-lbl{font-size:9px;color:var(--text4);text-transform:uppercase;letter-spacing:.05em}
+.plm-action{background:#fefce8;border:1px solid #fde68a;border-radius:9px;padding:10px 14px;font-size:12px;color:#92400e;line-height:1.6}
+.plm-chart-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:9px;padding:10px 13px}
+.plm-chart-title{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.plm-tune-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:6px 14px;border-radius:7px;background:var(--warn-bg);color:#b45309;border:1px solid var(--warn-border);text-decoration:none;transition:all .2s}
+.plm-tune-btn:hover{background:#fde68a}
 
 /* ══════════════════════════════════════════
    EXISTING STYLES (unchanged sections)
@@ -391,6 +424,7 @@ table.et tr:last-child td{border-bottom:none}
 .tex-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text2);cursor:pointer;padding:2px 6px;border-radius:4px;transition:background .15s}
 .tex-legend-item:hover{background:var(--bg2)}
 .tex-legend-dot{width:10px;height:3px;border-radius:2px;flex-shrink:0}
+@media(max-width:1300px){.hero-row{grid-template-columns:1fr 1fr 1fr;}}
 @media(max-width:1100px){.hero-row{grid-template-columns:1fr 1fr;}}
 @media(max-width:700px){.hero-row{grid-template-columns:1fr}.bottom-row{grid-template-columns:1fr}.topbar{padding:0 16px}.ts-txt{display:none}}
 
@@ -546,6 +580,17 @@ table.et tr:last-child td{border-bottom:none}
         <div id="opsLeft" style="display:flex;flex-direction:column;gap:3px;margin-top:6px"></div>
       </div>
       <div class="grp-right" id="heroOpsChips" onclick="event.stopPropagation()"></div>
+    </div>
+
+    <!-- 5. Cross-Loop Propagation -->
+    <div class="hero-card hc-prop" id="heroPropCard">
+      <div class="grp-left">
+        <div class="grp-top-row">
+          <div><div class="grp-pct" id="heroPropCount">—</div><div class="grp-lbl">Propagation</div></div>
+        </div>
+        <div id="propLeft" style="display:flex;flex-direction:column;gap:3px;margin-top:6px"></div>
+      </div>
+      <div class="grp-right" id="heroPropLinks" onclick="event.stopPropagation()"></div>
     </div>
 
   </div><!-- end hero-row -->
@@ -761,6 +806,17 @@ table.et tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+<!-- PROP LINK DETAIL MODAL -->
+<div class="plm" id="propLinkModal" onclick="if(event.target===this)closePropLinkModal()">
+  <div class="plm-box">
+    <div class="plm-hdr">
+      <div class="plm-title"><span>🔗</span><span id="plmTitle">Propagation Link</span></div>
+      <div class="plm-cls" onclick="closePropLinkModal()">×</div>
+    </div>
+    <div class="plm-body" id="plmBody"></div>
+  </div>
+</div>
+
 <!-- TILE / LOOP LIST MODAL -->
 <div class="mo" id="tileModal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="mb2"><div class="mhdr"><span class="mtitle" id="tmTitle">Loops</span><button class="mcls" onclick="document.getElementById('tileModal').classList.remove('open')">×</button></div><div class="mbdy"><div class="mlist" id="tmList"></div></div></div>
@@ -831,14 +887,14 @@ const PROBLEM_GROUPS=[
   {id:'valve',label:'Valve Problems',icon:'🔧',color:'#ef4444',pctId:'heroValvePct',chipsId:'heroValveChips',
    problems:[{id:'stiction',label:'Stiction'},{id:'valve_stuck',label:'Valve Stuck'},{id:'saturation',label:'Saturation'}]},
   {id:'tuning',label:'Tuning Issues',icon:'⚙️',color:'#f59e0b',pctId:'heroTuningPct',chipsId:'heroTuningChips',
-   problems:[{id:'sluggishness',label:'Sluggishness'},{id:'aggressive_tuning',label:'Aggressive Tuning'},{id:'sluggish_tuning',label:'Sluggish Tuning'},{id:'unresponsive',label:'Unresponsive Ctrl'}]},
+   problems:[{id:'aggressive_tuning',label:'Aggressive Tuning'},{id:'sluggish_tuning',label:'Sluggish Tuning'},{id:'unresponsive',label:'Unresponsive Ctrl'}]},
   {id:'ops',label:'Operational & Signal',icon:'📡',color:'#a78bfa',pctId:'heroOpsPct',chipsId:'heroOpsChips',
    problems:[{id:'loop_manual',label:'Loop in Manual'},{id:'sensor_issue',label:'Sensor Issue'},{id:'data_quality',label:'Data Quality'},{id:'external_oscillation',label:'Ext. Oscillation'}]},
 ];
 
 /* keep PROBLEMS for actions table compatibility */
 const PROBLEMS=[
-  {id:'stiction',label:'Stiction'},{id:'sluggishness',label:'Sluggishness'},{id:'valve_stuck',label:'Valve Stuck'},
+  {id:'stiction',label:'Stiction'},{id:'valve_stuck',label:'Valve Stuck'},
   {id:'aggressive_tuning',label:'Aggressive Tuning'},{id:'sluggish_tuning',label:'Sluggish Tuning'},{id:'external_oscillation',label:'Ext. Oscillation'},
   {id:'saturation',label:'Saturation'},{id:'sensor_issue',label:'Sensor Issue'},{id:'loop_manual',label:'Loop in Manual'},
   {id:'data_quality',label:'Data Quality'},{id:'unresponsive',label:'Unresponsive Ctrl'}
@@ -973,7 +1029,7 @@ async function loadTuningRecs(){
 }
 
 function isTuningGroup(problemId){
-  const TUNING_PROBS=['sluggishness','aggressive_tuning','sluggish_tuning','unresponsive'];
+  const TUNING_PROBS=['aggressive_tuning','sluggish_tuning','unresponsive'];
   return TUNING_PROBS.includes(problemId);
 }
 
@@ -1338,7 +1394,7 @@ async function init(){
     document.getElementById('ltxt').textContent='Reading results…';
     if(!res.ok){let detail='HTTP '+res.status;try{const j=await res.json();detail=j.detail||detail;}catch{}if(res.status===404)throw new Error('no_results');throw new Error(detail);}
     const data=await res.json();
-    S.loops=data.loops||[];S.plant=data.plant||{};S.runFolder=data.run_folder||'';
+    S.loops=data.loops||[];S.plant=data.plant||{};S.runFolder=data.run_folder||'';S.propagation=data.propagation||[];
     S.isCustomConfig=data.is_custom_config||false;
     if(!S.loops.length)throw new Error('no_results');
     try{
@@ -1393,6 +1449,7 @@ function populateAll(data){
   const hA=avg('hagglund_regularity');document.getElementById('ekO').textContent=hA!==null?fN(hA*100,1)+'%':'—';
   /* render all overview sections */
   renderHeroGroups();
+  renderPropTile();
   ovHmInit();
   renderActionsTable();
   /* auto-load first loop from actions table into trends tile */
@@ -1419,12 +1476,156 @@ function switchTab(tab){S.tab=tab;document.querySelectorAll('.vnav-tab').forEach
 
 async function openLD(nm){S.sel=nm;const l=S.loops.find(x=>x.loop===nm)||{};const sev=sc(l);document.getElementById('ldTab').classList.remove('hidden');document.getElementById('ldTab').style.display='flex';const _ldUom=S.uomMap[nm];document.getElementById('ldTabNm').textContent=nm;document.getElementById('ldNm').textContent=nm;const _ldUomEl=document.getElementById('ldNmUom');if(_ldUomEl)_ldUomEl.textContent=_ldUom?`(${_ldUom})`:'';document.getElementById('ldDg').textContent=l.diagnosis||'';document.getElementById('ldPill').innerHTML='';
   const diagLower2=(l.diagnosis||'').toLowerCase();
-  const isTuningLD=['sluggishness','aggressive tuning','sluggish tuning','unresponsive'].some(k=>diagLower2.includes(k));
+  const isTuningLD=['aggressive tuning','sluggish tuning','unresponsive'].some(k=>diagLower2.includes(k));
   document.getElementById('ldTuneBtn').innerHTML=isTuningLD?`<a href="/tune/${encodeURIComponent(nm)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:6px 14px;border-radius:7px;background:var(--warn-bg);color:#b45309;border:1px solid var(--warn-border);text-decoration:none;transition:all .2s" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='var(--warn-bg)'"><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.3'><circle cx='12' cy='12' r='3'/><path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z'/></svg>Tune Controller</a>`:"";  const h=parseFloat(l.health),hN=!isNaN(h)?Math.round(h):null;const sfN=l.service_factor!=null?Math.round(parseFloat(l.service_factor)):null;
   const diagLower=(l.diagnosis||'').toLowerCase();
-  const isTuning=['sluggishness','aggressive tuning','sluggish tuning','unresponsive'].some(k=>diagLower.includes(k));
+  const isTuning=['aggressive tuning','sluggish tuning','unresponsive'].some(k=>diagLower.includes(k));
   const tuneBtn=isTuning?`<a href="/tune/${encodeURIComponent(nm)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:700;padding:6px 13px;border-radius:7px;background:var(--warn-bg);color:#b45309;border:1px solid var(--warn-border);text-decoration:none;transition:all .2s" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='var(--warn-bg)'"><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.3'><circle cx='12' cy='12' r='3'/><path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z'/></svg>Tune Controller</a>`:""; 
   document.getElementById('dmGrid').innerHTML=`<div class="dmc ${sev==='critical'?'dc-crit':sev==='poor'?'dc-warn':'dc-ok'}"><div class="dmc-lbl">Health Score</div><div class="dmc-val">${hN!==null?hN+'%':'—'}</div><div class="dmc-sub">${badge(sev)}</div></div><div class="dmc"><div class="dmc-lbl">Service Factor</div><div class="dmc-val">${sfN!==null?sfN+'%':'—'}</div><div class="dmc-sub">% time active in AUTO</div></div><div class="dmc"><div class="dmc-lbl">Harris Index</div><div class="dmc-val">${l.harris_index!=null?Number(l.harris_index).toFixed(3):'—'}</div><div class="dmc-sub">min-variance benchmark</div></div><div class="dmc"><div class="dmc-lbl">Stiction</div><div class="dmc-val" style="font-size:16px;margin-top:6px">${l.stiction_label||'—'}</div><div class="dmc-sub">consensus detection</div></div>`;switchTab('ld');const d=await fetchTS(nm);if(d)drawCharts(d,'d_');}
+
+function renderPropTile(){
+  const links=S.propagation||[];
+  const countEl=document.getElementById('heroPropCount');
+  const leftEl=document.getElementById('propLeft');
+  const rightEl=document.getElementById('heroPropLinks');
+  if(!countEl||!leftEl||!rightEl) return;
+  countEl.textContent=links.length?links.length:'0';
+  // Left: top source loop sub-line matching other tile style
+  const srcCounts2={};
+  links.forEach(l=>{const s=l.source||'';srcCounts2[s]=(srcCounts2[s]||0)+1;});
+  const topSrc=Object.entries(srcCounts2).sort((a,b)=>b[1]-a[1])[0];
+  leftEl.innerHTML=links.length&&topSrc
+    ?`<div class="phi-reason"><span class="phi-reason-lbl">${topSrc[0].replace(/^YN\.ETH1\./,'')} ×${topSrc[1]} downstream</span></div>`
+    :'';
+  // Right: source loops ranked by downstream count only
+  const srcCounts={};
+  links.forEach(l=>{const s=l.source||'';srcCounts[s]=(srcCounts[s]||0)+1;});
+  const topSrcs=Object.entries(srcCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  rightEl.innerHTML=topSrcs.length
+    ?topSrcs.map(([src,cnt])=>{
+        const shortSrc=src.replace(/^YN\.ETH1\./,'');
+        return `<div class="prop-link-row"><span class="prop-src" style="max-width:none;font-size:10px">${shortSrc}</span><span class="prop-score" style="margin-left:auto">×${cnt} downstream</span></div>`;
+      }).join('')+
+      '<div style="display:flex;justify-content:flex-end;margin-top:4px"><div class="grp-arr" onclick="event.stopPropagation();openPropModal()" title="Show all links">→</div></div>'
+    :'<div style="font-size:9px;color:#6b7280;text-align:center;padding:8px 0">No links detected</div>';
+  const srcHtml='';
+  // unused, kept for reference
+  void srcHtml;
+}
+
+function openPropModal(){
+  const links=S.propagation||[];
+  document.getElementById('grpModalIcon').textContent='🔗';
+  document.getElementById('grpModalIcon').style.background='#bbf7d022';
+  document.getElementById('grpModalTitle').textContent='Cross-Loop Propagation';
+  const body=document.getElementById('grpModalBody');
+  const total=S.loops.length||1;
+  body.innerHTML=links.length
+    ?links.map((l,idx)=>{
+        const src=(l.source||'').replace(/^YN\.ETH1\./,'');
+        const tgt=(l.target||'').replace(/^YN\.ETH1\./,'');
+        const score=l.combined_score!=null?Math.round(l.combined_score):0;
+        const lag=l.lag_time||'—';
+        const col=score>=80?'#dc2626':score>=65?'#d97706':'#1a9e5a';
+        const circ=Math.PI*2*18;
+        const da=`${(score/100)*circ} ${circ}`;
+        return `<div class="ind-tile" onclick="openPropLinkDetail(${idx})">`+
+          `<div class="ind-circle"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="none" stroke="var(--border2)" stroke-width="3"/><circle cx="24" cy="24" r="18" fill="none" stroke="${col}" stroke-width="3" stroke-dasharray="${da}" stroke-linecap="round" transform="rotate(-90 24 24)"/></svg><div class="ind-circle-pct" style="color:${col}">${score}</div></div>`+
+          `<div class="ind-info"><div class="ind-name">${src} → ${tgt}</div><div class="ind-ratio" style="color:${col}">Lag: ${lag}</div></div>`+
+          `<div class="ind-arr">→</div>`+
+          `</div>`;
+      }).join('')+
+      '<div class="grp-modal-note">Click a link to see details & overlaid trends</div>'
+    :'<div style="padding:24px;text-align:center;color:var(--text4);font-size:13px">No propagation links detected</div>';
+  document.getElementById('grpModal').classList.add('open');
+}
+
+function closePropLinkModal(){document.getElementById('propLinkModal').classList.remove('open');}
+
+async function openPropLinkDetail(idx){
+  const links=S.propagation||[];
+  const link=links[idx];
+  if(!link) return;
+  // close the list modal
+  closeGrpModal();
+  const srcLoop=link.source||'';
+  const tgtLoop=link.target||'';
+  const srcShort=srcLoop.replace(/^YN\.ETH1\./,'');
+  const tgtShort=tgtLoop.replace(/^YN\.ETH1\./,'');
+  const score=link.combined_score!=null?Math.round(link.combined_score):'—';
+  const lag=link.lag_time||'—';
+  const corr=link.cross_correlation!=null?link.cross_correlation.toFixed(3):'—';
+  const srcData=S.loops.find(l=>l.loop===srcLoop)||{};
+  const tgtData=S.loops.find(l=>l.loop===tgtLoop)||{};
+  const srcDiag=srcData.diagnosis||'—';
+  const tgtDiag=tgtData.diagnosis||'—';
+  const srcSev=sc(srcData);
+  const tgtSev=sc(tgtData);
+  const sevColor=s=>s==='critical'?'var(--crit)':s==='poor'?'var(--warn)':'var(--ok)';
+  const isTuningSrc=['aggressive tuning','sluggish tuning','unresponsive'].some(k=>(srcDiag||'').toLowerCase().includes(k));
+  const tuneLink=isTuningSrc?`<a class="plm-tune-btn" href="/tune/${encodeURIComponent(srcLoop)}" target="_blank">⚙️ Tune ${srcShort}</a>`:'';
+  // Action message
+  const actionMsg=`Fix <strong>${srcShort}</strong> first — its oscillation is propagating into <strong>${tgtShort}</strong> with a ${lag} lag. `+
+    `Re-tuning ${tgtShort} will not help while the source disturbance persists. `+
+    (isTuningSrc?`Recommended: re-tune ${srcShort} controller.`:`Investigate and fix the root cause on ${srcShort}.`);
+  document.getElementById('plmTitle').textContent=`${srcShort} → ${tgtShort}`;
+  const body=document.getElementById('plmBody');
+  body.innerHTML=
+    // Pair header
+    `<div class="plm-pair">`+
+      `<div class="plm-loop-card" style="border-color:${sevColor(srcSev)}33">`+
+        `<div style="font-size:9px;font-weight:700;text-transform:uppercase;color:${sevColor(srcSev)};letter-spacing:.06em">SOURCE • ${srcSev.toUpperCase()}</div>`+
+        `<div class="plm-loop-tag">${srcLoop}</div>`+
+        `<div class="plm-loop-diag">${srcDiag}</div>`+
+      `</div>`+
+      `<div class="plm-arrow-col">`+
+        `<div style="font-size:18px;color:#6ee7b7">→</div>`+
+        `<div style="font-size:8px;color:#6b7280;white-space:nowrap">${lag}</div>`+
+      `</div>`+
+      `<div class="plm-loop-card" style="border-color:${sevColor(tgtSev)}33">`+
+        `<div style="font-size:9px;font-weight:700;text-transform:uppercase;color:${sevColor(tgtSev)};letter-spacing:.06em">TARGET • ${tgtSev.toUpperCase()}</div>`+
+        `<div class="plm-loop-tag">${tgtLoop}</div>`+
+        `<div class="plm-loop-diag">${tgtDiag}</div>`+
+      `</div>`+
+    `</div>`+
+    // Evidence stats
+    `<div class="plm-stats">`+
+      `<div class="plm-stat"><div class="plm-stat-val">${score}</div><div class="plm-stat-lbl">Combined Score</div></div>`+
+      `<div class="plm-stat"><div class="plm-stat-val">${corr}</div><div class="plm-stat-lbl">Correlation</div></div>`+
+      `<div class="plm-stat"><div class="plm-stat-val">${lag}</div><div class="plm-stat-lbl">Lag</div></div>`+
+    `</div>`+
+    // Action
+    `<div class="plm-action">⚠️ <strong>Action:</strong> ${actionMsg}${tuneLink?'<br><br>'+tuneLink:''}</div>`+
+    // Chart placeholder
+    `<div class="plm-chart-wrap">`+
+      `<div class="plm-chart-title">📈 PV Overlay — ${srcShort} vs ${tgtShort}</div>`+
+      `<div id="plmChart" style="width:100%;height:220px"></div>`+
+      `<div id="plmChartMsg" style="font-size:10px;color:var(--text4);margin-top:4px">Loading data…</div>`+
+    `</div>`;
+  document.getElementById('propLinkModal').classList.add('open');
+  // Fetch both timeseries and draw overlaid chart
+  const [dSrc, dTgt]=await Promise.all([fetchTS(srcLoop), fetchTS(tgtLoop)]);
+  const msgEl=document.getElementById('plmChartMsg');
+  if(!dSrc||!dTgt){if(msgEl)msgEl.textContent='Could not load time series data.';return;}
+  const ts=normTs(dSrc.timestamps||[]);
+  const pvSrc=dSrc.pv||[];
+  const pvTgt=dTgt.pv||[];
+  // Shift target by lag samples for visual alignment
+  const lagSamples=link.cc_lag_samples||0;
+  const pvTgtAligned=lagSamples>0
+    ?[...Array(lagSamples).fill(null),...pvTgt.slice(0,pvTgt.length-lagSamples)]
+    :pvTgt;
+  Plotly.newPlot('plmChart',[
+    {x:ts,y:pvSrc,name:srcShort+' PV',line:{color:'#2e86de',width:2},type:'scatter',mode:'lines'},
+    {x:ts,y:pvTgtAligned,name:tgtShort+' PV (lag-aligned)',line:{color:'#1a9e5a',width:2,dash:'dot'},type:'scatter',mode:'lines',yaxis:'y2'}
+  ],{
+    ...PL,height:220,
+    yaxis:{...PL.yaxis,title:srcShort+' PV'},
+    yaxis2:{overlaying:'y',side:'right',showgrid:false,title:tgtShort+' PV',color:'#1a9e5a'},
+    legend:{orientation:'h',y:-0.28,font:{size:10}}
+  },{responsive:true,displayModeBar:false});
+  if(msgEl)msgEl.textContent=lagSamples>0?`Target PV shifted ${lag} earlier to align with source.`:'Loops shown on same time axis (lag ≈ 0).';
+}
 
 function renderTech(){const q=(document.getElementById('srchEng')?.value||'').toLowerCase();let rows=S.loops.filter(l=>{if(!l.loop)return false;if(q&&!l.loop.toLowerCase().includes(q))return false;return true;});const ng=(l,f)=>parseFloat(l[f])||0;rows.sort((a,b)=>{let va,vb;const c=S.techSC;if(c==='loop'){va=a.loop;vb=b.loop;}else if(c==='severity'){va=sc(a);vb=sc(b);}else if(c==='stiction_label'){va=a.stiction_label||'';vb=b.stiction_label||'';}else if(c==='data_quality_status'){va=a.data_quality_status||'';vb=b.data_quality_status||'';}else{va=ng(a,c);vb=ng(b,c);}return va<vb?-S.techSD:va>vb?S.techSD:0;});const tbody=document.getElementById('techBody');if(!rows.length){tbody.innerHTML='<tr><td colspan="16" style="text-align:center;padding:24px;color:var(--text4)">No loops match</td></tr>';return;}tbody.innerHTML=rows.map((l,i)=>{const sev=sc(l),rank=i+1;const rkCls=rank<=3?'rk-c':rank<=8?'rk-w':'rk-g';const h=parseFloat(l.health),hN=!isNaN(h)?Math.round(h):null;const hbar=hN!==null?`<div class="hbc"><div class="mb"><div class="mbf" style="width:${Math.min(hN,100)}%;background:${sev==='critical'?'var(--crit)':sev==='poor'?'var(--warn)':'#3b82f6'}"></div></div><span class="nc">${hN}</span></div>`:'—';const conf=l.confidence!=null?Math.round(parseFloat(l.confidence))+'%':'—';const sf=l.service_factor!=null?Math.round(parseFloat(l.service_factor))+'%':'—';const hag=l.hagglund_regularity!=null?fN(l.hagglund_regularity,3):'—';const action=l.recommended_action||'Call Maintenance';const sevCls=sev==='critical'?'crit':sev==='poor'?'warn':'ok';const severity=`<div class="severity-btn ${sevCls}" data-tip="${action.replace(/"/g,'&quot;')}"><span class="severity-dot"></span>${sev==='critical'?'Act Now':sev==='poor'?'Watch':'OK'}</div>`;const _u=S.uomMap[l.loop];return `<tr onclick="openLD('${l.loop.replace(/'/g,"\\'")}')"><td><span class="rkb ${rkCls}">${rank}</span></td><td class="lname" style="text-align:center">${l.loop}${_u?`<div style="font-size:9px;color:#94a3b8;font-family:'IBM Plex Mono',monospace;margin-top:1px">(${_u})</div>`:''}</td><td>${hbar}</td><td>${severity}</td><td class="pdiag">${l.diagnosis||'—'}</td><td style="font-size:11px">${l.stiction_label||'—'}</td><td class="nc">${sf}</td><td class="nc">${fN(l.iae_per_hour,3)}</td><td class="nc">${l.iae_per_hour_norm!=null?fN(l.iae_per_hour_norm,1)+'%':'—'}</td><td class="nc">${fN(l.harris_index,3)}</td><td class="nc">${fN(l.pv_amplitude,2)}</td><td class="nc">${fN(l.op_activity,3)}</td><td class="nc">${hag}</td><td class="nc">${l.dominant_period||'—'}</td><td class="nc">${conf}</td><td style="font-size:11px">${l.data_quality_status||'—'}</td></tr>`;}).join('');}
 function sortTech(col){if(S.techSC===col)S.techSD*=-1;else{S.techSC=col;S.techSD=1;}renderTech();}

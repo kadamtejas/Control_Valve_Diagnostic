@@ -584,6 +584,7 @@ def _read_propagation(wb) -> list:
             "target": str(d.get("Target loop", "")).strip(),
             "combined_score": _safe_float(d.get("Combined score")),
             "lag_time": str(d.get("Lag (time)", "") or ""),
+            "cc_lag_samples": _safe_float(d.get("Lag (samples)")),
             "cross_correlation": _safe_float(d.get("Cross-correlation")),
             "coherence_score": _safe_float(d.get("Coherence score")),
         })

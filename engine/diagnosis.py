@@ -614,13 +614,15 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
 
     # External / propagated oscillation: regular oscillation + LOW OP activity +
     # poor Harris. The valve is NOT moving much, but PV is still oscillating
-    # regularly. Only call this when regularity is HIGH (>0.85) — moderate
-    # regularity with low OP activity is more likely sluggish tuning.
+    # regularly. Only call this when regularity is HIGH (>0.75) — attenuated
+    # downstream propagation naturally loses regularity vs the source.
+    # NaN Harris is expected when OP is near-static (itself an external osc
+    # signature) so treat NaN as passing the Harris gate.
     if (external_enabled
             and is_oscillating
-            and osc_reg >= 0.85
+            and osc_reg >= 0.75
             and metrics.op_activity < op_act_thr * 0.3
-            and not np.isnan(hi) and hi < hi_thr):
+            and (np.isnan(hi) or hi < hi_thr)):
         diag.primary = "External oscillation (upstream / disturbance)"
         diag.severity = "WARN"
         diag.confidence = 75.0
