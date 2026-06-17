@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Valve Diagnostics Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233b82f6'/%3E%3Cpath d='M16 3L5 9v14l11 6 11-6V9L16 3z' stroke='%23fff' stroke-width='2.2' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M16 11v7M12 13.5L16 11l4 2.5' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' fill='none'/%3E%3C/svg%3E"/>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.27.0/plotly.min.js"></script>
 <script>window.__CBV=Date.now();</script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -22,33 +23,33 @@
   --shadow-md:0 4px 16px rgba(15,39,68,.11);
   --shadow-lg:0 8px 32px rgba(15,39,68,.14);
 }
-html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+html{height:100%}body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:11px;line-height:1.4}
 *{font-feature-settings:'zero' 0}
 button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;background:none}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-.topbar{background:#fff;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;border-bottom:3px solid #3b82f6;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.topbar{background:#fff;padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:44px;position:sticky;top:0;z-index:100;border-bottom:3px solid #3b82f6;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 .topbar-left{display:flex;align-items:center;gap:14px}
 .logo{display:flex;align-items:center;gap:10px}
-.logo-hex{width:36px;height:36px;background:#3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-hex{width:28px;height:28px;background:#3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logo-brand{display:flex;flex-direction:column;gap:1px}
-.logo-brand-main{color:#1e3a5f;font-size:15px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;letter-spacing:-.01em;line-height:1}
+.logo-brand-main{color:#1e3a5f;font-size:12px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;letter-spacing:-.01em;line-height:1}
 .logo-brand-main span{color:#3b82f6;font-weight:300}
 .logo-brand-sub{color:#64748b;font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif}
 .topbar-divider{width:1px;height:24px;background:#e2e8f0;flex-shrink:0}
 .run-badge{background:#eff6ff;color:#1d4ed8;font-size:11px;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Mono',monospace;border:1px solid #bfdbfe}
 .topbar-right{display:flex;align-items:center;gap:4px}
 .ts-txt{color:#94a3b8;font-size:11px;font-family:'IBM Plex Mono',monospace;margin-right:6px}
-.btn-icon{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#64748b;cursor:pointer;border:none;background:transparent;transition:all .18s;flex-shrink:0}
+.btn-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#64748b;cursor:pointer;border:none;background:transparent;transition:all .18s;flex-shrink:0}
 .btn-icon:hover{background:#f1f5f9;color:#1e3a5f}
-.btn-upload{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:7px;color:#64748b;transition:all .18s;text-decoration:none;border:none;background:transparent;flex-shrink:0}
+.btn-upload{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;color:#64748b;transition:all .18s;text-decoration:none;border:none;background:transparent;flex-shrink:0}
 .btn-upload:hover{background:#f1f5f9;color:#1e3a5f}
-.btn-settings{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:7px;color:#64748b;transition:all .18s;cursor:pointer;background:transparent;border:none;flex-shrink:0}
+.btn-settings{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;color:#64748b;transition:all .18s;cursor:pointer;background:transparent;border:none;flex-shrink:0}
 .btn-settings:hover{background:#f1f5f9;color:#1e3a5f}
 .topbar-sep{width:1px;height:28px;background:#e2e8f0;margin:0 6px;flex-shrink:0}
 .user-wrap{display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:all .18s}
 .user-wrap:hover{background:#f8fafc;border-color:#e2e8f0}
-.user-avatar{width:32px;height:32px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1d4ed8;flex-shrink:0}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#1d4ed8;flex-shrink:0}
 .user-info{display:flex;flex-direction:column;gap:0}
 .user-welcome{font-size:9px;color:#3b82f6;font-weight:600;text-transform:uppercase;letter-spacing:.06em;line-height:1.2}
 .user-name{font-size:12px;font-weight:600;color:#1e293b;line-height:1.2}
@@ -56,7 +57,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .btn-logout{color:#94a3b8;font-size:11px;padding:4px 6px;border-radius:6px;transition:all .2s;cursor:pointer;text-decoration:none;border:none;background:transparent}
 .btn-logout:hover{background:#f1f5f9;color:#1e3a5f}
 .company-mark{display:flex;flex-direction:column;align-items:flex-end;gap:0;padding-left:6px}
-.company-name{font-size:14px;font-weight:800;color:#1e3a5f;letter-spacing:.01em;line-height:1.1}
+.company-name{font-size:11px;font-weight:800;color:#1e3a5f;letter-spacing:.01em;line-height:1.1}
 .company-tag{font-size:9px;color:#3b82f6;letter-spacing:.08em;text-transform:uppercase;font-weight:600;line-height:1.1}
 .alert-bar{display:none!important}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
@@ -65,10 +66,10 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 /* ══════════════════════════════════════════
    NEW HERO ROW — 4 tiles full width
    ══════════════════════════════════════════ */
-.hero-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:10px;padding:14px 24px 10px;background:var(--bg)}
+.hero-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:8px 18px 6px;background:var(--bg);overflow:hidden}
 
 /* Base hero card — full gradient, vertical layout */
-.hero-card{border-radius:14px;color:#fff;cursor:pointer;transition:transform .18s,box-shadow .18s;position:relative;overflow:hidden;min-height:140px;display:flex;flex-direction:column;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.hero-card{border-radius:10px;color:#fff;cursor:pointer;transition:transform .18s,box-shadow .18s;position:relative;overflow:hidden;min-height:0;min-width:0;display:flex;flex-direction:column;box-shadow:0 4px 18px rgba(0,0,0,.18)}
 .hero-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.22);background:#1a7fd4!important}
 /* decorative circle accent top-right */
 
@@ -76,27 +77,27 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 
 /* Plant Health card */
 .hc-health{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
-.phi-left{flex:0 0 auto;padding:10px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
-.phi-right{flex:1;border-left:1px solid #bfdbfe;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:5px;background:#eff6ff}
+.phi-left{flex:0 0 auto;min-width:0;padding:6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.phi-right{flex:1;border-left:1px solid #bfdbfe;padding:6px 8px;display:flex;flex-direction:column;justify-content:center;gap:2px;background:#eff6ff;overflow:hidden;min-width:0}
 .phi-right-title{font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94a3b8;margin-bottom:2px}
 .phi-status-row{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 0;cursor:pointer;transition:opacity .15s}
 .phi-status-row:hover{opacity:.8;background:rgba(46,134,222,0.10);border-radius:5px}
 .phi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.phi-status-lbl{font-size:10px;color:#475569;flex:1}
-.phi-status-num{font-size:14px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1}
+.phi-status-lbl{font-size:9px;color:#475569;flex:1}
+.phi-status-num{font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1}
 .phi-divider{height:1px;background:#e2e8f0;margin:3px 0}
 .phi-total-row{display:flex;align-items:center;justify-content:space-between;padding:0;color:#64748b;font-size:9px}
 .phi-bar-wrap{margin-top:6px}
 .phi-bar-track{height:4px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
 .phi-bar-fill{height:100%;background:linear-gradient(90deg,rgba(255,255,255,.9),rgba(255,255,255,.6));border-radius:3px;transition:width .6s ease}
-.phi-reason{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 0}
-.phi-reason-lbl{font-size:9px;font-weight:700;color:#334155;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.phi-reason-val{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0f172a;white-space:nowrap}
+.phi-reason{display:flex;align-items:center;gap:4px;padding:2px 0;min-width:0}
+.phi-reason-lbl{font-size:9px;font-weight:700;color:#334155;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.phi-reason-val{display:none}
 .phi-reason-val.crit{color:#fca5a5}
 .phi-reason-val.warn{color:#fde68a}
 .health-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
 .health-icon-circle{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.health-pct{font-size:30px;font-weight:700;line-height:1;font-family:'IBM Plex Sans',sans-serif;color:#0f2744}
+.health-pct{font-size:18px;font-weight:700;line-height:1;font-family:'IBM Plex Sans',sans-serif;color:#0f2744}
 .health-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0f2744}
 /* legacy sl-* */
 .sl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
@@ -107,24 +108,15 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .hc-valve{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
 .hc-tuning{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
 .hc-ops{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
-.hc-prop{background:#dbeafe;border:1px solid #bfdbfe;flex-direction:row;padding:0;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:background .18s}
-.hc-prop .grp-right{background:#eff6ff;border-left:1px solid #bfdbfe}
-.prop-link-row{display:flex;align-items:center;gap:4px;padding:2px 0;border-bottom:1px solid #bfdbfe;cursor:pointer;transition:opacity .15s}
-.prop-link-row:last-child{border-bottom:none}
-.prop-link-row:hover{opacity:.75}
-.prop-src{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0f2744;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62px}
-.prop-tgt{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:#0f2744;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62px}
-.prop-arrow{font-size:9px;color:#2e86de;flex-shrink:0}
-.prop-score{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0f2744;white-space:nowrap;margin-left:auto}
-.prop-lag{font-size:8px;color:#6b7280;white-space:nowrap;margin-left:3px}
-.grp-left{flex:0 0 48%;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px}
-.grp-right{flex:1;border-left:1px solid #bfdbfe;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;background:#eff6ff;overflow:hidden}
-.grp-top-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-.grp-icon-circle{width:36px;height:36px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+
+.grp-left{flex:0 0 38%;min-width:0;padding:4px 6px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.grp-right{flex:1;border-left:1px solid #bfdbfe;padding:4px 6px;display:flex;flex-direction:column;justify-content:center;gap:1px;background:#eff6ff;overflow:hidden;min-width:0}
+.grp-top-row{display:flex;align-items:center;gap:6px;margin-bottom:2px;min-width:0}
+.grp-icon-circle{width:26px;height:26px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
 .grp-icon{font-size:20px;opacity:1}
-.grp-pct{font-size:28px;font-weight:900;line-height:1;font-family:'IBM Plex Sans',sans-serif;color:#0f172a}
-.grp-lbl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#0f2744;opacity:1}
-.grp-prob-row{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:2px 0;cursor:pointer;transition:opacity .15s;border-bottom:1px solid #e2e8f0}
+.grp-pct{font-size:16px;font-weight:900;line-height:1;font-family:'IBM Plex Sans',sans-serif;color:#0f172a}
+.grp-lbl{font-size:8px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#0f2744;opacity:1;white-space:normal;line-height:1.2}
+.grp-prob-row{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:1px 0;cursor:pointer;transition:opacity .15s;border-bottom:1px solid #e2e8f0}
 .grp-prob-row:last-child{border-bottom:none}
 .grp-prob-row:hover{opacity:.8}
 .grp-prob-lbl{font-size:9px;font-weight:700;color:#334155;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -136,8 +128,8 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 /* ══════════════════════════════════════════
    FULL HEATMAP ON OVERVIEW
    ══════════════════════════════════════════ */
-.ov-hm-section{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);box-shadow:var(--shadow);margin:0 24px 14px 24px;overflow:hidden;width:calc(100% - 48px)}
-.ov-hm-toolbar{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border2);flex-wrap:wrap}
+.ov-hm-section{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);box-shadow:var(--shadow);margin:0 18px 10px;overflow:hidden}
+.ov-hm-toolbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border2);flex-wrap:wrap}
 .ov-hm-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
 .ov-unit-pills{display:flex;gap:5px;flex-wrap:wrap;flex:1}
 .ov-up{padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--text2);transition:all .15s;white-space:nowrap}
@@ -151,7 +143,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 /* ══════════════════════════════════════════
    BOTTOM ROW: Actions (left) + Trends (right)
    ══════════════════════════════════════════ */
-.bottom-row{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin:0 24px 20px}
+.bottom-row{display:grid;grid-template-columns:1.25fr minmax(280px,1fr);gap:14px;margin:0 18px 20px}
 
 /* Actions card */
 .act-sec{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden}
@@ -332,9 +324,9 @@ table.et tr:last-child td{border-bottom:none}
 .spin{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .ltxt{font-size:13px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
-.app-body{display:flex;height:calc(100vh - 56px);overflow:hidden}
-.vnav{width:180px;flex-shrink:0;background:#ffffff;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;padding:16px 0;gap:2px;overflow-y:auto}
-.vnav-tab{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:13px;font-weight:500;color:#64748b;cursor:pointer;border-left:3px solid transparent;transition:all .2s;white-space:nowrap;user-select:none}
+.app-body{display:flex;height:calc(100vh - 44px);overflow:hidden}
+.vnav{width:145px;flex-shrink:0;background:#ffffff;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;padding:12px 0;gap:2px;overflow-y:auto}
+.vnav-tab{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:11px;font-weight:500;color:#64748b;cursor:pointer;border-left:3px solid transparent;transition:all .2s;white-space:nowrap;user-select:none}
 .vnav-tab:hover{color:#0f2744;background:#f0f4f8}
 .vnav-tab.active{color:#2e86de;background:#e8f3fd;border-left-color:#2e86de;font-weight:600}
 .vnav-tab.hidden{display:none}
@@ -379,7 +371,7 @@ table.et tr:last-child td{border-bottom:none}
 .mon-mode-btn:hover{color:var(--navy)}
 .mon-mode-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
 .mon-panel{display:none}.mon-panel.active{display:block}
-.tex-wrap{display:flex;height:calc(100vh - 56px - 45px);overflow:hidden}
+.tex-wrap{display:flex;height:calc(100vh - 44px - 45px);overflow:hidden}
 .tex-sidebar{width:280px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
 .tex-sidebar-top{padding:12px;border-bottom:1px solid var(--border2);flex-shrink:0}
 .tex-search{width:100%;padding:7px 10px 7px 30px;border:1px solid var(--border);border-radius:7px;font-size:12px;outline:none;background:var(--bg2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%239ab0c4' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") 9px center no-repeat;color:var(--text)}
@@ -424,8 +416,8 @@ table.et tr:last-child td{border-bottom:none}
 .tex-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text2);cursor:pointer;padding:2px 6px;border-radius:4px;transition:background .15s}
 .tex-legend-item:hover{background:var(--bg2)}
 .tex-legend-dot{width:10px;height:3px;border-radius:2px;flex-shrink:0}
-@media(max-width:1300px){.hero-row{grid-template-columns:1fr 1fr 1fr;}}
-@media(max-width:1100px){.hero-row{grid-template-columns:1fr 1fr;}}
+@media(max-width:1100px){.hero-row{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:800px){.hero-row{grid-template-columns:repeat(2,minmax(0,1fr));}.bottom-row{grid-template-columns:1fr;}}
 @media(max-width:700px){.hero-row{grid-template-columns:1fr}.bottom-row{grid-template-columns:1fr}.topbar{padding:0 16px}.ts-txt{display:none}}
 
 .excl-tbl-hdr{padding:5px 3px;background:#1a7fd4;color:#fff;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;z-index:2;text-align:center;width:65px;max-width:65px;word-break:break-word;white-space:normal;line-height:1.3}
@@ -508,8 +500,8 @@ table.et tr:last-child td{border-bottom:none}
     <!-- 1. Plant Health — split left (score) / right (status) -->
     <div class="hero-card hc-health" onclick="openTileModal('all')">
       <div class="phi-left">
-        <div style="position:relative;width:84px;height:84px;flex-shrink:0">
-          <svg width="84" height="84" viewBox="0 0 84 84" style="transform:rotate(-90deg)">
+        <div style="position:relative;width:52px;height:52px;flex-shrink:0">
+          <svg width="52" height="52" viewBox="0 0 84 84" style="transform:rotate(-90deg)">
             <circle cx="42" cy="42" r="35" fill="none" stroke="#e2e8f0" stroke-width="7"/>
             <circle id="phiRingFill" cx="42" cy="42" r="35" fill="none" stroke="#3b82f6" stroke-width="7"
               stroke-linecap="round"
@@ -518,10 +510,10 @@ table.et tr:last-child td{border-bottom:none}
               style="transition:stroke-dashoffset .8s ease"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
-            <div class="health-pct" id="heroHealth" style="font-size:20px;font-weight:900;line-height:1;color:#0f2744">—</div>
+            <div class="health-pct" id="heroHealth" style="font-size:13px;font-weight:900;line-height:1;color:#0f2744">—</div>
           </div>
         </div>
-        <div class="health-lbl" style="text-align:center;font-size:11px;font-weight:800;color:#0f2744;letter-spacing:.08em">PLANT HEALTH</div>
+        <div class="health-lbl" style="text-align:center;font-size:8px;font-weight:800;color:#0f2744;letter-spacing:.08em">PLANT HEALTH</div>
       </div>
       <div class="phi-right" onclick="event.stopPropagation()">
         <div class="phi-right-title">Loop Status</div>
@@ -543,7 +535,7 @@ table.et tr:last-child td{border-bottom:none}
         <div class="phi-divider"></div>
         <div class="phi-total-row" onclick="openTileModal('all')">
           <span style="font-size:9px;opacity:.55">Total loops</span>
-          <span style="font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;opacity:.8" id="tilTot">—</span>
+          <span style="font-size:10px;font-weight:700;font-family:'IBM Plex Mono',monospace;opacity:.8" id="tilTot">—</span>
         </div>
       </div>
     </div>
@@ -553,9 +545,9 @@ table.et tr:last-child td{border-bottom:none}
       <div class="grp-left">
         <div class="grp-top-row">
           
-          <div><div class="grp-pct" id="heroValvePct">—</div><div class="grp-lbl">Valve Problems</div></div>
+          <div style="min-width:0"><div class="grp-pct" id="heroValvePct">—</div><div class="grp-lbl">Valve Problems</div></div>
         </div>
-        <div id="valveLeft" style="display:flex;flex-direction:column;gap:3px;margin-top:6px"></div>
+        <div id="valveLeft" style="display:flex;flex-direction:column;gap:2px;margin-top:3px"></div>
       </div>
       <div class="grp-right" id="heroValveChips" onclick="event.stopPropagation()"></div>
     </div>
@@ -564,9 +556,9 @@ table.et tr:last-child td{border-bottom:none}
       <div class="grp-left">
         <div class="grp-top-row">
           
-          <div><div class="grp-pct" id="heroTuningPct">—</div><div class="grp-lbl">Tuning Issues</div></div>
+          <div style="min-width:0"><div class="grp-pct" id="heroTuningPct">—</div><div class="grp-lbl">Tuning Issues</div></div>
         </div>
-        <div id="tuningLeft" style="display:flex;flex-direction:column;gap:3px;margin-top:6px"></div>
+        <div id="tuningLeft" style="display:flex;flex-direction:column;gap:2px;margin-top:3px"></div>
       </div>
       <div class="grp-right" id="heroTuningChips" onclick="event.stopPropagation()"></div>
     </div>
@@ -575,22 +567,11 @@ table.et tr:last-child td{border-bottom:none}
       <div class="grp-left">
         <div class="grp-top-row">
           
-          <div><div class="grp-pct" id="heroOpsPct">—</div><div class="grp-lbl">Operational &amp; Signal</div></div>
+          <div style="min-width:0"><div class="grp-pct" id="heroOpsPct">—</div><div class="grp-lbl">Operational &amp; Signal</div></div>
         </div>
-        <div id="opsLeft" style="display:flex;flex-direction:column;gap:3px;margin-top:6px"></div>
+        <div id="opsLeft" style="display:flex;flex-direction:column;gap:2px;margin-top:3px"></div>
       </div>
       <div class="grp-right" id="heroOpsChips" onclick="event.stopPropagation()"></div>
-    </div>
-
-    <!-- 5. Cross-Loop Propagation -->
-    <div class="hero-card hc-prop" id="heroPropCard">
-      <div class="grp-left">
-        <div class="grp-top-row">
-          <div><div class="grp-pct" id="heroPropCount">—</div><div class="grp-lbl">Propagation</div></div>
-        </div>
-        <div id="propLeft" style="display:flex;flex-direction:column;gap:3px;margin-top:6px"></div>
-      </div>
-      <div class="grp-right" id="heroPropLinks" onclick="event.stopPropagation()"></div>
     </div>
 
   </div><!-- end hero-row -->
@@ -973,8 +954,7 @@ function renderHeroGroups(){
         return{label:p.label,count:matched.length,loop:matched[0]};
       }).filter(r=>r.count>0).slice(0,3);
       leftEl.innerHTML=rows.length?rows.map(r=>{
-        const{p,v}=r.loop?diagParam(r.loop):{p:'',v:'—'};
-        return `<div class="phi-reason"><span class="phi-reason-lbl">${r.label} ×${r.count}</span><span class="phi-reason-val">${p}: ${v}</span></div>`;
+        return `<div class="phi-reason"><span class="phi-reason-lbl">${r.label} ×${r.count}</span></div>`;
       }).join(''):'';
     }
     /* right panel: one row per individual problem */
@@ -1036,13 +1016,33 @@ function isTuningGroup(problemId){
 function showProblemModal(problemId,problemLabel){
   const loops=S.loops.filter(l=>(l.diagnosis||'').toLowerCase().includes(problemId.replace(/_/g,' ')));
   const isTuning=isTuningGroup(problemId);
+  const propLinks=S.propagation||[];
   document.getElementById('tmTitle').textContent=`Loops with ${problemLabel}`;
   document.getElementById('tmList').innerHTML=loops.length
-    ?loops.map(l=>{
+    ?loops.map((l,li)=>{
       const tuned=T_RECS[l.loop];
-      const tunedBadge=tuned?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border);flex-shrink:0">✓ Tuned</span>`:'';
+      const tunedBadge=tuned?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border);flex-shrink:0">&#10003; Tuned</span>`:'';
       const tuneBtn=isTuning?`<a href="/tune/${encodeURIComponent(l.loop)}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:var(--warn-bg);color:var(--amber,#b45309);border:1px solid var(--warn-border);text-decoration:none;flex-shrink:0;white-space:nowrap"><svg width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.3'><circle cx='12' cy='12' r='3'/><path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z'/></svg>Tune</a>`:'';
-      return `<div class="mli" onclick="document.getElementById('tileModal').classList.remove('open');openLD('${l.loop.replace(/'/g,"\\'")}')"><span>${badge(sc(l))}</span><div style="flex:1;min-width:0"><div class="mli-nm">${l.loop}</div>${S.uomMap[l.loop]?`<div style="font-size:9px;color:#94a3b8;font-family:'IBM Plex Mono',monospace;margin-top:1px">(${S.uomMap[l.loop]})</div>`:''}<div class="mli-dg">${pdiag(l.diagnosis)}</div></div>${tunedBadge}${tuneBtn}<span style="color:var(--text3);font-size:16px;flex-shrink:0">›</span></div>`;
+      const loopPropLinks=propLinks.map((lk,idx)=>({lk,idx})).filter(({lk})=>lk.source===l.loop||lk.target===l.loop);
+      const propBadge=loopPropLinks.length?`<span title="Show propagation links" onclick="event.stopPropagation();var s=document.getElementById('lps_${li}');if(s)s.style.display=s.style.display==='none'?'block':'none'" style="display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;flex-shrink:0;cursor:pointer">&#128279; Propagation</span>`:'';
+      const propSubSection=loopPropLinks.length
+        ?`<div id="lps_${li}" style="display:none;margin-top:6px;padding:8px 10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px">`+
+          `<div style="font-size:9px;font-weight:700;color:#1d4ed8;letter-spacing:.4px;margin-bottom:5px">&#128279; PROPAGATION LINKS</div>`+
+          loopPropLinks.map(({lk,idx})=>{
+            const src=(lk.source||'').replace(/^YN\.ETH1\./,'');
+            const tgt=(lk.target||'').replace(/^YN\.ETH1\./,'');
+            const score=lk.combined_score!=null?Math.round(lk.combined_score):0;
+            const lag=lk.lag_time||'\u2014';
+            const col=score>=80?'#dc2626':score>=65?'#d97706':'#1a9e5a';
+            return `<div onclick="document.getElementById('tileModal').classList.remove('open');openPropLinkDetail(${idx})" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 9px;cursor:pointer;margin-bottom:4px" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#fff'">`+
+              `<div style="flex:1;min-width:0"><div style="font-size:10px;font-weight:700;color:var(--navy)">${src} &#8594; ${tgt}</div><div style="font-size:9px;color:var(--text3)">Lag: ${lag}</div></div>`+
+              `<div style="font-size:11px;font-weight:800;color:${col}">${score}</div>`+
+              `<span style="color:var(--text3);font-size:13px">&#8250;</span>`+
+              `</div>`;
+          }).join('')+
+          `</div>`
+        :'';
+      return `<div><div class="mli" onclick="document.getElementById('tileModal').classList.remove('open');openLD('${l.loop.replace(/'/g,"\\'")}')"><span>${badge(sc(l))}</span><div style="flex:1;min-width:0"><div class="mli-nm">${l.loop}</div>${S.uomMap[l.loop]?`<div style="font-size:9px;color:#94a3b8;font-family:'IBM Plex Mono',monospace;margin-top:1px">(${S.uomMap[l.loop]})</div>`:''}<div class="mli-dg">${pdiag(l.diagnosis)}</div></div>${tunedBadge}${propBadge}${tuneBtn}<span style="color:var(--text3);font-size:16px;flex-shrink:0">&#8250;</span></div>${propSubSection}</div>`;
     }).join('')
     :'<p style="padding:16px;color:var(--text4);font-style:italic;font-size:12px">No loops affected by this problem</p>';
   document.getElementById('tileModal').classList.add('open');
@@ -1318,6 +1318,7 @@ function ovDrawChart(){
     yaxis2:{overlaying:'y',side:'right',title:{text:'OP %',font:{size:9,color:'#d97706'},standoff:2},tickfont:{size:9,color:'#d97706'},showgrid:false,zeroline:false,range:opRange},
     hovermode:'x unified',
   },OV_CFG);
+  setTimeout(()=>{const el=document.getElementById('ovC_active');if(el&&el.data)Plotly.Plots.resize(el);},100);
 }
 
 async function ovLoadLoop(nm){
@@ -1449,7 +1450,6 @@ function populateAll(data){
   const hA=avg('hagglund_regularity');document.getElementById('ekO').textContent=hA!==null?fN(hA*100,1)+'%':'—';
   /* render all overview sections */
   renderHeroGroups();
-  renderPropTile();
   ovHmInit();
   renderActionsTable();
   /* auto-load first loop from actions table into trends tile */
@@ -1483,35 +1483,7 @@ async function openLD(nm){S.sel=nm;const l=S.loops.find(x=>x.loop===nm)||{};cons
   const tuneBtn=isTuning?`<a href="/tune/${encodeURIComponent(nm)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:700;padding:6px 13px;border-radius:7px;background:var(--warn-bg);color:#b45309;border:1px solid var(--warn-border);text-decoration:none;transition:all .2s" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='var(--warn-bg)'"><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.3'><circle cx='12' cy='12' r='3'/><path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z'/></svg>Tune Controller</a>`:""; 
   document.getElementById('dmGrid').innerHTML=`<div class="dmc ${sev==='critical'?'dc-crit':sev==='poor'?'dc-warn':'dc-ok'}"><div class="dmc-lbl">Health Score</div><div class="dmc-val">${hN!==null?hN+'%':'—'}</div><div class="dmc-sub">${badge(sev)}</div></div><div class="dmc"><div class="dmc-lbl">Service Factor</div><div class="dmc-val">${sfN!==null?sfN+'%':'—'}</div><div class="dmc-sub">% time active in AUTO</div></div><div class="dmc"><div class="dmc-lbl">Harris Index</div><div class="dmc-val">${l.harris_index!=null?Number(l.harris_index).toFixed(3):'—'}</div><div class="dmc-sub">min-variance benchmark</div></div><div class="dmc"><div class="dmc-lbl">Stiction</div><div class="dmc-val" style="font-size:16px;margin-top:6px">${l.stiction_label||'—'}</div><div class="dmc-sub">consensus detection</div></div>`;switchTab('ld');const d=await fetchTS(nm);if(d)drawCharts(d,'d_');}
 
-function renderPropTile(){
-  const links=S.propagation||[];
-  const countEl=document.getElementById('heroPropCount');
-  const leftEl=document.getElementById('propLeft');
-  const rightEl=document.getElementById('heroPropLinks');
-  if(!countEl||!leftEl||!rightEl) return;
-  countEl.textContent=links.length?links.length:'0';
-  // Left: top source loop sub-line matching other tile style
-  const srcCounts2={};
-  links.forEach(l=>{const s=l.source||'';srcCounts2[s]=(srcCounts2[s]||0)+1;});
-  const topSrc=Object.entries(srcCounts2).sort((a,b)=>b[1]-a[1])[0];
-  leftEl.innerHTML=links.length&&topSrc
-    ?`<div class="phi-reason"><span class="phi-reason-lbl">${topSrc[0].replace(/^YN\.ETH1\./,'')} ×${topSrc[1]} downstream</span></div>`
-    :'';
-  // Right: source loops ranked by downstream count only
-  const srcCounts={};
-  links.forEach(l=>{const s=l.source||'';srcCounts[s]=(srcCounts[s]||0)+1;});
-  const topSrcs=Object.entries(srcCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  rightEl.innerHTML=topSrcs.length
-    ?topSrcs.map(([src,cnt])=>{
-        const shortSrc=src.replace(/^YN\.ETH1\./,'');
-        return `<div class="prop-link-row"><span class="prop-src" style="max-width:none;font-size:10px">${shortSrc}</span><span class="prop-score" style="margin-left:auto">×${cnt} downstream</span></div>`;
-      }).join('')+
-      '<div style="display:flex;justify-content:flex-end;margin-top:4px"><div class="grp-arr" onclick="event.stopPropagation();openPropModal()" title="Show all links">→</div></div>'
-    :'<div style="font-size:9px;color:#6b7280;text-align:center;padding:8px 0">No links detected</div>';
-  const srcHtml='';
-  // unused, kept for reference
-  void srcHtml;
-}
+
 
 function openPropModal(){
   const links=S.propagation||[];
@@ -1541,6 +1513,7 @@ function openPropModal(){
 }
 
 function closePropLinkModal(){document.getElementById('propLinkModal').classList.remove('open');}
+function plmResetAxes(){const el=document.getElementById('plmChart');if(el&&el.data)Plotly.relayout('plmChart',{'xaxis.autorange':true,'yaxis.autorange':true,'yaxis2.autorange':true});}
 
 async function openPropLinkDetail(idx){
   const links=S.propagation||[];
@@ -1598,7 +1571,7 @@ async function openPropLinkDetail(idx){
     `<div class="plm-action">⚠️ <strong>Action:</strong> ${actionMsg}${tuneLink?'<br><br>'+tuneLink:''}</div>`+
     // Chart placeholder
     `<div class="plm-chart-wrap">`+
-      `<div class="plm-chart-title">📈 PV Overlay — ${srcShort} vs ${tgtShort}</div>`+
+      `<div class="plm-chart-title" style="display:flex;align-items:center;justify-content:space-between"><span>📈 PV Overlay — ${srcShort} vs ${tgtShort}</span><button class="rst-btn" style="padding:3px 10px;font-size:10px" onclick="plmResetAxes()">↺ Reset</button></div>`+
       `<div id="plmChart" style="width:100%;height:220px"></div>`+
       `<div id="plmChartMsg" style="font-size:10px;color:var(--text4);margin-top:4px">Loading data…</div>`+
     `</div>`;
@@ -1624,6 +1597,7 @@ async function openPropLinkDetail(idx){
     yaxis2:{overlaying:'y',side:'right',showgrid:false,title:tgtShort+' PV',color:'#1a9e5a'},
     legend:{orientation:'h',y:-0.28,font:{size:10}}
   },{responsive:true,displayModeBar:false});
+  setTimeout(()=>{const el=document.getElementById('plmChart');if(el&&el.data)Plotly.Plots.resize(el);},100);
   if(msgEl)msgEl.textContent=lagSamples>0?`Target PV shifted ${lag} earlier to align with source.`:'Loops shown on same time axis (lag ≈ 0).';
 }
 

@@ -694,7 +694,7 @@ def _fmt_num(v, d=2):
 
 
 def _build_results_summary(email: str) -> str:
-    """Compact per-loop summary of the user's latest diagnostic run for the chatbot prompt."""
+    """Comprehensive per-loop summary of the user's latest diagnostic run for the chatbot prompt."""
     rd = _results_dir_for(email)
     if not rd:
         return "The user has NOT run a diagnostic yet. No results are available. Tell them to upload a plant data file on the Upload page first if they ask about results."
@@ -703,45 +703,133 @@ def _build_results_summary(email: str) -> str:
     except Exception as e:
         return f"Results exist but could not be loaded ({e})."
 
-    lines = [f"Run folder: {data.get('run_folder', Path(rd).name)}"]
+    lines = []
 
+    # ── Plant-level summary ───────────────────────────────────────────────────
     plant = data.get("plant") or {}
-    kv = plant.get("kv") if isinstance(plant, dict) else None
-    if isinstance(kv, dict) and kv:
-        plant_bits = ", ".join(f"{k}: {v}" for k, v in list(kv.items())[:8])
-        lines.append(f"Plant summary: {plant_bits}")
+    if isinstance(plant, dict):
+        phi   = plant.get("plant_health_index")
+        total = plant.get("loops_total")
+        ana   = plant.get("loops_analysed")
+        skip  = plant.get("loops_skipped")
+        good  = plant.get("pct_good")
+        poor  = plant.get("pct_poor")
+        crit  = plant.get("pct_critical")
+        ts    = plant.get("run_timestamp", "")
+        intv  = plant.get("sample_interval", "")
+        dur   = plant.get("duration_hours")
+        dcounts = plant.get("diagnosis_counts") or {}
+        if phi is not None:
+            lines.append(f"Plant Health Index: {_fmt_num(phi, 0)}/100")
+        if total:
+            n_good = round((good or 0) * total / 100)
+            n_poor = round((poor or 0) * total / 100)
+            n_crit = round((crit or 0) * total / 100)
+            lines.append(f"Loops: total={total}, analysed={ana}, skipped={skip}, "
+                         f"healthy(>=75)={n_good}, attention(50-74)={n_poor}, critical(<50)={n_crit}")
+        if ts:
+            lines.append(f"Run timestamp: {ts}")
+        if dur:
+            lines.append(f"Data duration: {_fmt_num(dur, 1)} hours, sample interval: {intv}")
+        if dcounts:
+            dc_str = ", ".join(f"{k}: {v}" for k, v in dcounts.items())
+            lines.append(f"Fault distribution: {dc_str}")
 
+    # ── Per-loop details ──────────────────────────────────────────────────────
     loops = data.get("loops") or []
-    lines.append(f"Loops analysed: {len(loops)}")
+    lines.append(f"\nLoops analysed: {len(loops)}")
     for lp in loops:
+        sev      = lp.get('severity') or '-'
+        diag     = lp.get('diagnosis') or '-'
+        is_unhealthy = sev.upper() not in ('OK', 'GOOD', 'HEALTHY', '-')
+
+        # Core metrics — always included
         parts = [
             f"{lp.get('loop', '?')}:",
             f"health={_fmt_num(lp.get('health'), 0)}",
-            f"severity={lp.get('severity') or '-'}",
-            f"diagnosis={lp.get('diagnosis') or '-'}",
+            f"severity={sev}",
+            f"diagnosis={diag}",
+            f"confidence={_fmt_num(lp.get('confidence'), 0)}%",
             f"stiction={lp.get('stiction_label') or '-'}",
             f"service%={_fmt_num(lp.get('service_factor'), 0)}",
             f"IAE/hr={_fmt_num(lp.get('iae_per_hour'))}",
             f"IAEnorm%={_fmt_num(lp.get('iae_per_hour_norm'))}",
             f"harris={_fmt_num(lp.get('harris_index'))}",
+            f"PVamp={_fmt_num(lp.get('pv_amplitude'))}",
             f"OPact={_fmt_num(lp.get('op_activity'))}",
             f"hagglund={_fmt_num(lp.get('hagglund_regularity'))}",
+            f"dom_period={lp.get('dominant_period') or '-'}",
             f"dataQ={lp.get('data_quality_status') or '-'}",
         ]
-        if lp.get("recommended_action"):
+
+        # Data quality issues detail
+        if lp.get('issues'):
+            parts.append(f"dataQ_issues={lp['issues']}")
+
+        # Stiction method scores (from stiction sub-dict merged by reader)
+        stiction = lp.get('stiction') or {}
+        if stiction:
+            parts.append(
+                f"stiction_methods(heuristic={_fmt_num(stiction.get('heuristic'))}"
+                f"/horch={_fmt_num(stiction.get('horch_cc'))}"
+                f"/yamashita={_fmt_num(stiction.get('yamashita'))}"
+                f"/bicoh={_fmt_num(stiction.get('bicoherence'))}"
+                f" S%={_fmt_num(stiction.get('estimated_s'))})"
+            )
+
+        # Data quality detail (from dq sub-dict merged by reader)
+        dq = lp.get('data_quality') or {}
+        if dq and lp.get('data_quality_status', '').upper() != 'OK':
+            parts.append(
+                f"dq_detail(missing%={_fmt_num(dq.get('pct_missing'))}"
+                f" outliers={dq.get('outliers') or 0}"
+                f" frozen={dq.get('frozen') or '-'}"
+                f" quantised={dq.get('quantised') or '-'})"
+            )
+
+        # Recommended action — always
+        if lp.get('recommended_action'):
             parts.append(f"action={lp['recommended_action']}")
+
         lines.append(" ".join(parts))
 
+        # Rationale — only for unhealthy loops (saves tokens)
+        if is_unhealthy and lp.get('rationale'):
+            rationale = lp['rationale'][:300]  # cap at 300 chars
+            lines.append(f"  rationale: {rationale}")
+
+    # ── Maintenance actions ───────────────────────────────────────────────────
+    maintenance = data.get("maintenance") or []
+    if maintenance:
+        lines.append("\nMaintenance priority (loops needing physical attention):")
+        for m in maintenance[:5]:  # top 5 only
+            lines.append(
+                f"  {m.get('loop','?')}: {m.get('diagnosis','-')} "
+                f"severity={m.get('severity','-')} "
+                f"action={m.get('recommended_action','-')}"
+            )
+
+    # ── Propagation ───────────────────────────────────────────────────────────
     prop = data.get("propagation") or []
     if prop:
-        plines = []
+        lines.append("\nCross-loop propagation (oscillation spreading between loops):")
         for p in prop[:10]:
             if isinstance(p, dict):
-                plines.append(" ".join(f"{k}={v}" for k, v in p.items()))
-        if plines:
-            lines.append("Propagation (cross-loop): " + "; ".join(plines))
+                lines.append(
+                    f"  {p.get('source','?')} -> {p.get('target','?')}: "
+                    f"score={_fmt_num(p.get('combined_score'),1)} "
+                    f"lag={p.get('lag_time','-')}min "
+                    f"corr={_fmt_num(p.get('cross_correlation'),3)} "
+                    f"coherence={_fmt_num(p.get('coherence_score'),1)}"
+                )
 
-    return "\n".join(lines)
+    summary = "\n".join(lines)
+    try:
+        debug_path = BASE_DIR / "chatbot_debug_summary.txt"
+        debug_path.write_text(summary, encoding="utf-8")
+    except Exception:
+        pass
+    return summary
 
 
 CHATBOT_ROLE = (

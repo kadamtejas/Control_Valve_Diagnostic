@@ -1,0 +1,44 @@
+Plant Health Index: 48/100
+Loops: total=10, analysed=10, skipped=0, healthy(>=75)=1, attention(50-74)=4, critical(<50)=5
+Run timestamp: 2026-06-16T15:57:59
+Data duration: 24.0 hours, sample interval: 1.0 min
+Fault distribution: Aggressive tuning (oscillation): 3, External oscillation (upstream / disturbance): 2, Healthy: 2, Sluggish tuning: 1, Saturation (valve fully closed): 1, Valve stiction (Possible): 1
+
+Loops analysed: 10
+YN.ETH1.15FC311: health=35 severity=WARN diagnosis=Aggressive tuning (oscillation) confidence=80% stiction=Possible service%=100 IAE/hr=790.87 IAEnorm%=511.80 harris=0.01 PVamp=32.55 OPact=1.70 hagglund=1.00 dom_period=140.0 min dataQ=OK stiction_methods(heuristic=59.50/horch=3.60/yamashita=78.50/bicoh=60.70 S%=0.00) action=Re-tune controller — try lambda tuning or ITAE-optimal PI. Verify in MAN that the oscillation disappears (confirms tuning, not valve).
+  rationale: Sustained oscillation, period ≈ 140.0 min, regularity 1.00. Harris Index 0.01 (threshold 0.30), OP activity 1.70. OP is moving in step with PV — controller is the cause.
+YN.ETH1.15LC094: health=45 severity=WARN diagnosis=Sluggish tuning confidence=75% stiction=Healthy service%=100 IAE/hr=43.19 IAEnorm%=61.70 harris=- PVamp=5.09 OPact=0.10 hagglund=0.44 dom_period=47.0 min dataQ=OK stiction_methods(heuristic=20.10/horch=6.90/yamashita=0.00/bicoh=39.10 S%=0.00) action=Increase controller gain (Kc) or shorten Ti. Verify controller is not in P-only mode by mistake. Consider a step test for re-tuning.
+  rationale: Harris Index nan indicates poor variance reduction; IAE/hr 43 (normalised 61.7%). OP activity is low (0.10) — the controller is too detuned to reject disturbances or follow setpoint changes.
+YN.ETH1.16FC336: health=35 severity=WARN diagnosis=Aggressive tuning (oscillation) confidence=80% stiction=Healthy service%=100 IAE/hr=904.57 IAEnorm%=479.20 harris=0.04 PVamp=49.01 OPact=1.74 hagglund=1.00 dom_period=140.0 min dataQ=OK stiction_methods(heuristic=62.80/horch=3.90/yamashita=35.80/bicoh=0.00 S%=0.00) action=Re-tune controller — try lambda tuning or ITAE-optimal PI. Verify in MAN that the oscillation disappears (confirms tuning, not valve).
+  rationale: Sustained oscillation, period ≈ 140.0 min, regularity 1.00. Harris Index 0.04 (threshold 0.30), OP activity 1.74. OP is moving in step with PV — controller is the cause.
+YN.ETH1.15PC217: health=25 severity=FAIL diagnosis=Saturation (valve fully closed) confidence=92% stiction=Healthy service%=100 IAE/hr=4779.33 IAEnorm%=250.90 harris=- PVamp=34.00 OPact=0.00 hagglund=0.37 dom_period=159.0 min dataQ=OK stiction_methods(heuristic=31.60/horch=0.00/yamashita=0.00/bicoh=33.70 S%=0.00) action=Re-evaluate valve sizing. If shut for long periods, check seat tightness (passing valve) on next opportunity.
+  rationale: OP at <2% for 100% of the time. Valve sized for very different duty, or process load changed.
+YN.ETH1.15FC315: health=35 severity=WARN diagnosis=Aggressive tuning (oscillation) confidence=80% stiction=Possible service%=100 IAE/hr=1691.86 IAEnorm%=365.20 harris=0.01 PVamp=75.14 OPact=1.75 hagglund=1.00 dom_period=140.0 min dataQ=OK stiction_methods(heuristic=67.50/horch=3.70/yamashita=80.60/bicoh=60.40 S%=0.00) action=Re-tune controller — try lambda tuning or ITAE-optimal PI. Verify in MAN that the oscillation disappears (confirms tuning, not valve).
+  rationale: Sustained oscillation, period ≈ 140.0 min, regularity 1.00. Harris Index 0.01 (threshold 0.30), OP activity 1.75. OP is moving in step with PV — controller is the cause.
+YN.ETH1.17FC347: health=50 severity=WARN diagnosis=External oscillation (upstream / disturbance) confidence=75% stiction=Healthy service%=100 IAE/hr=274.80 IAEnorm%=1019.00 harris=0.01 PVamp=11.27 OPact=0.19 hagglund=0.82 dom_period=133.0 min dataQ=OK stiction_methods(heuristic=31.70/horch=17.40/yamashita=35.30/bicoh=49.10 S%=0.00) action=Trace the disturbance source via the Propagation sheet. Look for upstream loops oscillating at the same period. Fixing this loop's tuning will not help.
+  rationale: PV oscillates regularly (period ≈ 133.0 min, regularity 0.82, Harris 0.01) but OP activity is small (0.19). Controller is not the source — disturbance is propagating in from upstream.
+YN.ETH1.15FC316: health=51 severity=WARN diagnosis=Valve stiction (Possible) confidence=49% stiction=Possible service%=100 IAE/hr=62.37 IAEnorm%=9.80 harris=0.98 PVamp=103.91 OPact=0.30 hagglund=0.51 dom_period=18.0 min dataQ=OK stiction_methods(heuristic=38.20/horch=2.70/yamashita=83.80/bicoh=75.40 S%=1.78) action=Schedule valve service: clean stem/packing, check actuator, calibrate positioner. If positioner is older PP/I-P, consider digital upgrade.
+  rationale: Stiction consensus score 49/100 from 2 of 4 methods. Estimated S = 1.78% OP, J = 1.64% OP. PV-OP shape: parallelogram.
+YN.ETH1.15FFC317: health=50 severity=WARN diagnosis=External oscillation (upstream / disturbance) confidence=75% stiction=Possible service%=100 IAE/hr=197.09 IAEnorm%=236.30 harris=- PVamp=12.15 OPact=0.02 hagglund=0.99 dom_period=140.0 min dataQ=OK stiction_methods(heuristic=21.90/horch=100.00/yamashita=41.50/bicoh=39.10 S%=0.00) action=Trace the disturbance source via the Propagation sheet. Look for upstream loops oscillating at the same period. Fixing this loop's tuning will not help.
+  rationale: PV oscillates regularly (period ≈ 140.0 min, regularity 0.99, Harris nan) but OP activity is small (0.02). Controller is not the source — disturbance is propagating in from upstream.
+YN.ETH1.15LC095: health=85 severity=OK diagnosis=Healthy confidence=90% stiction=Possible service%=100 IAE/hr=5.59 IAEnorm%=7.50 harris=- PVamp=0.87 OPact=0.08 hagglund=0.45 dom_period=26.0 min dataQ=OK stiction_methods(heuristic=14.80/horch=100.00/yamashita=41.30/bicoh=30.80 S%=0.01) action=Continue routine monitoring.
+YN.ETH1.15FC901: health=65 severity=OK diagnosis=Healthy confidence=90% stiction=Possible service%=100 IAE/hr=32.20 IAEnorm%=61.90 harris=0.61 PVamp=5.27 OPact=0.68 hagglund=0.54 dom_period=8.0 min dataQ=WARN dataQ_issues=1.2% outliers (|robust-z|>6) stiction_methods(heuristic=28.60/horch=100.00/yamashita=81.10/bicoh=44.10 S%=0.00) dq_detail(missing%=0.00 outliers=17 frozen=- quantised=-) action=Continue routine monitoring.
+
+Maintenance priority (loops needing physical attention):
+  YN.ETH1.15PC217: Saturation (valve fully closed) severity=FAIL action=Re-evaluate valve sizing. If shut for long periods, check seat tightness (passing valve) on next opportunity.
+  YN.ETH1.15FC311: Aggressive tuning (oscillation) severity=WARN action=Re-tune controller — try lambda tuning or ITAE-optimal PI. Verify in MAN that the oscillation disappears (confirms tuning, not valve).
+  YN.ETH1.16FC336: Aggressive tuning (oscillation) severity=WARN action=Re-tune controller — try lambda tuning or ITAE-optimal PI. Verify in MAN that the oscillation disappears (confirms tuning, not valve).
+  YN.ETH1.15FC315: Aggressive tuning (oscillation) severity=WARN action=Re-tune controller — try lambda tuning or ITAE-optimal PI. Verify in MAN that the oscillation disappears (confirms tuning, not valve).
+  YN.ETH1.15LC094: Sluggish tuning severity=WARN action=Increase controller gain (Kc) or shorten Ti. Verify controller is not in P-only mode by mistake. Consider a step test for re-tuning.
+
+Cross-loop propagation (oscillation spreading between loops):
+  YN.ETH1.15FC311 -> YN.ETH1.17FC347: score=98.0 lag=9.0 minmin corr=0.997 coherence=93.8
+  YN.ETH1.15FC311 -> YN.ETH1.16FC336: score=96.4 lag=0.0 minmin corr=0.974 coherence=91.5
+  YN.ETH1.15FC311 -> YN.ETH1.15FC315: score=95.9 lag=0.0 minmin corr=0.992 coherence=87.4
+  YN.ETH1.16FC336 -> YN.ETH1.17FC347: score=95.3 lag=9.0 minmin corr=0.975 coherence=87.7
+  YN.ETH1.15FC315 -> YN.ETH1.17FC347: score=95.0 lag=9.0 minmin corr=0.993 coherence=84.2
+  YN.ETH1.16FC336 -> YN.ETH1.15FC315: score=94.2 lag=0.0 minmin corr=0.975 coherence=84.1
+  YN.ETH1.17FC347 -> YN.ETH1.15FFC317: score=86.6 lag=10.0 minmin corr=0.968 coherence=59.6
+  YN.ETH1.15FC311 -> YN.ETH1.15FFC317: score=86.3 lag=19.0 minmin corr=0.966 coherence=59.3
+  YN.ETH1.15FC315 -> YN.ETH1.15FFC317: score=85.7 lag=19.0 minmin corr=0.969 coherence=56.5
+  YN.ETH1.15LC094 -> YN.ETH1.15LC095: score=66.8 lag=0.0 minmin corr=-0.496 coherence=56.4

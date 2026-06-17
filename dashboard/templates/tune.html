@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Tuning Tool — {{ loop_name }}</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233b82f6'/%3E%3Cpath d='M16 3L5 9v14l11 6 11-6V9L16 3z' stroke='%23fff' stroke-width='2.2' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M16 11v7M12 13.5L16 11l4 2.5' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' fill='none'/%3E%3C/svg%3E"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
@@ -494,14 +495,55 @@ function identify(pv, op, sp){
     return ac/v;
   }
 
-  // ── 1. θ — dead time via cross-correlation peak ────────────────────────
-  const m_op=mn(op),m_pv=mn(pv);
-  const denom=Math.sqrt(op.reduce((s,x)=>s+(x-m_op)**2,0)*pv.reduce((s,x)=>s+(x-m_pv)**2,0))||1;
-  const xcorr=[];
-  for(let lag=0;lag<Math.min(30,Math.floor(N/4));lag++){
-    let cc=0;for(let i=0;i<N-lag;i++)cc+=(op[i]-m_op)*(pv[i+lag]-m_pv);xcorr.push(cc/denom);
+  // ── 0. STEP DETECTION — find OP steps (used by θ, K, τ, SOPDT) ─────────
+  // Adaptive threshold: scales with OP variability so sluggish loops
+  // (tiny OP movements) are not penalised by a hardcoded 3% threshold.
+  const op_std_val=std(op);
+  const stepThr=Math.max(Math.min(3, 2*op_std_val), 0.5);
+  const steps=[];
+  for(let i=2;i<op.length-2;i++){
+    const dop=op[i]-op[i-1];
+    if(Math.abs(dop)>=stepThr){
+      const prevStd=std(op.slice(Math.max(0,i-5),i));
+      if(prevStd<stepThr*0.5) steps.push({idx:i,dop});
+    }
   }
-  const theta=Math.max(0.5, xcorr.indexOf(Math.max(...xcorr)));
+
+  // ── 1. θ — dead time ────────────────────────────────────────────────
+  // Step-based: for each detected OP step, find how many samples until PV
+  // first moves outside its pre-step noise band — the direct definition of
+  // apparent dead time. Falls back to cross-correlation peak when no steps
+  // are available (no excitation in the data).
+  function estimateThetaFromSteps(stepsArr){
+    const deltas=[];
+    stepsArr.forEach(({idx,dop})=>{
+      const pre=pv.slice(Math.max(0,idx-10),idx);
+      if(pre.length<3) return;
+      const pvBefore=mn(pre);
+      const noise=std(pre);
+      const thr=Math.max(3*noise, 0.05);
+      const winLen=Math.min(80,Math.floor(N/6));
+      const endIdx=Math.min(N-1,idx+winLen);
+      for(let j=idx;j<endIdx;j++){
+        const dev=pv[j]-pvBefore;
+        if((dop>0&&dev>=thr)||(dop<0&&dev<=-thr)){deltas.push(j-idx);break;}
+      }
+    });
+    return deltas.length?Math.max(0.5,med(deltas)):null;
+  }
+  let theta;
+  const theta_step=estimateThetaFromSteps(steps);
+  if(theta_step!==null){
+    theta=theta_step;
+  } else {
+    const m_op=mn(op),m_pv=mn(pv);
+    const denom=Math.sqrt(op.reduce((s,x)=>s+(x-m_op)**2,0)*pv.reduce((s,x)=>s+(x-m_pv)**2,0))||1;
+    const xcorr=[];
+    for(let lag=0;lag<Math.min(30,Math.floor(N/4));lag++){
+      let cc=0;for(let i=0;i<N-lag;i++)cc+=(op[i]-m_op)*(pv[i+lag]-m_pv);xcorr.push(cc/denom);
+    }
+    theta=Math.max(0.5, xcorr.indexOf(Math.max(...xcorr)));
+  }
 
   // ── 2. Tu — oscillation period from error ACF ─────────────────────────
   const err=pv.map((v,i)=>v-sp[i]);
@@ -619,19 +661,8 @@ function identify(pv, op, sp){
 
   // ── 4. K — process gain ───────────────────────────────────────────────
   // Method A: step-based ΔPV/ΔOP (most accurate)
-  // Adaptive threshold: scales with OP variability so sluggish loops
-  // (tiny OP movements) are not penalised by a hardcoded 3% threshold.
-  const op_std_val=std(op);
-  const stepThr=Math.max(Math.min(3, 2*op_std_val), 0.5);
+  // (steps[] computed earlier alongside θ)
   let K=null, K_method='ols';
-  const steps=[];
-  for(let i=2;i<op.length-2;i++){
-    const dop=op[i]-op[i-1];
-    if(Math.abs(dop)>=stepThr){
-      const prevStd=std(op.slice(Math.max(0,i-5),i));
-      if(prevStd<stepThr*0.5) steps.push({idx:i,dop});
-    }
-  }
   if(steps.length>=2){
     const gains=[];
     steps.forEach(({idx,dop})=>{
