@@ -113,7 +113,7 @@ class PropagationLink:
 
 def propagation_analysis(loop_data: dict, df: pd.DataFrame, tc: TimeContext,
                          unit_mapping: dict, config: dict,
-                         selection=None) -> list:
+                         selection=None, saturated_loops: set = None) -> list:
     """
     Compute pairwise propagation indicators between all loops.
 
@@ -140,8 +140,12 @@ def propagation_analysis(loop_data: dict, df: pd.DataFrame, tc: TimeContext,
             pv_dict[n] = pv[finite]
 
     # All-pairs (we no longer use a topology filter)
+    # Exclude saturating loops as targets — their PV is uncontrolled and
+    # will spuriously correlate with anything else drifting in the plant.
+    _sat = saturated_loops or set()
     pairs = [(a, b) for i, a in enumerate(names) for b in names[i + 1:]
-             if a in pv_dict and b in pv_dict]
+             if a in pv_dict and b in pv_dict
+             and a not in _sat and b not in _sat]
 
     fs = 1.0 / max(tc.dt_seconds, 1e-6)
     max_lag = int(safe_float(config.get("MAX_LAG_SAMPLES", 50)))

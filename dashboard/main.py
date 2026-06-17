@@ -825,7 +825,7 @@ def _build_results_summary(email: str) -> str:
 
     summary = "\n".join(lines)
     try:
-        debug_path = BASE_DIR / "chatbot_debug_summary.txt"
+        debug_path = Path(rd) / "chatbot_debug_summary.txt"
         debug_path.write_text(summary, encoding="utf-8")
     except Exception:
         pass

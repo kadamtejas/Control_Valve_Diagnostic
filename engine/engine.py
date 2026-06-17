@@ -148,7 +148,15 @@ def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True) -> d
     # ── propagation ──
     if capabilities.can_propagation and selection.cross_loop_propagation:
         try:
-            links = propagation_analysis(loops, df, tc, unit_mapping, config, selection)
+            # Exclude saturating loops — their PV is uncontrolled and produces
+            # spurious cross-correlations with any other drifting loop.
+            saturated_loops = {
+                name for name, data in per_loop.items()
+                if data.get("diagnosis") and
+                "saturation" in (data["diagnosis"].primary or "").lower()
+            }
+            links = propagation_analysis(loops, df, tc, unit_mapping, config, selection,
+                                         saturated_loops=saturated_loops)
             logger.info(f"Propagation: {len(links)} significant links")
         except Exception as e:
             logger.error(f"Propagation analysis failed: {e}", exc_info=True)

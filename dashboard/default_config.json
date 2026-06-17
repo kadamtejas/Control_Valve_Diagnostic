@@ -5,7 +5,7 @@
     {"parameter": "IAE_PER_HOUR_THRESHOLD", "value": 200, "description": "IAE/hour threshold for 'poor tracking'"},
     {"parameter": "STICT_CONF_HIGH", "value": 70, "description": "Stiction confidence (%) considered HIGH"},
     {"parameter": "STICT_CONF_MED", "value": 40, "description": "Stiction confidence (%) considered MEDIUM"},
-    {"parameter": "PROP_CONF_MIN", "value": 50, "description": "Min propagation confidence (%) to log a link"},
+    {"parameter": "PROP_CONF_MIN", "value": 60, "description": "Min propagation confidence (%) to log a link"},
     {"parameter": "PROP_CONF_STRONG", "value": 70, "description": "Propagation confidence (%) considered STRONG"},
     {"parameter": "SERVICE_FACTOR_MIN_PCT", "value": 70, "description": "Min % time in AUTO/CAS for loop to be analysed"},
     {"parameter": "SS_DETECTION_WINDOW", "value": 30, "description": "Window size (samples) for steady-state detection"},

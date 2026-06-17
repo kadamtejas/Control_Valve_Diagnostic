@@ -137,7 +137,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .ov-up.active{background:var(--navy);color:#fff;border-color:var(--navy)}
 .ov-hm-legend{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text3);flex-shrink:0}
 .ov-hm-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
-.ov-hm-scroll{overflow-x:auto;padding:10px 16px 14px;display:flex;justify-content:center;align-items:flex-start}
+.ov-hm-scroll{overflow-x:auto;padding:10px 0 14px;display:block}
 /* reuse existing hm-tbl / hm-cell / hm-row-lbl / hm-unit-hdr / hm-col-lbl classes from tech page */
 
 /* ══════════════════════════════════════════
@@ -347,14 +347,14 @@ table.et tr:last-child td{border-bottom:none}
 .sb-ok{background:transparent;color:var(--ok);border:1px solid transparent}
 .sb-warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
 .sb-crit{background:var(--crit-bg);color:var(--crit);border:1px solid var(--crit-border)}
-.hm-tbl{border-collapse:separate;border-spacing:3px;font-size:11px;table-layout:auto}
-.hm-tbl th.hm-row-lbl{text-align:right;padding:4px 12px 4px 4px;font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;min-width:140px;position:sticky;left:0;background:var(--surface);z-index:2}
+.hm-tbl{border-collapse:separate;border-spacing:3px;font-size:11px;table-layout:auto;width:max-content}
+.hm-tbl th.hm-row-lbl{text-align:right;padding:4px 12px 4px 4px;font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;min-width:140px;position:sticky;left:-3px;background:var(--surface);z-index:10;box-shadow:6px 0 0 0 var(--surface),10px 0 8px -4px rgba(15,39,68,.1)}
 .hm-unit-hdr{background:#dbeafe;color:#1e40af;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:8px 4px;border-radius:0;border:1px solid #bfdbfe}
 .hm-tbl th.hm-col-lbl{font-size:9px;font-weight:600;color:var(--text2);padding:3px 2px;white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg);height:90px;vertical-align:bottom;max-width:24px;cursor:default;background:var(--surface)}
 .hm-cell{padding:5px 8px;border-radius:4px;text-align:center;font-size:10px;font-weight:700;color:#1e3a2f;white-space:nowrap;cursor:pointer;width:72px;transition:filter .15s,transform .15s}
 .hm-cell:hover{filter:brightness(1.12);transform:scale(1.06);z-index:10;position:relative}
 .hm-cell.hm-ok{background:#bfdbfe;color:#1e3a5f}.hm-cell.hm-warn{background:#fcd34d}.hm-cell.hm-crit{background:#fca5a5}.hm-cell.hm-na{background:#e2e8f0;color:#6b8299}.hm-cell.hm-dash{background:#f1f5f9;color:#9ca3af}
-#hmTip{display:none;position:fixed;z-index:9999;background:#0f2744;color:#e8f3fd;font-size:12px;font-family:'IBM Plex Sans',sans-serif;padding:12px 16px;border-radius:10px;width:260px;pointer-events:none;box-shadow:0 8px 32px rgba(15,39,68,.3);border:1px solid rgba(255,255,255,.12)}
+.hm-tbl thead th.hm-row-lbl{z-index:11!important}#hmTip{display:none;position:fixed;z-index:9999;background:#0f2744;color:#e8f3fd;font-size:12px;font-family:'IBM Plex Sans',sans-serif;padding:12px 16px;border-radius:10px;width:260px;pointer-events:none;box-shadow:0 8px 32px rgba(15,39,68,.3);border:1px solid rgba(255,255,255,.12)}
 #hmTip .ht-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7fd3ff;margin-bottom:6px;word-break:break-all}
 #hmTip .ht-kpi{font-weight:700;font-size:13px;margin-bottom:4px}
 #hmTip .ht-val{font-size:12px;margin-bottom:4px}
@@ -981,8 +981,8 @@ function openGroupModal(groupId){
   document.getElementById('grpModalIcon').style.background=grp.color+'22';
   document.getElementById('grpModalTitle').textContent=grp.label;
   const body=document.getElementById('grpModalBody');
-  body.innerHTML=grp.problems.filter(p=>S.loops.filter(l=>(l.diagnosis||"").toLowerCase().includes(p.id.replace(/_/g," "))).length>0).map(p=>{
-    const matched=S.loops.filter(l=>(l.diagnosis||'').toLowerCase().includes(p.id.replace(/_/g,' ')));
+  body.innerHTML=grp.problems.filter(p=>S.loops.filter(l=>diagMatchesProblem(l,p.id)).length>0).map(p=>{
+    const matched=S.loops.filter(l=>diagMatchesProblem(l,p.id));
     const count=matched.length;
     const pct=total>0?Math.round((count/total)*100):0;
     let col='#1a9e5a';if(pct>=40)col='#dc2626';else if(pct>=20)col='#d97706';
@@ -1008,13 +1008,22 @@ async function loadTuningRecs(){
   }catch{}
 }
 
+function diagMatchesProblem(l,pid){
+  const d=(l.diagnosis||'').toLowerCase();
+  const sf=parseFloat(l.service_factor);
+  if(pid==='loop_manual') return d.includes('loop in man')||d.includes('loop manual')||(sf!=null&&!isNaN(sf)&&sf<70&&d.includes('man'));
+  if(pid==='valve_stuck') return d.includes('valve stuck')||d.includes('unresponsive');
+  if(pid==='sensor_issue') return d.includes('sensor issue')||d.includes('frozen')||d.includes('sensor noise');
+  if(pid==='data_quality') return d.includes('data quality')||d.includes('compression');
+  return d.includes(pid.replace(/_/g,' '));
+}
 function isTuningGroup(problemId){
   const TUNING_PROBS=['aggressive_tuning','sluggish_tuning','unresponsive'];
   return TUNING_PROBS.includes(problemId);
 }
 
 function showProblemModal(problemId,problemLabel){
-  const loops=S.loops.filter(l=>(l.diagnosis||'').toLowerCase().includes(problemId.replace(/_/g,' ')));
+  const loops=S.loops.filter(l=>diagMatchesProblem(l,problemId));
   const isTuning=isTuningGroup(problemId);
   const propLinks=S.propagation||[];
   document.getElementById('tmTitle').textContent=`Loops with ${problemLabel}`;
@@ -1055,7 +1064,7 @@ function renderActionsTable(){
   const lbl=document.getElementById('actFilterLabel');
   let loops=S.loops.filter(l=>sc(l)!=='good');
   if(S.problemFilter){
-    loops=loops.filter(l=>(l.diagnosis||'').toLowerCase().includes(S.problemFilter.replace(/_/g,' ')));
+    loops=loops.filter(l=>diagMatchesProblem(l,S.problemFilter));
     btn.style.display='inline-flex';lbl.textContent='Filtered: '+S.problemFilter.replace(/_/g,' ');
   } else if(S.groupFilter&&S.groupFilter.length){
     loops=loops.filter(l=>S.groupFilter.some(pid=>(l.diagnosis||'').toLowerCase().includes(pid)));
@@ -1463,7 +1472,7 @@ function populateAll(data){
 /* ══════════════════════════════════════════════════════
    SHARED: fetchTS, normTs, drawCharts, Plotly
    ══════════════════════════════════════════════════════ */
-const PL={margin:{t:10,r:10,b:36,l:46},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(240,244,248,0.5)',font:{family:"'IBM Plex Mono',monospace",size:10,color:'#6b8299'},xaxis:{gridcolor:'#e8eef4',linecolor:'#d8e2ec',zeroline:false,automargin:true},yaxis:{gridcolor:'#e8eef4',linecolor:'#d8e2ec',zeroline:false,automargin:true},legend:{orientation:'h',y:-0.22,font:{size:10}},hoverlabel:{bgcolor:'#0f2744',font:{color:'#fff',size:11}}};
+const PL={margin:{t:10,r:72,b:36,l:46},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(240,244,248,0.5)',font:{family:"'IBM Plex Mono',monospace",size:10,color:'#6b8299'},xaxis:{gridcolor:'#e8eef4',linecolor:'#d8e2ec',zeroline:false,automargin:true},yaxis:{gridcolor:'#e8eef4',linecolor:'#d8e2ec',zeroline:false,automargin:true},legend:{orientation:'h',y:-0.22,font:{size:10}},hoverlabel:{bgcolor:'#0f2744',font:{color:'#fff',size:11}}};
 const CFG={responsive:true,displayModeBar:false};
 async function fetchTS(nm){if(S.tsCache[nm])return S.tsCache[nm];try{const r=await fetch('/api/timeseries/'+encodeURIComponent(nm));if(!r.ok)return null;const d=await r.json();S.tsCache[nm]=d;return d;}catch{return null;}}
 function normTs(raw){if(!raw||!raw.length)return raw;const first=raw[0];if(typeof first==='string'){const n=Number(first);if(!isNaN(n)&&n>1e12)return raw.map(t=>new Date(Number(t)).toISOString().replace('T',' ').slice(0,19));if(!isNaN(n)&&n>1e9)return raw.map(t=>new Date(Number(t)*1000).toISOString().replace('T',' ').slice(0,19));if(!isNaN(n)&&n>30000)return raw.map(t=>new Date((Number(t)-25569)*86400000).toISOString().replace('T',' ').slice(0,19));return raw.map(t=>t?String(t).replace('T',' ').slice(0,19):null);}if(first>1e12)return raw.map(t=>new Date(t).toISOString().replace('T',' ').slice(0,19));if(first>1e9)return raw.map(t=>new Date(t*1000).toISOString().replace('T',' ').slice(0,19));if(first>30000)return raw.map(t=>new Date((t-25569)*86400000).toISOString().replace('T',' ').slice(0,19));const base=Date.now()-first*1000;return raw.map(t=>new Date(base+t*1000).toISOString().replace('T',' ').slice(0,19));}
@@ -1592,9 +1601,9 @@ async function openPropLinkDetail(idx){
     {x:ts,y:pvSrc,name:srcShort+' PV',line:{color:'#2e86de',width:2},type:'scatter',mode:'lines'},
     {x:ts,y:pvTgtAligned,name:tgtShort+' PV (lag-aligned)',line:{color:'#1a9e5a',width:2,dash:'dot'},type:'scatter',mode:'lines',yaxis:'y2'}
   ],{
-    ...PL,height:220,
-    yaxis:{...PL.yaxis,title:srcShort+' PV'},
-    yaxis2:{overlaying:'y',side:'right',showgrid:false,title:tgtShort+' PV',color:'#1a9e5a'},
+    ...PL,height:220,margin:{...PL.margin,r:80},
+    yaxis:{...PL.yaxis,title:{text:srcShort+' PV',font:{size:9,color:'#2e86de'},standoff:4},tickfont:{size:9,color:'#2e86de'}},
+    yaxis2:{overlaying:'y',side:'right',showgrid:false,title:{text:tgtShort+' PV',font:{size:9,color:'#1a9e5a'},standoff:8},tickfont:{size:9,color:'#1a9e5a'},zeroline:false},
     legend:{orientation:'h',y:-0.28,font:{size:10}}
   },{responsive:true,displayModeBar:false});
   setTimeout(()=>{const el=document.getElementById('plmChart');if(el&&el.data)Plotly.Plots.resize(el);},100);
