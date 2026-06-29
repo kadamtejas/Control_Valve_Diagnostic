@@ -145,11 +145,23 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 /* ── HOLD-OUT ── */
 .ho-run-btn{padding:6px 14px;background:var(--blue);color:#fff;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:background .2s}
 .ho-run-btn:hover{background:var(--navy)}
+.ho-auto-btn{padding:4px 9px;background:var(--bg2);color:var(--blue);border:1px solid var(--blue);border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:all .2s;white-space:nowrap}
+.ho-auto-btn:hover{background:var(--blue);color:#fff}
+.ho-auto-btn:disabled{opacity:.45;cursor:not-allowed}
 .ai-agent-btn{display:flex;align-items:center;gap:6px;padding:7px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:all .2s;margin-top:10px;width:100%}
 .ai-agent-btn:hover{background:linear-gradient(135deg,#4f46e5,#7c3aed);transform:translateY(-1px)}
 .ai-agent-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .agent-report{margin-top:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;font-size:12px;line-height:1.7;color:var(--text2);display:none;white-space:pre-wrap;font-family:'IBM Plex Sans',sans-serif}
 .agent-report.visible{display:block}
+.agent-modal-overlay{display:none;position:fixed;inset:0;z-index:600;pointer-events:none}
+.agent-modal-overlay.open{display:block;pointer-events:auto}
+.agent-modal{background:var(--bg1,#fff);border-radius:10px;width:min(640px,92vw);max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.22);position:fixed;top:10vh;left:50%;transform:translateX(-50%);z-index:601}
+.agent-modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:grab;user-select:none}
+.agent-modal-header:active{cursor:grabbing}
+.agent-modal-title{font-size:13px;font-weight:700;color:var(--navy,#1b3a5c);font-family:'IBM Plex Sans',sans-serif}
+.agent-modal-close{background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;padding:2px 6px;border-radius:4px;}
+.agent-modal-close:hover{background:var(--bg2)}
+.agent-modal-body{padding:18px;overflow-y:auto;font-size:12px;line-height:1.7;color:var(--text2);white-space:pre-wrap;font-family:'IBM Plex Sans',sans-serif}
 .agent-spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .ho-bar-wrap{display:flex;align-items:center;gap:8px;margin:8px 0}
@@ -344,6 +356,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
             <div id="splitInputWrap" style="display:none;align-items:center;gap:6px;font-size:11px;color:var(--text2)">
               Train % <input id="hvSplitPct" type="number" oninput="document.getElementById('hvValPct').textContent=100-(+this.value||50)" min="20" max="80" value="60" step="5" style="width:50px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg2);color:var(--text);font-size:11px;font-family:'IBM Plex Sans',sans-serif;font-weight:600"/>
               / <span id="hvValPct">40</span>% validate
+              <button class="ho-auto-btn" id="hoAutoBtn" onclick="runSweep()" title="Run 4 splits (40/50/60/70% train) and show consensus K confidence">&#9889; Sweep</button>
             </div>
           </div>
           <div id="ho-results" style="display:none;margin-top:12px">
@@ -366,6 +379,13 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
               <span style="font-size:9px;font-family:'IBM Plex Sans',sans-serif;width:28px;text-align:right;flex-shrink:0" id="ho-diff-pct">—</span>
             </div>
             <div class="ho-verdict" id="ho-verdict"></div>
+            <div id="ho-sweep-result" style="display:none;margin-top:10px">
+              <div id="ho-sweep-verdict"></div>
+              <div id="ho-sweep-toggle" onclick="toggleSweepDetails()" style="margin-top:8px;font-size:10px;font-weight:600;color:var(--blue);cursor:pointer;user-select:none">&#9660; Show split details</div>
+              <div id="ho-sweep-details" style="display:none;margin-top:8px">
+                <table id="ho-sweep-tbl" style="width:100%;border-collapse:collapse"></table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -440,7 +460,6 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
         <span id="agentBtnTxt">AI Tuning Analysis</span>
       </button>
-      <div class="agent-report" id="agentReport"></div>
     </div>
 
     <!-- Right: Engineer Notes + Accept & Save -->
@@ -572,14 +591,61 @@ function identify(pv, op, sp){
 
   // ── 3. LEVEL — integrating process, separate tuning formula ───────────
   if(lt==='level'){
-    // Ki = slope of dPV/dt vs OP deviation
+    // ── A. Try to extract Ki from open-loop ramp segments in historian data ──
+    // A ramp segment = OP holds steady (±1%) for ≥5 samples while PV ramps
+    let Ki_openloop=null;
+    (function detectOpenLoopRamp(){
+      const MIN_SEG=5;           // minimum consecutive samples for a valid ramp
+      const OP_STABLE_TOL=1.0;   // OP must not move more than ±1% within segment
+      const MIN_OP_STEP=3.0;     // OP level must differ from pre-segment by ≥3%
+      const MIN_RAMP_RATE=0.005; // PV must ramp at least 0.005 %/sample
+      const ramps=[];
+      let i=1;
+      while(i<N-MIN_SEG){
+        // find where OP makes a step (change > MIN_OP_STEP)
+        const dop=op[i]-op[i-1];
+        if(Math.abs(dop)<MIN_OP_STEP){i++;continue;}
+        const opLevel=op[i];
+        // walk forward collecting samples where OP stays stable
+        let j=i;
+        while(j<N && Math.abs(op[j]-opLevel)<=OP_STABLE_TOL) j++;
+        const segLen=j-i;
+        if(segLen>=MIN_SEG){
+          const pvSeg=pv.slice(i,j);
+          // fit linear ramp to pvSeg via least-squares slope
+          const xs=pvSeg.map((_,k)=>k);
+          const xm=mn(xs); const ym=mn(pvSeg);
+          const num=xs.reduce((s,x,k)=>s+(x-xm)*(pvSeg[k]-ym),0);
+          const den=xs.reduce((s,x)=>s+(x-xm)**2,0)||1;
+          const slope=num/den; // PV units per sample (per minute)
+          if(Math.abs(slope)>=MIN_RAMP_RATE){
+            // Ki = ramp_rate / delta_OP
+            ramps.push(Math.abs(slope/dop));
+          }
+        }
+        i=j||i+1;
+      }
+      if(ramps.length>0) Ki_openloop=Math.max(0.001,med(ramps));
+    })();
+
+    // ── B. Closed-loop fallback (original logic) ──
     const dpv=pv.slice(1).map((v,i)=>v-pv[i]);
     const opDev=op.map(v=>v-mn(op));
     const validPairs=dpv.map((d,i)=>({d,o:opDev[i]})).filter(({o})=>Math.abs(o)>2);
-    const ki_fallback=validPairs.length<10;
-    const Ki=!ki_fallback
+    const ki_closedloop_ok=validPairs.length>=10;
+    const Ki_closedloop=ki_closedloop_ok
       ? Math.max(0.001, Math.abs(med(validPairs.map(({d,o})=>d/o))))
-      : 0.01;
+      : null;
+
+    // ── C. Pick best available Ki source ──
+    let Ki, ki_source, ki_fallback;
+    if(Ki_openloop!==null){
+      Ki=Ki_openloop; ki_source='open_loop'; ki_fallback=false;
+    } else if(Ki_closedloop!==null){
+      Ki=Ki_closedloop; ki_source='closed_loop'; ki_fallback=false;
+    } else {
+      Ki=0.01; ki_source='fallback'; ki_fallback=true;
+    }
     const lam=Math.max(3*theta, 5.0);
     const Kp_new=rnd(1/(Ki*lam**2),4);
     const Ti_new=rnd(2*lam,2);
@@ -603,7 +669,7 @@ function identify(pv, op, sp){
       theta:rnd(theta,1),Tu,conf_Tu,lambda:rnd(lam,2),
       Kp_old,Ti_old,Kp_new,Ti_new,
       Ki_old:rnd(Kp_old/Ti_old,4),Ki_new:rnd(Kp_new/Ti_new,4),
-      r2_K:0,conf_K:ki_fallback?0.15:0.4,isIntegrating:true,ki_fallback,
+      r2_K:0,conf_K:ki_fallback?0.15:(ki_source==='bump_test'?0.85:ki_source==='open_loop'?0.75:0.4),isIntegrating:true,ki_fallback,ki_source,
       pv_b:pvb,op_b:opb,pv_a:pva,op_a:opa,
       iae_b:Math.round(iae_b_real),iae_a:Math.round(iae_a),
       iae_pct:rnd((1-iae_a/iae_b_real)*100,1),
@@ -995,9 +1061,10 @@ function populate(){
   }
   let actions;
   if(isInteg){
+    const kiSourceLabel=M.ki_source==='open_loop'?'open-loop historian segment':'closed-loop historian data';
     if(kiFallback){
       actions=[
-        ['r','\u26a0','<b>Ki estimation failed</b>',' \u2014 insufficient OP excitation in historian data. A dedicated open-loop step test is required.'],
+        ['r','\u26a0','<b>Ki estimation failed</b>',' \u2014 no open-loop ramp segment found in historian data. Run a bump test and re-upload the data for that period.'],
         ['a','\ud83d\udcca',`<b>Dead time \u03b8 = ${M.theta} min, Tu = ${M.Tu} min</b>`,' are estimated from data and can be used as a starting point.'],
         ['b','\ud83d\udccb','<b>Perform an open-loop step test</b>',' \u2014 manually step OP by 5\u201310% and record PV ramp rate. Ki = \u0394PV / (\u0394t \u00d7 \u0394OP).'],
         ['g','\u2139',`<b>Once Ki is known</b>`,' apply: Kp = 1/(Ki\u00d7\u03bb\u00b2), Ti = 2\u03bb, where \u03bb = max(3\u03b8, 5) min.'],
@@ -1007,7 +1074,7 @@ function populate(){
         ['a','\u26a0',`<b>Set Kp = ${M.Kp_new}</b>`,` (current estimated: ${M.Kp_old}) \u2014 integrating tuning formula applied (Kp = 1/(Ki\u00d7\u03bb\u00b2))`],
         ['a','\u23f1',`<b>Set Ti = ${M.Ti_new} min</b>`,` (current estimated: ${M.Ti_old} min) \u2014 Ti = 2\u03bb for integrating process`],
         ['b','\ud83d\udccb','<b>Monitor closely for 2\u20134 hours</b>',' after change. Level loops are sensitive to integral windup.'],
-        ['g','\u2713',`<b>Ki confidence: ${Math.round(M.conf_K*100)}%</b>`,' \u2014 estimated from closed-loop data. Verify with a step test before commissioning.'],
+        ['g','\u2713',`<b>Ki confidence: ${Math.round(M.conf_K*100)}% \u2014 source: ${kiSourceLabel}</b>`,''],
       ];
     }
   } else {
@@ -1048,8 +1115,16 @@ function populate(){
     if(hoBtn){hoBtn.disabled=false;hoBtn.style.opacity='';hoBtn.style.cursor='';hoBtn.title='';}
     const old=document.getElementById('ho-no-excit-note');if(old)old.remove();
   }
-  document.getElementById('saveBtn').disabled=false;
-  document.getElementById('savePanelBtn').disabled=false;
+  document.getElementById('saveBtn').disabled=(kiFallback||noExcit);
+  document.getElementById('savePanelBtn').disabled=(kiFallback||noExcit);
+  if(kiFallback||noExcit){
+    const tip='Tuning recommendation not available — insufficient data to estimate process gain.';
+    document.getElementById('saveBtn').title=tip;
+    document.getElementById('savePanelBtn').title=tip;
+  } else {
+    document.getElementById('saveBtn').title='';
+    document.getElementById('savePanelBtn').title='';
+  }
   document.getElementById('agentBtn').disabled=false;
   fetch(`/api/tune/recommendation/${encodeURIComponent(LOOP)}`)
     .then(r=>r.json())
@@ -1166,8 +1241,14 @@ async function runTuningAgent(){
   const report=document.getElementById('agentReport');
   btn.disabled=true;
   btnTxt.innerHTML='<span class="agent-spinner"></span> Analysing...';
-  report.textContent='';
-  report.classList.add('visible');
+  report.classList.remove('visible');
+  report.textContent='Analysing…';
+  document.getElementById('agentModalLoop').textContent=LOOP;
+  // Reset position to center on each open
+  const modal=document.querySelector('.agent-modal');
+  if(modal){modal.style.left='';modal.style.top='';modal.style.transform='';}
+  document.getElementById('agentModalOverlay').classList.add('open');
+  _initAgentDrag();
 
   // Build a rich context object from M (model) and D (data/diagnosis)
   const ctx={
@@ -1255,6 +1336,79 @@ Be concise, technical but readable. No markdown headers with # symbols. Use the 
   }
   btnTxt.innerHTML='&#10227; Re-run AI Analysis';
   btn.disabled=false;
+}
+
+function runSweep(){
+  if(!D)return;
+  const btn=document.getElementById('hoAutoBtn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="agent-spinner"></span>';
+  const pv=D.pv,op=D.op,sp=D.sp,N=pv.length;
+  const slc=(arr,idx)=>idx.map(i=>arr[Math.min(i,arr.length-1)]);
+  const splits=[{pct:40,seed:123456789},{pct:50,seed:987654321},{pct:60,seed:456789123},{pct:70,seed:321654987}];
+  const results=[];
+  for(const {pct,seed:initSeed} of splits){
+    let seed=initSeed;
+    const rng=()=>{seed^=seed<<13;seed^=seed>>17;seed^=seed<<5;return(seed>>>0)/4294967296;};
+    const all=Array.from({length:N},(_,i)=>i);
+    for(let i=all.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[all[i],all[j]]=[all[j],all[i]];}
+    const cut=Math.floor(N*pct/100);
+    const trainIdx=all.slice(0,cut).sort((a,b)=>a-b);
+    const valIdx=all.slice(cut).sort((a,b)=>a-b);
+    const rT=calcK(slc(pv,trainIdx),slc(op,trainIdx),slc(sp,trainIdx));
+    const rV=calcK(slc(pv,valIdx),slc(op,valIdx),slc(sp,valIdx));
+    if(!rT||!rV)continue;
+    const diff=Math.abs(rT.K-rV.K)/(rT.K||1)*100;
+    results.push({pct,kTrain:rT.K,kVal:rV.K,diff});
+  }
+  btn.innerHTML='&#9889; Sweep';
+  btn.disabled=false;
+  if(!results.length)return;
+  // Consensus K across all train sets
+  const kVals=results.map(r=>r.kTrain);
+  const consensusK=rnd(kVals.reduce((s,v)=>s+v,0)/kVals.length,3);
+  const kMin=rnd(Math.min(...kVals),3);
+  const kMax=rnd(Math.max(...kVals),3);
+  const n=results.length;
+  const excellent=results.filter(r=>r.diff<10).length;
+  const acceptable=results.filter(r=>r.diff<20).length;
+  let color,bg,border,icon,label,subtext;
+  if(excellent>=3){
+    color='#085041';bg='var(--ok-bg)';border='var(--ok-border)';icon='&#10003;';
+    label='HIGH CONFIDENCE &mdash; K stable across '+excellent+'/'+n+' splits';
+    subtext='Consensus K = '+consensusK+'&ensp;(range: '+kMin+' &ndash; '+kMax+')';
+  } else if(excellent>=2||acceptable>=3){
+    color='#78350f';bg='var(--warn-bg)';border='var(--warn-border)';icon='&#9888;';
+    label='MODERATE CONFIDENCE &mdash; K partly consistent ('+excellent+'/'+n+' splits &lt;10% diff)';
+    subtext='Consensus K = '+consensusK+'&ensp;(range: '+kMin+' &ndash; '+kMax+') &mdash; verify with a step test';
+  } else {
+    color='var(--crit)';bg='var(--crit-bg)';border='var(--crit-border)';icon='&#10007;';
+    label='LOW CONFIDENCE &mdash; K varies widely across splits';
+    subtext='Range: '+kMin+' &ndash; '+kMax+' &mdash; process likely non-stationary. Step test recommended.';
+  }
+  const vd=document.getElementById('ho-sweep-verdict');
+  vd.style.cssText='background:'+bg+';border:1px solid '+border+';border-radius:7px;padding:12px 14px;font-size:11px;color:'+color+';line-height:1.7';
+  vd.innerHTML='<div style="font-size:12px;font-weight:700;margin-bottom:3px">'+icon+'&ensp;'+label+'</div><div style="opacity:.85">'+subtext+'</div>';
+  // Build split details table
+  const rows=results.map(r=>{
+    const d=Math.round(r.diff);
+    const dc=r.diff<10?'var(--ok)':r.diff<20?'var(--warn)':'var(--crit)';
+    const badge=r.diff<10?'Excellent':r.diff<20?'Acceptable':'Inconsistent';
+    const bs=r.diff<10?'background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border)':r.diff<20?'background:var(--warn-bg);color:var(--warn);border-color:var(--warn-border)':'background:var(--crit-bg);color:var(--crit);border-color:var(--crit-border)';
+    return '<tr><td style="padding:5px 8px;font-size:11px;font-weight:600;color:var(--text2)">'+r.pct+'% / '+(100-r.pct)+'%</td><td style="padding:5px 8px;font-size:11px;color:var(--navy);font-weight:600">'+r.kTrain+'</td><td style="padding:5px 8px;font-size:11px;color:var(--navy);font-weight:600">'+r.kVal+'</td><td style="padding:5px 8px;font-size:11px;font-weight:700;color:'+dc+'">'+d+'%</td><td style="padding:5px 8px"><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;border:1px solid;'+bs+'">'+badge+'</span></td></tr>';
+  }).join('');
+  document.getElementById('ho-sweep-tbl').innerHTML='<thead><tr style="background:var(--bg2)"><th style="padding:5px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);text-align:left">Split (train/val)</th><th style="padding:5px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);text-align:left">K_train</th><th style="padding:5px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);text-align:left">K_validate</th><th style="padding:5px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);text-align:left">Diff</th><th style="padding:5px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);text-align:left">Status</th></tr></thead><tbody>'+rows+'</tbody>';
+  document.getElementById('ho-sweep-result').style.display='block';
+  document.getElementById('ho-sweep-details').style.display='none';
+  document.getElementById('ho-sweep-toggle').innerHTML='&#9660; Show split details';
+}
+
+function toggleSweepDetails(){
+  const d=document.getElementById('ho-sweep-details');
+  const t=document.getElementById('ho-sweep-toggle');
+  const open=d.style.display!=='none';
+  d.style.display=open?'none':'block';
+  t.innerHTML=open?'&#9660; Show split details':'&#9650; Hide split details';
 }
 
 function runHoldout(){
@@ -1383,10 +1537,45 @@ async function saveRec(){
 }
 
 
+function closeAgentModal(e){
+  if(e&&e.target!==document.getElementById('agentModalOverlay'))return;
+  document.getElementById('agentModalOverlay').classList.remove('open');
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')document.getElementById('agentModalOverlay').classList.remove('open');});
+
+// Drag logic for agent modal
+let _agentDragging=false,_agentSX,_agentSY,_agentOL,_agentOT;
+function _initAgentDrag(){
+  const modal=document.querySelector('.agent-modal');
+  const header=modal?modal.querySelector('.agent-modal-header'):null;
+  if(!header||header._dragBound)return;
+  header._dragBound=true;
+  header.addEventListener('mousedown',function(e){
+    if(e.target.closest('.agent-modal-close'))return;
+    _agentDragging=true;
+    const rect=modal.getBoundingClientRect();
+    modal.style.transform='none';
+    modal.style.left=rect.left+'px';
+    modal.style.top=rect.top+'px';
+    _agentSX=e.clientX;_agentSY=e.clientY;
+    _agentOL=rect.left;_agentOT=rect.top;
+    e.preventDefault();
+  });
+}
+document.addEventListener('mousemove',function(e){
+  if(!_agentDragging)return;
+  const modal=document.querySelector('.agent-modal');
+  if(!modal)return;
+  const dx=e.clientX-_agentSX,dy=e.clientY-_agentSY;
+  modal.style.left=Math.max(0,Math.min(window.innerWidth-100,_agentOL+dx))+'px';
+  modal.style.top=Math.max(0,Math.min(window.innerHeight-60,_agentOT+dy))+'px';
+});
+document.addEventListener('mouseup',function(){_agentDragging=false;});
 function toggleCard(id){
   const card=document.getElementById(id);
   if(card) card.classList.toggle('collapsed');
 }
+
 function toggleLinkedCards(){
   const h=document.getElementById('card-holdout');
   const f=document.getElementById('card-fopdt');
@@ -1704,5 +1893,17 @@ document.addEventListener('click',function(e){
   if(a){try{localStorage.removeItem(VDT_CHAT_KEY);localStorage.removeItem('vdtChatRunId');}catch(err){}}
 });
 </script>
+
+<!-- AI Tuning Analysis Modal -->
+<div class="agent-modal-overlay" id="agentModalOverlay" onclick="closeAgentModal(event)">
+  <div class="agent-modal">
+    <div class="agent-modal-header">
+      <span class="agent-modal-title">&#10024; AI Tuning Analysis — <span id="agentModalLoop"></span></span>
+      <button class="agent-modal-close" onclick="closeAgentModal()">&times;</button>
+    </div>
+    <div class="agent-modal-body" id="agentReport"></div>
+  </div>
+</div>
+
 </body>
 </html>

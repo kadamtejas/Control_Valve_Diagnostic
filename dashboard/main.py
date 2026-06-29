@@ -693,8 +693,47 @@ def _fmt_num(v, d=2):
         return "-"
 
 
-def _build_results_summary(email: str) -> str:
-    """Comprehensive per-loop summary of the user's latest diagnostic run for the chatbot prompt."""
+def _build_results_summary(email: str, user_message: str = "") -> str:
+    """Query-aware per-loop summary. Sends full detail only for loops relevant to the user's question.
+    Healthy loops are compressed to one line. Scales cleanly to 30-100 loops.
+    """
+    # ── Query analysis ────────────────────────────────────────────────────────
+    msg_lower = user_message.lower()
+
+    # Topic keywords → which diagnosis types to expand
+    TOPIC_MAP = {
+        "stiction": ["stiction"],
+        "stick": ["stiction"],
+        "oscillat": ["aggressive tuning", "external oscillation"],
+        "aggress": ["aggressive tuning"],
+        "external": ["external oscillation"],
+        "sluggish": ["sluggish"],
+        "slow": ["sluggish"],
+        "saturat": ["saturation"],
+        "manual": ["loop in manual"],
+        "sensor": ["sensor"],
+        "frozen": ["sensor"],
+        "data quality": ["data quality"],
+        "compression": ["data quality"],
+        "propagat": ["_propagation"],
+        "tuning": ["aggressive tuning", "sluggish"],
+        "worst": ["_worst"],
+        "critical": ["_worst"],
+        "bad": ["_worst"],
+        "overall": ["_plant"],
+        "plant": ["_plant"],
+        "summary": ["_plant"],
+        "health": ["_plant"],
+        "mainten": ["_maintenance"],
+    }
+
+    # Collect matched topics from the user message
+    matched_topics: list = []
+    for kw, topics in TOPIC_MAP.items():
+        if kw in msg_lower:
+            matched_topics.extend(topics)
+    matched_topics = list(set(matched_topics))
+
     rd = _results_dir_for(email)
     if not rd:
         return "The user has NOT run a diagnostic yet. No results are available. Tell them to upload a plant data file on the Upload page first if they ask about results."
@@ -761,15 +800,46 @@ def _build_results_summary(email: str) -> str:
             dc_str = ", ".join(f"{k}: {v}" for k, v in dcounts.items())
             lines.append(f"Fault distribution: {dc_str}")
 
-    # ── Per-loop details ──────────────────────────────────────────────────────
+    # ── Per-loop details (query-aware) ───────────────────────────────────────
     loops = data.get("loops") or []
-    lines.append(f"\nLoops analysed: {len(loops)}")
-    for lp in loops:
-        sev      = lp.get('severity') or '-'
-        diag     = lp.get('diagnosis') or '-'
-        is_unhealthy = sev.upper() not in ('OK', 'GOOD', 'HEALTHY', '-')
+    all_loop_names = [str(lp.get('loop', '')).lower() for lp in loops]
 
-        # Core metrics — always included
+    # Detect specific loop names mentioned in the query
+    mentioned_loops = [
+        lp.get('loop') for lp in loops
+        if lp.get('loop') and str(lp['loop']).lower() in msg_lower
+    ]
+
+    def _should_expand(lp: dict, matched_topics: list, mentioned_loops: list) -> bool:
+        """Decide if this loop gets full detail or one-liner."""
+        sev = (lp.get('severity') or '').upper()
+        diag = (lp.get('diagnosis') or '').lower()
+        loop_name = str(lp.get('loop', ''))
+        is_healthy = sev in ('OK', 'GOOD', 'HEALTHY', '-') or diag == 'healthy'
+
+        if loop_name in mentioned_loops:
+            return True
+        if mentioned_loops:
+            return False
+        if not matched_topics:
+            return not is_healthy
+        if "_worst" in matched_topics:
+            sorted_loops = sorted(loops, key=lambda x: x.get('health') or 100)
+            worst_names = [l.get('loop') for l in sorted_loops[:5]]
+            return loop_name in worst_names
+        if "_plant" in matched_topics or "_maintenance" in matched_topics:
+            return not is_healthy
+        if "_propagation" in matched_topics:
+            return False
+        for topic in matched_topics:
+            if topic in diag:
+                return True
+        return False
+
+    def _loop_full_detail(lp: dict) -> list:
+        """Full detail lines for a loop."""
+        sev  = lp.get('severity') or '-'
+        diag = lp.get('diagnosis') or '-'
         parts = [
             f"{lp.get('loop', '?')}:",
             f"health={_fmt_num(lp.get('health'), 0)}",
@@ -787,12 +857,8 @@ def _build_results_summary(email: str) -> str:
             f"dom_period={lp.get('dominant_period') or '-'}",
             f"dataQ={lp.get('data_quality_status') or '-'}",
         ]
-
-        # Data quality issues detail
         if lp.get('issues'):
             parts.append(f"dataQ_issues={lp['issues']}")
-
-        # Stiction method scores (from stiction sub-dict merged by reader)
         stiction = lp.get('stiction') or {}
         if stiction:
             parts.append(
@@ -802,8 +868,6 @@ def _build_results_summary(email: str) -> str:
                 f"/bicoh={_fmt_num(stiction.get('bicoherence'))}"
                 f" S%={_fmt_num(stiction.get('estimated_s'))})"
             )
-
-        # Data quality detail (from dq sub-dict merged by reader)
         dq = lp.get('data_quality') or {}
         if dq and lp.get('data_quality_status', '').upper() != 'OK':
             parts.append(
@@ -812,17 +876,34 @@ def _build_results_summary(email: str) -> str:
                 f" frozen={dq.get('frozen') or '-'}"
                 f" quantised={dq.get('quantised') or '-'})"
             )
-
-        # Recommended action — always
         if lp.get('recommended_action'):
             parts.append(f"action={lp['recommended_action']}")
+        result = [" ".join(parts)]
+        if lp.get('rationale'):
+            result.append(f"  rationale: {lp['rationale'][:300]}")
+        return result
 
-        lines.append(" ".join(parts))
-
-        # Rationale — only for unhealthy loops (saves tokens)
-        if is_unhealthy and lp.get('rationale'):
-            rationale = lp['rationale'][:300]  # cap at 300 chars
-            lines.append(f"  rationale: {rationale}")
+    lines.append(f"\nLoops analysed: {len(loops)}")
+    n_expanded = 0
+    for lp in loops:
+        if _should_expand(lp, matched_topics, mentioned_loops):
+            lines.extend(_loop_full_detail(lp))
+            n_expanded += 1
+        else:
+            # One-liner for healthy or irrelevant loops
+            lines.append(
+                f"{lp.get('loop','?')}: {lp.get('diagnosis','-')} "
+                f"health={_fmt_num(lp.get('health'),0)} [{lp.get('severity','-')}]"
+            )
+    if n_expanded == 0 and not matched_topics and not mentioned_loops:
+        # Fallback: no matches at all — show top 5 faulty in full
+        sorted_faulty = sorted(
+            [l for l in loops if (l.get('severity') or '').upper() not in ('OK','GOOD','HEALTHY','-')],
+            key=lambda x: x.get('health') or 100
+        )[:5]
+        lines.append("(Showing top faulty loops in detail as no specific query matched)")
+        for lp in sorted_faulty:
+            lines.extend(_loop_full_detail(lp))
 
     # ── Maintenance actions ───────────────────────────────────────────────────
     maintenance = data.get("maintenance") or []
@@ -887,12 +968,17 @@ async def api_chat(payload: dict, current_user: dict = Depends(get_current_user)
     if not history:
         raise HTTPException(status_code=400, detail="no valid messages")
 
+    # Extract the latest user message for query-aware context
+    latest_user_msg = next(
+        (m["content"] for m in reversed(history) if m["role"] == "user"), ""
+    )
+
     system_prompt = (
         CHATBOT_ROLE
         + "\n\n===== KNOWLEDGE =====\n"
         + _load_chatbot_knowledge()
         + "\n\n===== LATEST RESULTS (this user) =====\n"
-        + _build_results_summary(current_user["sub"])
+        + _build_results_summary(current_user["sub"], latest_user_msg)
     )
 
     try:
