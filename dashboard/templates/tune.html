@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -38,7 +38,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .logo-brand-tune-main{color:#1e3a5f;font-size:14px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;letter-spacing:-.01em;line-height:1}
 .logo-brand-tune-main span{color:#3b82f6;font-weight:300}
 .logo-brand-tune-sub{color:#64748b;font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
-.tb-tag{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Mono',monospace}
+.tb-tag{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Sans',sans-serif}
 .tb-title{color:#64748b;font-size:13px;font-weight:500}
 .tb-type-badge{font-size:10px;padding:2px 9px;border-radius:12px;font-weight:700;border:1px solid;margin-left:4px}
 .tb-type-badge{font-size:10px;padding:2px 9px;border-radius:12px;font-weight:700;border:1px solid;margin-left:4px}
@@ -59,7 +59,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .load-overlay{position:fixed;inset:0;background:rgba(240,244,248,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px}
 .spin{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ltxt{font-size:13px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
+.ltxt{font-size:13px;color:var(--text3);font-family:'IBM Plex Sans',sans-serif}
 
 /* ── WARN BANNER ── */
 .warn-banner{background:var(--amber-bg);border:1px solid var(--warn-border);border-radius:var(--r);padding:12px 16px;display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--amber)}
@@ -78,13 +78,13 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .mp-tbl th{padding:5px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2);background:var(--bg2);text-align:left}
 .mp-tbl td{padding:6px 8px;border-bottom:1px solid var(--border2);vertical-align:middle}
 .mp-tbl tr:last-child td{border-bottom:none}
-.mp-param{font-size:10px;font-weight:700;color:var(--navy);font-family:'IBM Plex Mono',monospace}
-.mp-val{font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)}
+.mp-param{font-size:10px;font-weight:700;color:var(--navy);font-family:'IBM Plex Sans',sans-serif}
+.mp-val{font-size:13px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;color:var(--navy)}
 .mp-sub{font-size:8px;color:var(--text4);margin-top:1px}
 .mp-conf-wrap{display:flex;align-items:center;gap:4px}
 .mp-conf-track{flex:1;min-width:40px;background:var(--border2);border-radius:6px;height:4px;overflow:hidden}
 .mp-conf-fill{height:100%;border-radius:6px;transition:width .5s}
-.mp-conf-pct{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:600;white-space:nowrap}
+.mp-conf-pct{font-size:9px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;white-space:nowrap}
 .mp-badge{font-size:8px;font-weight:700;padding:1px 5px;border-radius:20px;border:1px solid;white-space:nowrap}
 .sb-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border)}
 .sb-warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-border)}
@@ -102,7 +102,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .sc-tbl{width:100%;border-collapse:collapse;font-size:11px}
 .sc-tbl th{padding:5px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);border-bottom:1px solid var(--border2);background:var(--bg2);text-align:center}
 .sc-tbl th:first-child{text-align:left}
-.sc-tbl td{padding:7px 8px;border-bottom:1px solid var(--border2);text-align:center;vertical-align:middle;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600}
+.sc-tbl td{padding:7px 8px;border-bottom:1px solid var(--border2);text-align:center;vertical-align:middle;font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:600}
 .sc-tbl td:first-child{text-align:left;font-family:'IBM Plex Sans',sans-serif;font-size:10px;font-weight:700;color:var(--navy)}
 .sc-tbl tr:last-child td{border-bottom:none}
 .sc-tbl tr:hover td{background:var(--bg2)}
@@ -118,8 +118,8 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .param-tbl td{padding:8px 10px;border-bottom:1px solid var(--border2);vertical-align:middle}
 .param-tbl tr:last-child td{border-bottom:none}
 .param-tbl tr:hover td{background:var(--bg2)}
-.oval{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text)}
-.nval{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--blue-lt)}
+.oval{font-size:12px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;color:var(--text)}
+.nval{font-size:12px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;color:var(--blue-lt)}
 .why-pct{font-size:11px;font-weight:700;color:var(--text2)}
 .why-txt{font-size:10px;color:var(--text3);line-height:1.4;margin-top:1px}
 
@@ -145,6 +145,13 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 /* ── HOLD-OUT ── */
 .ho-run-btn{padding:6px 14px;background:var(--blue);color:#fff;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:background .2s}
 .ho-run-btn:hover{background:var(--navy)}
+.ai-agent-btn{display:flex;align-items:center;gap:6px;padding:7px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:all .2s;margin-top:10px;width:100%}
+.ai-agent-btn:hover{background:linear-gradient(135deg,#4f46e5,#7c3aed);transform:translateY(-1px)}
+.ai-agent-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.agent-report{margin-top:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;font-size:12px;line-height:1.7;color:var(--text2);display:none;white-space:pre-wrap;font-family:'IBM Plex Sans',sans-serif}
+.agent-report.visible{display:block}
+.agent-spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .ho-bar-wrap{display:flex;align-items:center;gap:8px;margin:8px 0}
 .ho-bar-bg{flex:1;height:6px;background:var(--border2);border-radius:4px;overflow:hidden}
 .ho-bar-fill{height:100%;border-radius:4px;transition:width .5s}
@@ -164,7 +171,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .save-panel{background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:var(--rl);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .sp-title{font-size:13px;font-weight:700;color:var(--ok);margin-bottom:3px}
 .sp-sub{font-size:11px;color:#0f6e56}
-.sp-saved{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--ok);margin-top:4px;display:none}
+.sp-saved{font-size:11px;font-family:'IBM Plex Sans',sans-serif;color:var(--ok);margin-top:4px;display:none}
 
 /* ── TUNED NOTICE ── */
 .tuned-notice{background:var(--ok-bg);border:1px solid var(--ok-border);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--ok);display:none;align-items:center;gap:8px}
@@ -335,7 +342,7 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
               <option value="random">Random split</option>
             </select>
             <div id="splitInputWrap" style="display:none;align-items:center;gap:6px;font-size:11px;color:var(--text2)">
-              Train % <input id="hvSplitPct" type="number" oninput="document.getElementById('hvValPct').textContent=100-(+this.value||50)" min="20" max="80" value="60" step="5" style="width:50px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg2);color:var(--text);font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600"/>
+              Train % <input id="hvSplitPct" type="number" oninput="document.getElementById('hvValPct').textContent=100-(+this.value||50)" min="20" max="80" value="60" step="5" style="width:50px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;background:var(--bg2);color:var(--text);font-size:11px;font-family:'IBM Plex Sans',sans-serif;font-weight:600"/>
               / <span id="hvValPct">40</span>% validate
             </div>
           </div>
@@ -343,20 +350,20 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
               <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)">
                 <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">K_train <span class="ibt" data-tip="Process gain estimated on the training set. Should match K_validate within 10% for a reliable model.">i</span></div>
-                <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)" id="ho-ktrain">—</div>
+                <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;color:var(--navy)" id="ho-ktrain">—</div>
               </div>
               <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)">
                 <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">K_validate <span class="ibt" data-tip="Process gain estimated on the validation set. If far from K_train, the gain is non-stationary — consider a dedicated step test.">i</span></div>
-                <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--navy)" id="ho-kval">—</div>
+                <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;color:var(--navy)" id="ho-kval">—</div>
               </div>
               <div style="background:var(--bg2);border-radius:7px;padding:10px;border:1px solid var(--border2)">
                 <div style="font-size:9px;color:var(--text4);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Difference <span class="ibt" data-tip="% difference between K_train and K_validate. &lt;10% = Excellent. 10–20% = Acceptable. &gt;20% = Inconsistent.">i</span></div>
-                <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace" id="ho-diff">—</div>
+                <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Sans',sans-serif" id="ho-diff">—</div>
               </div>
             </div>
             <div class="ho-bar-wrap">
               <div class="ho-bar-bg"><div class="ho-bar-fill" id="ho-bar" style="width:0%"></div></div>
-              <span style="font-size:9px;font-family:'IBM Plex Mono',monospace;width:28px;text-align:right;flex-shrink:0" id="ho-diff-pct">—</span>
+              <span style="font-size:9px;font-family:'IBM Plex Sans',sans-serif;width:28px;text-align:right;flex-shrink:0" id="ho-diff-pct">—</span>
             </div>
             <div class="ho-verdict" id="ho-verdict"></div>
           </div>
@@ -428,6 +435,12 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
     <div class="card">
       <div class="ch"><span class="cht">ACTION PLAN</span></div>
       <div class="cb" id="actions-list"></div>
+      <!-- AI Tuning Analysis Agent -->
+      <button class="ai-agent-btn" id="agentBtn" onclick="runTuningAgent()" disabled>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        <span id="agentBtnTxt">AI Tuning Analysis</span>
+      </button>
+      <div class="agent-report" id="agentReport"></div>
     </div>
 
     <!-- Right: Engineer Notes + Accept & Save -->
@@ -973,11 +986,11 @@ function populate(){
       return `
       <tr>
         <td style="font-size:11px;color:var(--text2);font-weight:600">${nm} <span class="ibt" data-tip="${tip}">i</span><div style="font-size:9px;color:var(--text4);font-weight:400;margin-top:1px">${why}</div></td>
-        <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text)">${bv}</td>
-        <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--blue-lt)">${av}</td>
-        <td style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--text4)" class="user-opt-col">\u2014</td>
-        <td style="text-align:center;font-size:11px;font-weight:700;color:${pctColor};font-family:'IBM Plex Mono',monospace">${pctTxt}</td>
-        <td style="text-align:center;font-size:11px;font-weight:700;color:var(--text4);font-family:'IBM Plex Mono',monospace" class="user-diff-col">\u2014</td>
+        <td style="text-align:center;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:700;color:var(--text)">${bv}</td>
+        <td style="text-align:center;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:700;color:var(--blue-lt)">${av}</td>
+        <td style="text-align:center;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:700;color:var(--text4)" class="user-opt-col">\u2014</td>
+        <td style="text-align:center;font-size:11px;font-weight:700;color:${pctColor};font-family:'IBM Plex Sans',sans-serif">${pctTxt}</td>
+        <td style="text-align:center;font-size:11px;font-weight:700;color:var(--text4);font-family:'IBM Plex Sans',sans-serif" class="user-diff-col">\u2014</td>
       </tr>`;}).join('');
   }
   let actions;
@@ -1037,6 +1050,7 @@ function populate(){
   }
   document.getElementById('saveBtn').disabled=false;
   document.getElementById('savePanelBtn').disabled=false;
+  document.getElementById('agentBtn').disabled=false;
   fetch(`/api/tune/recommendation/${encodeURIComponent(LOOP)}`)
     .then(r=>r.json())
     .then(body=>{
@@ -1145,6 +1159,104 @@ function calcK(pvS,opS,spS){
 function toggleSplitInput(){
   document.getElementById('splitInputWrap').style.display=document.getElementById('hvMethod').value==='random'?'flex':'none';
 }
+async function runTuningAgent(){
+  if(!M||!D)return;
+  const btn=document.getElementById('agentBtn');
+  const btnTxt=document.getElementById('agentBtnTxt');
+  const report=document.getElementById('agentReport');
+  btn.disabled=true;
+  btnTxt.innerHTML='<span class="agent-spinner"></span> Analysing...';
+  report.textContent='';
+  report.classList.add('visible');
+
+  // Build a rich context object from M (model) and D (data/diagnosis)
+  const ctx={
+    loop: LOOP,
+    loop_type: D.loop_type,
+    diagnosis_primary: D.diag_primary||'unknown',
+    diagnosis_severity: D.diag_severity||'unknown',
+    n_samples: D.n_samples,
+    model_type: M.isIntegrating?'Integrating':M.model,
+    K: M.K, K_method: M.K_method, conf_K_pct: Math.round((M.conf_K||0)*100),
+    r2_K: M.r2_K,
+    tau: M.tau, tau_method: M.tau_method, tau_conf_pct: Math.round((M.tau_conf||0)*100),
+    tau2: M.tau2||null,
+    theta: M.theta,
+    Tu: M.Tu, conf_Tu_pct: Math.round((M.conf_Tu||0)*100),
+    lambda: M.lambda,
+    op_range: M.op_range,
+    no_excitation: M.no_excitation||false,
+    isIntegrating: M.isIntegrating||false,
+    ki_fallback: M.ki_fallback||false,
+    tuning_possible: !M.no_excitation && !(M.isIntegrating && M.ki_fallback),
+    // Only send Kp/Ti new values if tuning is actually possible
+    Kp_old: M.Kp_old, Ti_old: M.Ti_old,
+    Kp_new: (!M.no_excitation && !(M.isIntegrating && M.ki_fallback)) ? M.Kp_new : null,
+    Ti_new: (!M.no_excitation && !(M.isIntegrating && M.ki_fallback)) ? M.Ti_new : null,
+    iae_improvement_pct: (!M.no_excitation) ? M.iae_pct : null,
+    op_wear_reduction_pct: (!M.no_excitation) ? M.op_wear_pct : null,
+    pv_std: M.pv_std,
+    model_reason: M.model_reason||'',
+    model_reason_detail: M.model_reason_detail||'',
+  };
+
+  const prompt=`You are an expert process control engineer analysing a control loop from a valve diagnostic tool.
+
+Loop: ${ctx.loop}
+Loop type: ${ctx.loop_type}
+Diagnosis: ${ctx.diagnosis_primary} (Severity: ${ctx.diagnosis_severity})
+Data samples: ${ctx.n_samples} (1-minute intervals = ${Math.round(ctx.n_samples/60*10)/10} hours)
+
+PROCESS MODEL IDENTIFICATION:
+- Model selected: ${ctx.model_type}
+- Process gain K = ${ctx.K} (method: ${ctx.K_method}, confidence: ${ctx.conf_K_pct}%, R² = ${ctx.r2_K})
+- Time constant τ = ${ctx.tau} min (method: ${ctx.tau_method}, confidence: ${ctx.tau_conf_pct}%)
+${ctx.tau2?'- Secondary time constant τ₂ = '+ctx.tau2+' min (SOPDT Broida method)':''}
+- Dead time θ = ${ctx.theta} min
+- Oscillation period Tu = ${ctx.Tu} min (confidence: ${ctx.conf_Tu_pct}%)
+- OP range used: ${ctx.op_range}%
+- No excitation flag: ${ctx.no_excitation}
+- Model reason: ${ctx.model_reason} ${ctx.model_reason_detail}
+
+TUNING RESULT:
+- Tuning possible: ${ctx.tuning_possible}
+- Lambda (IMC filter): ${ctx.lambda} min
+- Current Kp (estimated): ${ctx.Kp_old} | Recommended Kp: ${ctx.Kp_new}
+- Current Ti (estimated): ${ctx.Ti_old} min | Recommended Ti: ${ctx.Ti_new} min
+- Predicted IAE improvement: ${ctx.iae_improvement_pct}%
+- Predicted valve wear reduction: ${ctx.op_wear_reduction_pct}%
+
+Write a clear, professional tuning analysis report for a control engineer. Structure it as:
+
+1. TUNING STATUS - Was tuning possible? One sentence verdict.
+2. WHY / WHY NOT - Explain the key reasons in plain English (2-4 sentences). Reference the actual numbers above.
+3. MODEL CONFIDENCE - How reliable are K, tau, theta estimates? What does this mean for the recommendation?
+4. RECOMMENDATION - What should the engineer do next? Be specific and actionable.
+5. WATCH OUT FOR - Any risks or things to verify before applying the tuning.
+
+Be concise, technical but readable. No markdown headers with # symbols. Use the section names as plain text labels. Do not invent numbers not provided above.`;
+
+  try{
+    const resp=await fetch('/api/agent/tune',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ctx})
+    });
+    const data=await resp.json();
+    if(data.reply){
+      report.textContent=data.reply;
+    } else if(data.detail){
+      report.textContent='Agent error: '+data.detail;
+    } else {
+      report.textContent='No response from agent. Please try again.';
+    }
+  } catch(e){
+    report.textContent='Could not reach AI agent: '+e.message;
+  }
+  btnTxt.innerHTML='&#10227; Re-run AI Analysis';
+  btn.disabled=false;
+}
+
 function runHoldout(){
   if(!D)return;
   const pv=D.pv,op=D.op,sp=D.sp,N=pv.length;
@@ -1334,10 +1446,10 @@ function toggleLinkedCards(){
 .cfg-row:last-child{border-bottom:none}
 .cfg-row:hover{background:#f8fafc}
 .cfg-lbl{flex:1}
-.cfg-lbl-name{font-size:11px;font-weight:600;color:var(--navy);font-family:'IBM Plex Mono',monospace}
+.cfg-lbl-name{font-size:11px;font-weight:600;color:var(--navy);font-family:'IBM Plex Sans',sans-serif}
 .cfg-lbl-desc{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.4}
-.cfg-lbl-default{font-size:9px;color:var(--text4);font-family:'IBM Plex Mono',monospace;margin-top:3px}
-.cfg-inp{width:88px;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--navy);font-weight:600;background:var(--bg2);text-align:right;transition:border-color .15s}
+.cfg-lbl-default{font-size:9px;color:var(--text4);font-family:'IBM Plex Sans',sans-serif;margin-top:3px}
+.cfg-inp{width:88px;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;color:var(--navy);font-weight:600;background:var(--bg2);text-align:right;transition:border-color .15s}
 .cfg-inp:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,134,222,.1);background:#fff}
 .cfg-inp.cfg-changed{border-color:var(--warn);background:#fffdf5}
 .cfg-toggle{position:relative;width:38px;height:20px;flex-shrink:0}

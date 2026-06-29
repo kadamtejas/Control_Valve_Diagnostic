@@ -33,6 +33,7 @@ from .plotting import (
 )
 from .excel_writer import write_excel_report
 from .pdf_writer import write_pdf_summary
+from .pdf_writer_styled import write_pdf_summary_styled
 
 
 def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True) -> dict:
@@ -201,6 +202,15 @@ def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True) -> d
     except Exception as e:
         logger.error(f"PDF generation failed: {e}", exc_info=True)
         pdf_path = None
+
+    styled_pdf_path = os.path.join(output_dir, "Executive_summary_styled.pdf")
+    try:
+        write_pdf_summary_styled(styled_pdf_path, kpi, per_loop, tc, dashboard_png,
+                                 capabilities, heatmap_png=heatmap_png)
+        logger.info(f"Styled PDF summary: {styled_pdf_path}")
+    except Exception as e:
+        logger.error(f"Styled PDF generation failed: {e}", exc_info=True)
+        styled_pdf_path = None
 
     return {
         "df": df, "tc": tc, "loops": loops, "config": config,

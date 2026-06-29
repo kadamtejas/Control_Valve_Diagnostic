@@ -148,3 +148,198 @@ Upload page: drag-and-drop the DCS historian Excel export, then run diagnostics.
 - Saved tuning recommendations are in-memory only (lost on restart).
 - PDF/report export is planned for a future phase.
 - Works with any plant's Excel export if the loop_format/tag conventions are followed — not limited to the ethylene fractionator.
+
+## 14. Formulas and Term Calculations
+
+This section documents the exact formulas used inside the tool engine. Use this to explain how any metric is calculated or why a diagnosis was triggered.
+
+### IAE (Integrated Absolute Error)
+IAE_total = sum(|PV - SP|) over all samples
+IAE/hr = IAE_total / duration_in_hours
+IAE/hr normalised (%) = (IAE/hr / PV_scale) x 100
+  where PV_scale = max(|mean(PV)|, 4 x std(PV), 1.0)
+This normalisation makes IAE comparable across loops with different engineering units and scales.
+Default threshold: IAE/hr > 200 OR IAE_norm% > 15% flags poor tracking.
+
+### OP Activity
+OP Activity = mean(|OP[i] - OP[i-1]|) over all samples — the average absolute step in controller output per sample.
+Default threshold: > 1.5 flags high valve movement / potential stiction or aggressive tuning.
+
+### PV Amplitude
+PV Amplitude = max(PV) - min(PV) — peak-to-peak range of the process variable.
+PV Amplitude % = (PV Amplitude / PV_scale) x 100 — relative to the operating scale.
+Used in stiction heuristic and oscillation detection (>5% of scale flags significant oscillation).
+
+### Service Factor
+Service Factor (%) = (number of samples in AUTO or CASCADE mode / total samples) x 100.
+Default threshold: < 70% triggers "Loop in Manual" diagnosis.
+
+### Harris Index (Minimum Variance Benchmark)
+Based on Harris (1989). Measures how close a loop is to the theoretical minimum variance achievable given its dead time.
+Formula:
+  1. Compute error e[t] = PV[t] - SP[t]
+  2. Fit an AR(p) model to e using Yule-Walker equations (p = max(AR order, dead_time + 5), capped at N/4)
+  3. Compute AR residual variance: sigma_e^2 = r[0] - phi . r[1:p]
+  4. Compute impulse response h[0..b] of 1/A(q) where b = dead time in samples
+  5. sigma_mv^2 = sigma_e^2 x sum(h[0..b-1]^2) — minimum achievable variance
+  6. Harris Index = sigma_mv^2 / var(e) — clipped to [0, 1]
+Interpretation: 1.0 = ideal (already at minimum variance). 0.0 = no control benefit.
+Dead time (b) is estimated from the peak lag in the OP to PV cross-correlation.
+Default threshold: Harris < 0.3 is considered poor. NaN is returned when OP is near-static (treated as passing the gate, not failing).
+
+### Hagglund Oscillation Regularity
+Measures how regular (periodic) the oscillations are, based on zero-crossing spacing of the error signal.
+Formula:
+  1. Compute error e[t] = PV[t] - SP[t], apply mild 5-sample rolling mean low-pass filter
+  2. Find all zero-crossing indices of e
+  3. Compute intervals between consecutive zero crossings
+  4. Regularity = 1 / (1 + std(intervals) / mean(intervals))
+  5. Dominant period (samples) = 2 x mean(intervals)
+Regularity is in [0, 1]. 1.0 = perfectly periodic. 0.0 = random.
+Thresholds: >= 0.6 triggers oscillation flag (aggressive tuning gate); >= 0.75 used for external oscillation gate (stricter, since downstream attenuation reduces regularity).
+
+### Stiction Detection — 4 Methods
+All scores are 0-100. Final consensus is a weighted average.
+
+Method 1 — Heuristic (weight 0.25)
+Uses a sigmoid-like soft function: soft(x, thr) = 100 x (x/thr) / (x/thr + 1), so x = threshold gives score ~50, x = 3x threshold gives ~85.
+score = 0.40 x soft(OP_activity, OP_ACTIVITY_THRESHOLD)
+      + 0.25 x soft(PV_amplitude, AMP_THRESHOLD)
+      + 0.20 x soft(IAE/hr, IAE_PER_HOUR_THRESHOLD)
+      + 0.15 x soft(OP_reversals_per_sample, 0.1)
+where OP_reversals = number of sign changes in diff(OP).
+
+Method 2 — Horch Cross-Correlation (weight 0.30)
+Based on Horch (1999). Under no stiction, the cross-correlation r_{OP,PV}(lag) is even-symmetric. Under stiction it becomes asymmetric.
+Decompose r_{OP,PV} into even and odd parts.
+score = min(energy_odd / (energy_total x 0.5), 1.0) x 100
+Higher score = more asymmetry = more stiction-like.
+
+Method 3 — Yamashita Shape Classifier (weight 0.25)
+Examines the PV-vs-OP phase plot shape (range-normalised to [0,1]):
+- Straight/tight line: healthy (score 0)
+- Ellipse (smooth corners): backlash/hysteresis (score ~45)
+- Parallelogram (sharp corners, closed area): stiction (score 60-95)
+Sharp corners detected by angle between incoming/outgoing path vectors at each OP reversal. cos(angle) < -0.5 = sharp corner.
+score = 60 + 35 x (sharp_fraction) for parallelogram shape.
+
+Method 4 — Bicoherence (weight 0.20)
+Detects frequency-domain nonlinearity. Stiction creates harmonics which produce elevated bicoherence.
+b^2(f1, f2) = |E[X(f1).X(f2).X*(f1+f2)]|^2 / (E[|X(f1).X(f2)|^2] . E[|X(f1+f2)|^2])
+score = min(mean_bicoh / 0.5, 1.0) x 50 + min(sig_fraction / 0.15, 1.0) x 30
+where sig_fraction = fraction of frequency bins with bicoherence above noise threshold (6 / n_segments).
+
+Consensus Combination
+consensus_score = 0.25 x heuristic + 0.30 x horch + 0.25 x yamashita + 0.20 x bicoherence
+(weights re-normalised if any method is disabled)
+methods_agreeing = count of enabled methods with individual score > 50.
+Labels:
+  consensus >= STICT_CONF_HIGH (default 70) AND methods_agreeing >= 2: Confirmed
+  consensus >= 70 but fewer than 2 agreeing: Likely
+  consensus >= STICT_CONF_MED (default 40): Possible
+  else: Healthy
+
+Rossi-Scali S and J estimation
+S (stickband, % OP) = median OP excursion before PV starts moving after each OP reversal.
+J (slip-jump, % OP) = median PV jump at first-move point, mapped back to OP units via local gain.
+
+### Diagnosis Gate Conditions (exact engine logic, priority order)
+
+Diagnoses are checked in strict priority order — first match wins. Lower priority diagnoses are never checked once a higher one fires.
+
+Priority 1 — Sensor / Frozen PV:
+  PV standard deviation < 0.01 (near-zero variation = frozen signal)
+
+Priority 2 — Data Quality (compression):
+  More than 30% of consecutive PV samples are identical (historian compression artefact)
+
+Priority 3 — Loop in Manual:
+  Service factor < SERVICE_FACTOR_MIN_PCT (default 70%)
+
+Priority 4 — Saturation:
+  OP >= 98% OR OP <= 2% for more than 20% of samples
+
+Priority 5 — Stiction:
+  consensus_score >= STICT_CONF_HIGH (default 70) AND methods_agreeing >= 2
+  OR consensus_score >= STICT_CONF_MED (default 40) with supporting evidence
+  (stiction is checked before oscillation — a sticking valve causes oscillation but the root cause is mechanical)
+
+Priority 6a — Aggressive Tuning:
+  ALL of these must be true:
+  1. Hägglund regularity >= osc_min (default 0.6) — sustained periodic oscillation
+  2. PV amplitude > 5% of PV operating value OR absolute PV amplitude > 5.0 — oscillation is significant
+  3. OP activity > OP_ACTIVITY_THRESHOLD (default 1.5)
+     OR (regularity >= 0.85 AND OP activity > 0.5 x threshold) — softer gate for near-perfect limit cycles
+  4. Harris Index < HARRIS_INDEX_THRESHOLD (default 0.3) — poor control performance
+  Note: OP activity IS a gate condition here. The logic is: if OP is moving in step with PV, the controller is the cause of the oscillation (aggressive tuning). If OP is NOT moving much but PV is still oscillating, the cause is external (see below).
+
+Priority 6b — External Oscillation:
+  ALL of these must be true:
+  1. Hägglund regularity >= 0.75 (stricter than aggressive tuning — downstream attenuation reduces regularity)
+  2. PV amplitude significant (same as above)
+  3. OP activity < 0.3 x OP_ACTIVITY_THRESHOLD — OP is near-static (controller NOT fighting)
+  4. Harris Index < threshold OR NaN (NaN is expected when OP is near-static)
+
+Priority 7 — Sluggish Tuning:
+  Harris Index < threshold AND no oscillation detected AND OP activity low
+
+Priority 8 — Healthy:
+  None of the above fired
+
+Key distinction — Aggressive vs External oscillation:
+  Aggressive tuning: PV oscillates AND OP oscillates with it (controller is causing it)
+  External oscillation: PV oscillates BUT OP is near-static (disturbance coming from upstream, controller not involved)
+  The OP activity threshold is what separates these two diagnoses.
+
+### Health Score (per loop)
+  Sensor issue (frozen PV): 10
+  Data quality (compression artefact): 50
+  Loop in Manual: max(20, service_factor%)
+  Saturation (valve fully open or closed): 25
+  Stiction: max(20, 100 - consensus_score)
+  Aggressive tuning: 35
+  External oscillation: 50
+  Sluggish tuning: 35 (55 for borderline sluggish)
+  Unresponsive controller: 30
+  Signal noise / secondary data quality: 60-70
+  Healthy: 100
+Secondary issues (oversized valve, quantisation) reduce the score by 10-15 points each on top of the primary.
+
+### Plant Health Index
+Weighted average of all loop health scores, where loops with lower health scores contribute proportionally more weight (severity weighting). Displayed as 0-100. >= 75 = Good, 50-74 = Needs Attention, < 50 = Critical.
+
+### IMC-PI Tuning Formulas
+lambda (closed-loop speed target) = max(2 x theta, 0.6 x Tu, 0.5 x tau, lambda_floor)
+where lambda_floor is a configurable minimum from the tuning config drawer.
+
+FOPDT (first-order process — flow, pressure, temperature loops):
+  Kp = tau / (K x (lambda + theta))
+  Ti = clamp(tau, 0.5 x tau, 4 x (lambda + theta))
+
+SOPDT (second-order process — detected when >= 50% of OP steps show an inflection point):
+  Kp = (tau1 + tau2) / (K x (lambda + theta))
+  Ti = tau1 + tau2
+
+Integrating / Level (LC loops — FOPDT does not apply):
+  Kp = 1 / (Ki x lambda^2)
+  Ti = 2 x lambda
+  where Ki = integrating gain estimated from dPV/dt vs OP deviation from steady-state.
+
+When K confidence is Low, the tool anchors the recommendation to the existing estimated Kp with a direction multiplier (increase/decrease) rather than trusting the raw formula-derived number.
+
+### Process Model Parameters
+K (process gain) = median(delta_PV / delta_OP) across detected clean OP step windows (|delta_OP| >= 3%, low pre-step variance). PV normalised to 0-100% span first. Falls back to windowed OLS if no clean steps — sets no_excitation = true and suppresses the tuning recommendation.
+theta (dead time, min) = lag at peak of OP to PV cross-correlation, converted from samples to minutes.
+tau1 (primary time constant, min) = time to reach 63.2% of final delta_PV after a step. Fallbacks: ACF decay rate, or variance ratio method.
+tau2 (SOPDT second lag, min) = Broida 2-point method: t1 at 28.3% of delta_PV, t2 at 63.2%; tau_eff = 5.5 x (t2 - t1); tau2 = 0.33 x tau_eff.
+Tu (oscillation period) = dominant period from error ACF zero-crossings, in minutes.
+
+### Propagation Scoring
+Pairwise between all non-saturating loops. Three components:
+  1. Cross-correlation score = |peak correlation coefficient| x 100 (weight 0.4)
+  2. Granger causality score = max(0, 100 x (1 - p_value/0.05)) if p < 0.05, else 0 (weight 0.3)
+  3. Spectral coherence score (weight 0.3) = fraction of frequency bins where coherence > 0.5, weighted by coherence magnitude, scaled to 0-100.
+raw_score = 0.4 x CC_score + 0.3 x Granger_score + 0.3 x coherence_score
+combined_score = raw_score x CROSS_UNIT_DOWNWEIGHT (default 0.5) if the two loops are in different plant units; otherwise = raw_score.
+Only links with combined_score >= PROP_CONF_MIN (default 60) are reported.
+Direction (source to target) is determined by the cross-correlation lag: the loop that leads in time is the source.
