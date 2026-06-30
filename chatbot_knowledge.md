@@ -123,6 +123,19 @@ SOPDT is selected when ≥ 50% of valid steps show an inflection point. Low conf
 | Temperature (TC) | 5–120 min | FOPDT/SOPDT | τ floor 5 min; slow — step test strongly recommended |
 | Level (LC) | Integrating | Integrating | FOPDT does not apply; special formulas used |
 | Unknown | unbounded | FOPDT default | Tag didn't match naming convention; review carefully |
+
+### When a loop is NOT tunable (recommended action is not the same as valid Kp/Ti)
+A loop having a "recommended action" does NOT mean the tool can produce valid tuning numbers (Kp/Ti). These are two different things:
+- The diagnosis may suggest a generic action (e.g. "increase gain / shorten Ti" for sluggish tuning).
+- But the tuning engine can only deliver real Kp/Ti values when its model parameters were successfully estimated from the data.
+
+A loop is effectively NOT auto-tunable from the historian data when any of these appear on the Tuning page — in which case the loop needs a dedicated open-loop step test (AUTO, ΔOP ≥ 5%) BEFORE any values can be applied:
+- "Ki could not be estimated — insufficient OP excitation" on a Level (LC) loop. Level loops are integrating; without Ki, the integrating formula cannot produce valid Kp/Ti, so the loop is NOT tunable from this data even though a generic sluggish action may be listed.
+- τ or K confidence is Low, or the page says "run a step test" (common for Temperature / TC loops and any loop with little OP movement).
+- Expected-improvement / outcome figures show "not available" or "not applicable".
+
+Rule for answering: do NOT tell the user a loop is tunable just because a recommended action exists. If Ki is missing or a step test is required, say the loop is not tunable from the current data and a step test is needed first.
+
 Tag convention: instrument code between digit groups, e.g. 15FC317, 22TC101. Excel files need a loop_format sheet (else default _PV/_OP/_SP suffixes are assumed).
 
 ## 10. Upload & data
@@ -136,6 +149,7 @@ Upload page: drag-and-drop the DCS historian Excel export, then run diagnostics.
 | Loop type "unknown" | Tag doesn't match naming pattern | Check tag convention (FC/PC/TC/LC between digit groups) |
 | τ confidence Low | No clean OP steps (loop in manual / little movement) | Run a step test in AUTO with ΔOP ≥ 5% |
 | "FOPDT model not valid" on level loop | Level loops are integrating | Use the integrating-process tuning shown; don't apply FOPDT Kp/Ti |
+| "Ki could not be estimated" / LC loop shows no Kp,Ti | Insufficient OP excitation in historian data | Loop is NOT tunable from this data; run an open-loop step test (AUTO, ΔOP ≥ 5%) first |
 | Tuning recommendation lost | Server restarted (in-memory storage) | Note values before restart |
 | Small predicted improvement | Tuning already near-optimal or low K confidence | Check confidence; consider a step test |
 

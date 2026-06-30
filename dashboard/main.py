@@ -67,7 +67,7 @@ def _get_groq_client():
         api_key = os.environ.get("GROQ_API_KEY")
         if not api_key:
             raise RuntimeError("GROQ_API_KEY not found — check the .env file in the POC root.")
-        _groq_client = Groq(api_key=api_key)
+        _groq_client = Groq(api_key=api_key, max_retries=0, timeout=20.0)
     return _groq_client
 
 
@@ -77,6 +77,21 @@ def _load_chatbot_knowledge() -> str:
         return KNOWLEDGE_PATH.read_text(encoding="utf-8")
     except Exception:
         return "(Knowledge file not available.)"
+
+
+def _knowledge_for_query(user_message: str) -> str:
+    """RAG: inject only the knowledge chunks relevant to the question.
+    Falls back to the full knowledge file if the index isn't built yet, the
+    HF API fails, or nothing scores as relevant — so chat never breaks.
+    """
+    try:
+        from chatbot_rag import retrieve
+        hit = retrieve(user_message)
+        if hit is not None:        # "" = nothing relevant (send no knowledge); str = chunks
+            return hit
+    except Exception:
+        pass
+    return _load_chatbot_knowledge()   # None = retrieval failed -> full-file safety net
 
 # ── In-memory state ───────────────────────────────────────────────────────────
 # { email: "results_My_plant_data_1" }          — active results folder per user
@@ -787,18 +802,36 @@ def _build_results_summary(email: str, user_message: str = "") -> str:
         if phi is not None:
             lines.append(f"Plant Health Index: {_fmt_num(phi, 0)}/100")
         if total:
-            n_good = round((good or 0) * total / 100)
-            n_poor = round((poor or 0) * total / 100)
-            n_crit = round((crit or 0) * total / 100)
-            lines.append(f"Loops: total={total}, analysed={ana}, skipped={skip}, "
-                         f"healthy(>=75)={n_good}, attention(50-74)={n_poor}, critical(<50)={n_crit}")
+            # Count health buckets directly from each loop's health value — exact
+            # integers that always sum correctly. Deriving from rounded percentages
+            # (the old way) drifted and could disagree turn-to-turn.
+            n_good = n_poor = n_crit = 0
+            for _lp in (data.get("loops") or []):
+                try:
+                    h = float(_lp.get("health"))
+                except (TypeError, ValueError):
+                    continue
+                if h >= 75:
+                    n_good += 1
+                elif h >= 50:
+                    n_poor += 1
+                else:
+                    n_crit += 1
+            lines.append(f"Loops: total={total}, analysed={ana}, skipped={skip}")
+            lines.append(f"Loop health (EXACT counts, do not recompute): "
+                         f"healthy(>=75)={n_good}, attention(50-74)={n_poor}, "
+                         f"critical(<50)={n_crit}")
+            lines.append(f"Loops in trouble (attention + critical) = {n_poor + n_crit} "
+                         f"of {total}. Use THIS number for 'how many loops are in trouble'; "
+                         f"do NOT count from fault types below.")
         if ts:
             lines.append(f"Run timestamp: {ts}")
         if dur:
             lines.append(f"Data duration: {_fmt_num(dur, 1)} hours, sample interval: {intv}")
         if dcounts:
             dc_str = ", ".join(f"{k}: {v}" for k, v in dcounts.items())
-            lines.append(f"Fault distribution: {dc_str}")
+            lines.append(f"Fault types present (these are fault-type tallies, NOT loop "
+                         f"counts — for counting loops use the EXACT counts above): {dc_str}")
 
     # ── Per-loop details (query-aware) ───────────────────────────────────────
     loops = data.get("loops") or []
@@ -809,6 +842,21 @@ def _build_results_summary(email: str, user_message: str = "") -> str:
         lp.get('loop') for lp in loops
         if lp.get('loop') and str(lp['loop']).lower() in msg_lower
     ]
+
+    # ── Results-relevance gate ───────────────────────────────────────────────
+    # If the question names no loop and matches no results topic (e.g. "hi", or
+    # a pure concept question), send NO loop data and NO plant numbers — just a
+    # neutral note that a run exists. This keeps greetings clean (no numbers in
+    # context = nothing to recite) and cuts almost all per-message tokens.
+    if not matched_topics and not mentioned_loops:
+        note = ("A completed diagnostic run is available for this user. Do NOT state "
+                "plant health numbers or loop results unless the user actually asks; "
+                "if they only greet, greet back briefly and offer to help.")
+        try:
+            (Path(rd) / "chatbot_debug_summary.txt").write_text(note, encoding="utf-8")
+        except Exception:
+            pass
+        return note
 
     def _should_expand(lp: dict, matched_topics: list, mentioned_loops: list) -> bool:
         """Decide if this loop gets full detail or one-liner."""
@@ -883,27 +931,27 @@ def _build_results_summary(email: str, user_message: str = "") -> str:
             result.append(f"  rationale: {lp['rationale'][:300]}")
         return result
 
+    EXPAND_CAP = 8   # max loops shown in full on a topic/generic question
     lines.append(f"\nLoops analysed: {len(loops)}")
     n_expanded = 0
+    n_capped = 0
     for lp in loops:
-        if _should_expand(lp, matched_topics, mentioned_loops):
+        loop_name = str(lp.get('loop', ''))
+        want = _should_expand(lp, matched_topics, mentioned_loops)
+        is_named = loop_name in mentioned_loops
+        if want and (is_named or n_expanded < EXPAND_CAP):
             lines.extend(_loop_full_detail(lp))
             n_expanded += 1
         else:
-            # One-liner for healthy or irrelevant loops
+            if want:
+                n_capped += 1   # wanted full detail but hit the cap
             lines.append(
                 f"{lp.get('loop','?')}: {lp.get('diagnosis','-')} "
                 f"health={_fmt_num(lp.get('health'),0)} [{lp.get('severity','-')}]"
             )
-    if n_expanded == 0 and not matched_topics and not mentioned_loops:
-        # Fallback: no matches at all — show top 5 faulty in full
-        sorted_faulty = sorted(
-            [l for l in loops if (l.get('severity') or '').upper() not in ('OK','GOOD','HEALTHY','-')],
-            key=lambda x: x.get('health') or 100
-        )[:5]
-        lines.append("(Showing top faulty loops in detail as no specific query matched)")
-        for lp in sorted_faulty:
-            lines.extend(_loop_full_detail(lp))
+    if n_capped:
+        lines.append(f"(+{n_capped} more flagged loops collapsed to one-liners — ask about "
+                     f"a specific loop or category for full detail.)")
 
     # ── Maintenance actions ───────────────────────────────────────────────────
     maintenance = data.get("maintenance") or []
@@ -976,7 +1024,7 @@ async def api_chat(payload: dict, current_user: dict = Depends(get_current_user)
     system_prompt = (
         CHATBOT_ROLE
         + "\n\n===== KNOWLEDGE =====\n"
-        + _load_chatbot_knowledge()
+        + _knowledge_for_query(latest_user_msg)
         + "\n\n===== LATEST RESULTS (this user) =====\n"
         + _build_results_summary(current_user["sub"], latest_user_msg)
     )
