@@ -51,7 +51,7 @@
     },
     {
       "heading": "12. Glossary",
-      "text": "## 12. Glossary\n**PV** measured process variable · **SP** setpoint (target) · **OP** controller output to valve (0–100%) · **DCS** Distributed Control System · **IAE** Integrated Absolute Error ∫|PV−SP|dt, lower is better · **Harris Index** minimum-variance benchmark, 1.0 = theoretical optimum · **Service Factor** % time in Auto/Cascade · **Stiction** static valve friction causing stick-jump motion and limit cycles · **FOPDT/SOPDT** First/Second Order Plus Dead Time process models · **K** process gain · **θ** dead time · **τ** time constant · **Tu** oscillation period from error ACF · **λ** IMC closed-loop speed target (larger = slower/safer) · **Kp** proportional gain · **Ti** integral time (min) · **ACF** autocorrelation function · **Hägglund index** oscillation regularity measure · **IMC-PI** Internal Model Control PI tuning method · **UOM** unit of measure shown next to a loop's PV."
+      "text": "## 12. Glossary\n**PV** measured process variable · **SP** setpoint (target) · **OP** controller output to valve (0–100%) · **DCS** Distributed Control System · **IAE** Integrated Absolute Error ∫|PV−SP|dt, lower is better · **Harris Index** minimum-variance benchmark, 1.0 = theoretical optimum · **Service Factor** % time in Auto/Cascade · **Stiction** static valve friction causing stick-jump motion and limit cycles · **FOPDT/SOPDT** First/Second Order Plus Dead Time process models · **K** process gain · **θ** dead time · **τ** time constant · **Tu** oscillation period from error ACF · **λ** IMC closed-loop speed target (larger = slower/safer) · **Kp** proportional gain · **Ti** integral time (min) · **ACF** autocorrelation function · **Hägglund index** oscillation regularity measure · **IMC-PI** Internal Model Control PI tuning method · **UOM** unit of measure shown next to a loop's PV.\n\n**Diagnostic Heatmap column labels** (short labels shown in the Overview heatmap grid): **Reg** = Hägglund oscillation regularity index (≥0.60 flags sustained oscillation, ≥0.75 external) · **IAEnorm** = IAE norm% (IAE normalised to PV span, comparable across loops) · **OPact** = OP Activity (std-dev of controller output; valve-wear indicator) · **PVamp** = PV Amplitude (peak-to-peak PV variation) · **Conf** = Confidence % of the diagnosis · **dataQ** = Data Quality (Pass / Warn / Fail)."
     },
     {
       "heading": "13. Known limits (POC)",
@@ -62,16 +62,16 @@
       "text": "## 14. Formulas and Term Calculations\n\nThis section documents the exact formulas used inside the tool engine. Use this to explain how any metric is calculated or why a diagnosis was triggered."
     },
     {
-      "heading": "IAE (Integrated Absolute Error)",
-      "text": "[Section: 14. Formulas and Term Calculations]\n### IAE (Integrated Absolute Error)\nIAE_total = sum(|PV - SP|) over all samples\nIAE/hr = IAE_total / duration_in_hours\nIAE/hr normalised (%) = (IAE/hr / PV_scale) x 100\n  where PV_scale = max(|mean(PV)|, 4 x std(PV), 1.0)\nThis normalisation makes IAE comparable across loops with different engineering units and scales.\nDefault threshold: IAE/hr > 200 OR IAE_norm% > 15% flags poor tracking."
+      "heading": "IAE (Integrated Absolute Error) (heatmap label: IAEnorm)",
+      "text": "[Section: 14. Formulas and Term Calculations]\n### IAE (Integrated Absolute Error) (heatmap label: IAEnorm)\nIAE_total = sum(|PV - SP|) over all samples\nIAE/hr = IAE_total / duration_in_hours\nIAE/hr normalised (%) = (IAE/hr / PV_scale) x 100\n  where PV_scale = max(|mean(PV)|, 4 x std(PV), 1.0)\nThis normalisation makes IAE comparable across loops with different engineering units and scales.\nDefault threshold: IAE/hr > 200 OR IAE_norm% > 15% flags poor tracking."
     },
     {
-      "heading": "OP Activity",
-      "text": "[Section: 14. Formulas and Term Calculations]\n### OP Activity\nOP Activity = mean(|OP[i] - OP[i-1]|) over all samples — the average absolute step in controller output per sample.\nDefault threshold: > 1.5 flags high valve movement / potential stiction or aggressive tuning."
+      "heading": "OP Activity (heatmap label: OPact)",
+      "text": "[Section: 14. Formulas and Term Calculations]\n### OP Activity (heatmap label: OPact)\nOP Activity = mean(|OP[i] - OP[i-1]|) over all samples — the average absolute step in controller output per sample.\nDefault threshold: > 1.5 flags high valve movement / potential stiction or aggressive tuning."
     },
     {
-      "heading": "PV Amplitude",
-      "text": "[Section: 14. Formulas and Term Calculations]\n### PV Amplitude\nPV Amplitude = max(PV) - min(PV) — peak-to-peak range of the process variable.\nPV Amplitude % = (PV Amplitude / PV_scale) x 100 — relative to the operating scale.\nUsed in stiction heuristic and oscillation detection (>5% of scale flags significant oscillation)."
+      "heading": "PV Amplitude (heatmap label: PVamp)",
+      "text": "[Section: 14. Formulas and Term Calculations]\n### PV Amplitude (heatmap label: PVamp)\nPV Amplitude = max(PV) - min(PV) — peak-to-peak range of the process variable.\nPV Amplitude % = (PV Amplitude / PV_scale) x 100 — relative to the operating scale.\nUsed in stiction heuristic and oscillation detection (>5% of scale flags significant oscillation)."
     },
     {
       "heading": "Service Factor",
@@ -82,8 +82,8 @@
       "text": "[Section: 14. Formulas and Term Calculations]\n### Harris Index (Minimum Variance Benchmark)\nBased on Harris (1989). Measures how close a loop is to the theoretical minimum variance achievable given its dead time.\nFormula:\n  1. Compute error e[t] = PV[t] - SP[t]\n  2. Fit an AR(p) model to e using Yule-Walker equations (p = max(AR order, dead_time + 5), capped at N/4)\n  3. Compute AR residual variance: sigma_e^2 = r[0] - phi . r[1:p]\n  4. Compute impulse response h[0..b] of 1/A(q) where b = dead time in samples\n  5. sigma_mv^2 = sigma_e^2 x sum(h[0..b-1]^2) — minimum achievable variance\n  6. Harris Index = sigma_mv^2 / var(e) — clipped to [0, 1]\nInterpretation: 1.0 = ideal (already at minimum variance). 0.0 = no control benefit.\nDead time (b) is estimated from the peak lag in the OP to PV cross-correlation.\nDefault threshold: Harris < 0.3 is considered poor. NaN is returned when OP is near-static (treated as passing the gate, not failing)."
     },
     {
-      "heading": "Hagglund Oscillation Regularity",
-      "text": "[Section: 14. Formulas and Term Calculations]\n### Hagglund Oscillation Regularity\nMeasures how regular (periodic) the oscillations are, based on zero-crossing spacing of the error signal.\nFormula:\n  1. Compute error e[t] = PV[t] - SP[t], apply mild 5-sample rolling mean low-pass filter\n  2. Find all zero-crossing indices of e\n  3. Compute intervals between consecutive zero crossings\n  4. Regularity = 1 / (1 + std(intervals) / mean(intervals))\n  5. Dominant period (samples) = 2 x mean(intervals)\nRegularity is in [0, 1]. 1.0 = perfectly periodic. 0.0 = random.\nThresholds: >= 0.6 triggers oscillation flag (aggressive tuning gate); >= 0.75 used for external oscillation gate (stricter, since downstream attenuation reduces regularity)."
+      "heading": "Hagglund Oscillation Regularity (heatmap label: Reg)",
+      "text": "[Section: 14. Formulas and Term Calculations]\n### Hagglund Oscillation Regularity (heatmap label: Reg)\nMeasures how regular (periodic) the oscillations are, based on zero-crossing spacing of the error signal.\nFormula:\n  1. Compute error e[t] = PV[t] - SP[t], apply mild 5-sample rolling mean low-pass filter\n  2. Find all zero-crossing indices of e\n  3. Compute intervals between consecutive zero crossings\n  4. Regularity = 1 / (1 + std(intervals) / mean(intervals))\n  5. Dominant period (samples) = 2 x mean(intervals)\nRegularity is in [0, 1]. 1.0 = perfectly periodic. 0.0 = random.\nThresholds: >= 0.6 triggers oscillation flag (aggressive tuning gate); >= 0.75 used for external oscillation gate (stricter, since downstream attenuation reduces regularity)."
     },
     {
       "heading": "Stiction Detection — 4 Methods",

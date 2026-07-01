@@ -156,6 +156,8 @@ Upload page: drag-and-drop the DCS historian Excel export, then run diagnostics.
 ## 12. Glossary
 **PV** measured process variable · **SP** setpoint (target) · **OP** controller output to valve (0–100%) · **DCS** Distributed Control System · **IAE** Integrated Absolute Error ∫|PV−SP|dt, lower is better · **Harris Index** minimum-variance benchmark, 1.0 = theoretical optimum · **Service Factor** % time in Auto/Cascade · **Stiction** static valve friction causing stick-jump motion and limit cycles · **FOPDT/SOPDT** First/Second Order Plus Dead Time process models · **K** process gain · **θ** dead time · **τ** time constant · **Tu** oscillation period from error ACF · **λ** IMC closed-loop speed target (larger = slower/safer) · **Kp** proportional gain · **Ti** integral time (min) · **ACF** autocorrelation function · **Hägglund index** oscillation regularity measure · **IMC-PI** Internal Model Control PI tuning method · **UOM** unit of measure shown next to a loop's PV.
 
+**Diagnostic Heatmap column labels** (short labels shown in the Overview heatmap grid): **Reg** = Hägglund oscillation regularity index (≥0.60 flags sustained oscillation, ≥0.75 external) · **IAEnorm** = IAE norm% (IAE normalised to PV span, comparable across loops) · **OPact** = OP Activity (std-dev of controller output; valve-wear indicator) · **PVamp** = PV Amplitude (peak-to-peak PV variation) · **Conf** = Confidence % of the diagnosis · **dataQ** = Data Quality (Pass / Warn / Fail).
+
 ## 13. Known limits (POC)
 - Local app, not hosted 24/7; login required; results isolated per user.
 - "Current (Estimated)" Kp/Ti are indicative, reverse-engineered — verify in DCS.
@@ -167,7 +169,7 @@ Upload page: drag-and-drop the DCS historian Excel export, then run diagnostics.
 
 This section documents the exact formulas used inside the tool engine. Use this to explain how any metric is calculated or why a diagnosis was triggered.
 
-### IAE (Integrated Absolute Error)
+### IAE (Integrated Absolute Error) (heatmap label: IAEnorm)
 IAE_total = sum(|PV - SP|) over all samples
 IAE/hr = IAE_total / duration_in_hours
 IAE/hr normalised (%) = (IAE/hr / PV_scale) x 100
@@ -175,11 +177,11 @@ IAE/hr normalised (%) = (IAE/hr / PV_scale) x 100
 This normalisation makes IAE comparable across loops with different engineering units and scales.
 Default threshold: IAE/hr > 200 OR IAE_norm% > 15% flags poor tracking.
 
-### OP Activity
+### OP Activity (heatmap label: OPact)
 OP Activity = mean(|OP[i] - OP[i-1]|) over all samples — the average absolute step in controller output per sample.
 Default threshold: > 1.5 flags high valve movement / potential stiction or aggressive tuning.
 
-### PV Amplitude
+### PV Amplitude (heatmap label: PVamp)
 PV Amplitude = max(PV) - min(PV) — peak-to-peak range of the process variable.
 PV Amplitude % = (PV Amplitude / PV_scale) x 100 — relative to the operating scale.
 Used in stiction heuristic and oscillation detection (>5% of scale flags significant oscillation).
@@ -201,7 +203,7 @@ Interpretation: 1.0 = ideal (already at minimum variance). 0.0 = no control bene
 Dead time (b) is estimated from the peak lag in the OP to PV cross-correlation.
 Default threshold: Harris < 0.3 is considered poor. NaN is returned when OP is near-static (treated as passing the gate, not failing).
 
-### Hagglund Oscillation Regularity
+### Hagglund Oscillation Regularity (heatmap label: Reg)
 Measures how regular (periodic) the oscillations are, based on zero-crossing spacing of the error signal.
 Formula:
   1. Compute error e[t] = PV[t] - SP[t], apply mild 5-sample rolling mean low-pass filter

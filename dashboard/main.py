@@ -21,7 +21,8 @@ from fastapi import (
     Depends, FastAPI, File, HTTPException, Request, UploadFile, status
 )
 from fastapi.responses import (
-    FileResponse, HTMLResponse, JSONResponse, RedirectResponse
+    FileResponse, HTMLResponse, JSONResponse, RedirectResponse,
+    StreamingResponse,
 )
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -58,17 +59,92 @@ load_dotenv(BASE_DIR / ".env")
 KNOWLEDGE_PATH = BASE_DIR / "chatbot_knowledge.md"
 GROQ_MODEL = "llama-3.3-70b-versatile"
 CHAT_HISTORY_LIMIT = 10
-_groq_client = None
+GROQ_TIMEOUT = 20.0  # per-key timeout; worst-case wait = num_keys x GROQ_TIMEOUT
+_groq_clients = None
 
 
-def _get_groq_client():
-    global _groq_client
-    if _groq_client is None:
-        api_key = os.environ.get("GROQ_API_KEY")
-        if not api_key:
-            raise RuntimeError("GROQ_API_KEY not found — check the .env file in the POC root.")
-        _groq_client = Groq(api_key=api_key, max_retries=0, timeout=20.0)
-    return _groq_client
+def _load_groq_keys():
+    """Collect Groq API keys from env, in priority order, de-duplicated.
+    Supports GROQ_API_KEY, GROQ_API_KEY_2, GROQ_API_KEY_3, and a
+    comma-separated GROQ_API_KEYS. The first key is tried first."""
+    keys = []
+    multi = os.environ.get("GROQ_API_KEYS", "")
+    if multi.strip():
+        keys.extend(k.strip() for k in multi.split(",") if k.strip())
+    for name in ("GROQ_API_KEY", "GROQ_API_KEY_2", "GROQ_API_KEY2",
+                 "GROQ_API_KEY_3", "GROQ_API_KEY3",
+                 "GROQ_API_KEY_4", "GROQ_API_KEY4"):
+        v = os.environ.get(name, "").strip()
+        if v:
+            keys.append(v)
+    seen, ordered = set(), []
+    for k in keys:
+        if k not in seen:
+            seen.add(k)
+            ordered.append(k)
+    return ordered
+
+
+def _get_groq_clients():
+    """Build (once) one Groq client per available key, cached in order."""
+    global _groq_clients
+    if _groq_clients is None:
+        keys = _load_groq_keys()
+        if not keys:
+            raise RuntimeError("No GROQ_API_KEY found — check the .env file in the POC root.")
+        _groq_clients = [Groq(api_key=k, max_retries=0, timeout=GROQ_TIMEOUT) for k in keys]
+    return _groq_clients
+
+
+def _is_rotatable_error(e) -> bool:
+    """True only for key-specific failures (rate-limit / auth) where a
+    different key might succeed. False for request errors (e.g. 400) that
+    would fail identically on every key."""
+    status = getattr(e, "status_code", None)
+    if status in (429, 401, 403):
+        return True
+    m = str(e).lower()
+    return ("rate limit" in m or "429" in m or "401" in m or "403" in m
+            or "invalid api key" in m or "authentication" in m)
+
+
+def _groq_chat(**kwargs):
+    """chat.completions.create with key failover. Tries each key in order;
+    on a key-specific failure moves to the next key. Non-rotatable errors
+    (and the last key's error) are raised immediately."""
+    clients = _get_groq_clients()
+    for i, client in enumerate(clients):
+        try:
+            return client.chat.completions.create(**kwargs)
+        except Exception as e:
+            if _is_rotatable_error(e) and i < len(clients) - 1:
+                continue  # this key is rate-limited / invalid — try the next
+            raise
+
+
+def _groq_chat_stream(**kwargs):
+    """Yield reply text chunks with key failover. Failover happens only before
+    the first token is emitted; once a key starts streaming we stay on it (a
+    stream cannot be cleanly restarted mid-flow). Rotatable errors from Groq
+    surface at creation / first chunk, before any emit, so this is safe."""
+    clients = _get_groq_clients()
+    kwargs["stream"] = True
+    for i, client in enumerate(clients):
+        emitted = False
+        try:
+            stream = client.chat.completions.create(**kwargs)
+            for chunk in stream:
+                delta = ""
+                if chunk.choices:
+                    delta = chunk.choices[0].delta.content or ""
+                if delta:
+                    emitted = True
+                    yield delta
+            return
+        except Exception as e:
+            if not emitted and _is_rotatable_error(e) and i < len(clients) - 1:
+                continue  # nothing sent yet on this key — try the next
+            raise
 
 
 def _load_chatbot_knowledge() -> str:
@@ -1030,15 +1106,25 @@ async def api_chat(payload: dict, current_user: dict = Depends(get_current_user)
     )
 
     try:
-        client = _get_groq_client()
-        resp = client.chat.completions.create(
+        gen = _groq_chat_stream(
             model=GROQ_MODEL,
             messages=[{"role": "system", "content": system_prompt}] + history,
             max_tokens=700,
             temperature=0.3,
         )
-        reply = resp.choices[0].message.content
-        return JSONResponse(content={"reply": reply})
+        # Pull the first chunk eagerly so auth / rate-limit errors surface as a
+        # proper HTTP error instead of a broken 200 stream.
+        try:
+            first_chunk = next(gen)
+        except StopIteration:
+            first_chunk = ""
+
+        def event_stream():
+            if first_chunk:
+                yield first_chunk
+            yield from gen
+
+        return StreamingResponse(event_stream(), media_type="text/plain; charset=utf-8")
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
@@ -1961,8 +2047,7 @@ Write a clear, professional tuning analysis report for a control engineer. Struc
 Be concise, technical but readable. Use the section names as plain text labels. Do not invent numbers not provided above."""
 
     try:
-        client = _get_groq_client()
-        resp = client.chat.completions.create(
+        resp = _groq_chat(
             model=GROQ_MODEL,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=800,

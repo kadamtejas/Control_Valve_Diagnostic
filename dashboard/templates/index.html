@@ -1930,14 +1930,31 @@ async function vdtChatSend(){
   try{
     const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({messages:vdtChatHistory})});
-    const data=await r.json();
+    if(!r.ok){
+      typing.remove();
+      let detail='Something went wrong. Please try again.';
+      try{const data=await r.json();detail=data.detail||detail;}catch(e){}
+      vdtChatAppend('sys',detail);
+      btn.disabled=false;inp.focus();return;
+    }
     typing.remove();
-    if(r.ok&&data.reply){
-      vdtChatAppend('bot',data.reply);
-      vdtChatHistory.push({role:'assistant',content:data.reply});
+    const bubble=vdtChatAppend('bot','');
+    const reader=r.body.getReader();
+    const decoder=new TextDecoder();
+    let full='';
+    while(true){
+      const {done,value}=await reader.read();
+      if(done)break;
+      full+=decoder.decode(value,{stream:true});
+      bubble.textContent=full;
+      box.scrollTop=box.scrollHeight;
+    }
+    if(full){
+      vdtChatHistory.push({role:'assistant',content:full});
       vdtChatSave();
     }else{
-      vdtChatAppend('sys',data.detail||'Something went wrong. Please try again.');
+      bubble.remove();
+      vdtChatAppend('sys','Empty reply. Please try again.');
     }
   }catch(e){
     typing.remove();
