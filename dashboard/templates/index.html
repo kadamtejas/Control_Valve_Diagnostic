@@ -1871,6 +1871,18 @@ function srchClear(id,cb){const inp=document.getElementById(id);if(inp){inp.valu
 #vdtChatSend{background:#2563eb;color:#fff;border:none;border-radius:9px;padding:0 14px;font-size:15px;cursor:pointer;transition:background .15s}
 #vdtChatSend:hover{background:#1d4ed8}
 #vdtChatSend:disabled{background:#93c5fd;cursor:default}
+.vdt-ch-msg.bot{white-space:normal}
+.vdt-ch-msg.bot p{margin:0 0 7px}
+.vdt-ch-msg.bot p:last-child{margin-bottom:0}
+.vdt-ch-msg.bot ol,.vdt-ch-msg.bot ul{margin:4px 0 7px;padding-left:20px}
+.vdt-ch-msg.bot li{margin:2px 0}
+.vdt-ch-msg.bot strong{font-weight:700;color:#0b1e3a}
+.vdt-ch-msg.bot code{background:#eef2f7;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;padding:1px 5px;border-radius:4px;color:#1d4ed8}
+.vdt-ch-msg.bot pre.vdt-code{background:#0f172a;color:#e2e8f0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;line-height:1.5;padding:9px 11px;border-radius:8px;margin:6px 0;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+#vdtChatMic{background:#eef2f7;color:#2563eb;border:1px solid #cbd5e1;border-radius:9px;padding:0 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s,border-color .15s}
+#vdtChatMic:hover{background:#e0e7ff}
+#vdtChatMic.rec{background:#ef4444;color:#fff;border-color:#ef4444;animation:vdtPulse 1.1s ease-in-out infinite}
+@keyframes vdtPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
 </style>
 
 <button id="vdtChatBtn" title="Ask the assistant" onclick="vdtChatToggle()">💬</button>
@@ -1887,6 +1899,7 @@ function srchClear(id,cb){const inp=document.getElementById(id);if(inp){inp.valu
   </div>
   <div class="vdt-ch-inrow">
     <textarea id="vdtChatInput" rows="1" placeholder="Type a question…"></textarea>
+    <button id="vdtChatMic" onclick="vdtVoiceToggle()" title="Speak your question" aria-label="Voice input"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
     <button id="vdtChatSend" onclick="vdtChatSend()">➤</button>
   </div>
 </div>
@@ -1904,11 +1917,45 @@ function vdtChatToggle(){
   p.classList.toggle('open');
   if(p.classList.contains('open'))document.getElementById('vdtChatInput').focus();
 }
+function vdtEsc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function vdtSpan(s){
+  return s.split(/(`[^`]+`)/g).map(function(p){
+    if(p.length>1&&p[0]==='`'&&p[p.length-1]==='`')return '<code>'+p.slice(1,-1)+'</code>';
+    return p.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  }).join('');
+}
+function vdtBlocks(text){
+  const lines=vdtEsc(text).split('\n');
+  const ol=/^\s*\d+\.\s+/,ul=/^\s*[-*]\s+/,blank=/^\s*$/;
+  let out=[],i=0;
+  while(i<lines.length){
+    if(ol.test(lines[i])){let it=[];while(i<lines.length&&ol.test(lines[i])){it.push(lines[i].replace(ol,''));i++;}out.push('<ol>'+it.map(function(x){return '<li>'+vdtSpan(x)+'</li>';}).join('')+'</ol>');continue;}
+    if(ul.test(lines[i])){let it=[];while(i<lines.length&&ul.test(lines[i])){it.push(lines[i].replace(ul,''));i++;}out.push('<ul>'+it.map(function(x){return '<li>'+vdtSpan(x)+'</li>';}).join('')+'</ul>');continue;}
+    if(blank.test(lines[i])){i++;continue;}
+    let para=[];while(i<lines.length&&!blank.test(lines[i])&&!ol.test(lines[i])&&!ul.test(lines[i])){para.push(lines[i]);i++;}
+    out.push('<p>'+para.map(vdtSpan).join('<br>')+'</p>');
+  }
+  return out.join('');
+}
+function vdtMarkdown(src){
+  if(!src)return '';
+  const parts=src.split('```');
+  let html='';
+  for(let i=0;i<parts.length;i++){
+    if(i%2===1){
+      let code=parts[i];const nl=code.indexOf('\n');
+      if(nl>=0){const first=code.slice(0,nl).trim();if(/^[a-z0-9+#_-]{0,15}$/i.test(first))code=code.slice(nl+1);}
+      code=code.replace(/\n$/,'');
+      html+='<pre class="vdt-code">'+vdtEsc(code)+'</pre>';
+    }else{html+=vdtBlocks(parts[i]);}
+  }
+  return html;
+}
 function vdtChatAppend(role,text){
   const box=document.getElementById('vdtChatMsgs');
   const d=document.createElement('div');
   d.className='vdt-ch-msg '+role;
-  d.textContent=text;
+  if(role==='bot'){d.innerHTML=vdtMarkdown(text);}else{d.textContent=text;}
   box.appendChild(d);
   box.scrollTop=box.scrollHeight;
   return d;
@@ -1946,7 +1993,7 @@ async function vdtChatSend(){
       const {done,value}=await reader.read();
       if(done)break;
       full+=decoder.decode(value,{stream:true});
-      bubble.textContent=full;
+      bubble.innerHTML=vdtMarkdown(full);
       box.scrollTop=box.scrollHeight;
     }
     if(full){
@@ -1966,6 +2013,48 @@ async function vdtChatSend(){
 document.getElementById('vdtChatInput').addEventListener('keydown',function(e){
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();vdtChatSend();}
 });
+// ---- Voice input (Web Speech API). Fills the box, never auto-sends. ----
+let vdtRec=null,vdtListening=false,vdtBaseText='';
+function vdtVoiceToggle(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){vdtChatAppend('sys','Voice input needs Chrome or Edge. Please type your question.');return;}
+  if(vdtListening){if(vdtRec)vdtRec.stop();return;}
+  const inp=document.getElementById('vdtChatInput');
+  const mic=document.getElementById('vdtChatMic');
+  vdtRec=new SR();
+  vdtRec.lang='en-IN';
+  vdtRec.interimResults=true;
+  vdtRec.continuous=false;
+  vdtRec.maxAlternatives=1;
+  vdtBaseText=inp.value?inp.value.replace(/\s+$/,'')+' ':'';
+  let vdtGotResult=false,vdtVoiceErr=null;
+  vdtRec.onstart=function(){vdtListening=true;mic.classList.add('rec');mic.title='Listening… click to stop';inp.placeholder='Listening…';};
+  vdtRec.onresult=function(e){
+    vdtGotResult=true;
+    let interim='',finalTxt='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal)finalTxt+=t;else interim+=t;
+    }
+    if(finalTxt)vdtBaseText=(vdtBaseText+finalTxt).replace(/\s+/g,' ').replace(/^\s+/,'')+' ';
+    inp.value=(vdtBaseText+interim).replace(/\s+$/,'');
+  };
+  vdtRec.onerror=function(e){
+    vdtVoiceErr=e.error;
+    vdtListening=false;mic.classList.remove('rec');inp.placeholder='Type a question…';
+    console.warn('[voice] error:',e.error);
+    const msg={'not-allowed':'Microphone blocked. Click the mic icon in the address bar and allow access.','service-not-allowed':'Mic blocked by the browser or OS. Allow access and retry.','no-speech':'No speech detected — check the mic is picking you up, then try again.','audio-capture':'No working microphone found. Check your input device in Windows sound settings.','network':'Speech service unreachable — voice needs an internet connection to transcribe.','aborted':'Voice input stopped.'}[e.error]||('Voice error: '+e.error);
+    vdtChatAppend('sys',msg);
+  };
+  vdtRec.onend=function(){
+    vdtListening=false;mic.classList.remove('rec');mic.title='Speak your question';
+    inp.placeholder='Type a question…';inp.value=inp.value.replace(/\s+$/,'');
+    if(!vdtGotResult&&!vdtVoiceErr)vdtChatAppend('sys','No speech captured. Check the correct mic is selected in chrome://settings/content/microphone.');
+    inp.focus();
+  };
+  try{vdtRec.start();}catch(err){console.warn('[voice] start failed:',err);}
+}
+(function(){if(!(window.SpeechRecognition||window.webkitSpeechRecognition)){const m=document.getElementById('vdtChatMic');if(m)m.style.display='none';}})();
 // reset chat when a new diagnostic run exists, else restore conversation
 (async function(){
   let rid=null;
