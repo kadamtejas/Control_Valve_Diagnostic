@@ -14,7 +14,7 @@ includes Rossi-Scali parameter estimation (S, J).
 """
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -31,8 +31,8 @@ class StictionResult:
     bicoherence_score: float = 0.0     # 0–100
     consensus_score: float = 0.0       # 0–100, weighted average
     consensus_label: str = "Healthy"   # Healthy / Possible / Likely / Confirmed
-    estimated_S: float = 0.0           # Rossi-Scali stickband, OP%
-    estimated_J: float = 0.0           # Rossi-Scali slip-jump, OP%
+    estimated_S: Optional[float] = None  # Rossi-Scali stickband, OP% (None = no valid segment found)
+    estimated_J: Optional[float] = None  # Rossi-Scali slip-jump, OP% (None = no valid segment found)
     yamashita_shape: str = "unknown"   # "straight" / "ellipse" / "parallelogram" / "unknown"
     methods_agreeing: int = 0
 
@@ -255,18 +255,28 @@ def stiction_bicoherence(pv: np.ndarray) -> float:
 
 
 # ─── Rossi-Scali parameter estimation (S, J) ───────────────────────────
-def estimate_stiction_parameters(pv: np.ndarray, op: np.ndarray) -> tuple:
+def estimate_stiction_parameters(pv: np.ndarray, op: np.ndarray, config: dict = None) -> tuple:
     """
     Estimate stickband S and slip-jump J in OP%.
     Method: identify reversal segments where PV stays flat while OP keeps
     moving; the OP excursion before PV starts moving is S. The PV jump
     when motion resumes maps back to a J estimate via the local OP-PV gain.
-    Returns (S_pct, J_pct).
+    Returns (S_pct, J_pct), or (None, None) if no valid segment is found.
+
+    Uses a trailing (causal) rolling mean to detect PV movement so the
+    "did PV move after this reversal" test never looks ahead of the
+    reversal point — a centered window would leak future PV samples
+    backward and make PV appear to move before it actually did.
+
+    The minimum segment length (in samples) is config-driven via
+    STICTION_MIN_SEGMENT_SAMPLES rather than a fixed constant, since a
+    sensible minimum depends on the loop's cycling speed relative to the
+    historian's sample interval — not a fixed number of samples.
     """
     pv = np.asarray(pv, dtype=float)
     op = np.asarray(op, dtype=float)
     if len(pv) < 50:
-        return 0.0, 0.0
+        return None, None
 
     op_d = np.diff(op)
     sign = np.sign(op_d)
@@ -274,20 +284,23 @@ def estimate_stiction_parameters(pv: np.ndarray, op: np.ndarray) -> tuple:
     # find "OP-moving" segments and "OP-still" segments
     reversal_idx = np.where(np.diff(sign) != 0)[0]
     if len(reversal_idx) < 4:
-        return 0.0, 0.0
+        return None, None
 
-    pv_smooth = pd.Series(pv).rolling(5, center=True, min_periods=1).mean().values
+    pv_smooth = pd.Series(pv).rolling(5, center=False, min_periods=1).mean().values
     pv_d = np.diff(pv_smooth)
 
     S_estimates = []
     J_estimates = []
     pv_amp_total = float(np.std(pv)) + 1e-9
     pv_threshold = 0.5 * pv_amp_total / 5
+    cfg = config or {}
+    min_seg = int(safe_float(cfg.get("STICTION_MIN_SEGMENT_SAMPLES",
+                                      DEFAULTS.get("STICTION_MIN_SEGMENT_SAMPLES", 3))))
 
     for k in range(len(reversal_idx) - 1):
         r1 = reversal_idx[k]
         r2 = reversal_idx[k + 1]
-        if r2 - r1 < 5:
+        if r2 - r1 < min_seg:
             continue
         op_segment = op[r1: r2]
         pv_segment = pv_d[r1: r2]
@@ -296,6 +309,15 @@ def estimate_stiction_parameters(pv: np.ndarray, op: np.ndarray) -> tuple:
         if len(pv_moves) == 0:
             continue
         first_move = pv_moves[0]
+        if first_move == 0:
+            # PV was already moving in the very first sample after the
+            # reversal — the stuck-then-slip transition happened faster
+            # than this segment's sample interval can resolve. This is a
+            # censored (unmeasurable) observation, not evidence of a zero
+            # stickband: counting it as S=0 would understate S for any
+            # loop that cycles faster than the historian sample rate.
+            # Skip it rather than let it masquerade as a measured zero.
+            continue
         S_op = abs(op_segment[first_move] - op_segment[0])
         S_estimates.append(S_op)
         # Slip-jump: PV change at the first-move index minus expected
@@ -306,9 +328,10 @@ def estimate_stiction_parameters(pv: np.ndarray, op: np.ndarray) -> tuple:
             J_op = J_pv / max(abs(local_gain), 1e-3)
             J_estimates.append(min(J_op, S_op))
 
-    S = float(np.median(S_estimates)) if S_estimates else 0.0
-    J = float(np.median(J_estimates)) if J_estimates else 0.0
-    return round(S, 2), round(J, 2)
+    S = float(np.median(S_estimates)) if S_estimates else None
+    J = float(np.median(J_estimates)) if J_estimates else None
+    return (round(S, 2) if S is not None else None,
+            round(J, 2) if J is not None else None)
 
 
 def stiction_consensus(pv, op, sp, metrics: LoopMetrics, config,
@@ -336,7 +359,7 @@ def stiction_consensus(pv, op, sp, metrics: LoopMetrics, config,
         res.yamashita_score, res.yamashita_shape = stiction_yamashita(pv, op)
     if use_b:
         res.bicoherence_score = stiction_bicoherence(pv)
-    res.estimated_S, res.estimated_J = estimate_stiction_parameters(pv, op)
+    res.estimated_S, res.estimated_J = estimate_stiction_parameters(pv, op, config)
 
     # Build weight vector across the four methods, zeroing disabled ones
     raw_w = np.array([

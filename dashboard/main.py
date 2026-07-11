@@ -229,11 +229,17 @@ def _results_dir_for(email: str) -> str | None:
     return None
 
 
-def _run_engine_background(job_id: str, input_path: Path, results_folder: str, mode: str):
+def _run_engine_background(job_id: str, input_path: Path, results_folder: str, mode: str,
+                           config: dict = None):
     """
     Runs in a background thread.
     When frozen as .exe: calls run_v3() directly (no subprocess needed — engine is bundled).
     In dev mode: calls valve_diagnostics_v3.py via subprocess like the bat files do.
+
+    `config`, if given, is a flat {parameter: value} dict — the resolved
+    per-user config (default or their own saved settings). It's passed
+    straight through to the engine; nothing gets written into or read back
+    from the uploaded Excel's DIAGNOSTIC_CONFIG sheet anymore.
     """
     output_dir = str(BASE_DIR / results_folder)
     engine_mode = "MANUAL" if mode == "manual" else "AUTO"
@@ -254,6 +260,7 @@ def _run_engine_background(job_id: str, input_path: Path, results_folder: str, m
                 output_dir,
                 mode=engine_mode,
                 verbose=True,
+                config=config,
             )
             if exit_code == 0:
                 jobs[job_id]["status"] = "done"
@@ -277,6 +284,14 @@ def _run_engine_background(job_id: str, input_path: Path, results_folder: str, m
         ]
         if mode == "manual":
             cmd.append("--manual")
+
+        config_json_path = None
+        if config is not None:
+            os.makedirs(output_dir, exist_ok=True)
+            config_json_path = Path(output_dir) / "_run_config.json"
+            with open(config_json_path, "w", encoding="utf-8") as f:
+                json.dump(config, f, indent=2)
+            cmd.extend(["--config-json", str(config_json_path)])
 
         try:
             result = subprocess.run(
@@ -340,84 +355,18 @@ def _save_config(email: str, config: dict):
         json.dump(config, f, indent=2)
 
 
-def _write_config_to_excel(input_path: Path, config: dict):
-    """Overwrite DIAGNOSTIC_CONFIG, DIAGNOSTIC_SELECTION, MODE_MAPPING sheets.
-    If any required sheet is missing from the Excel, it is created from the
-    default/user config so the health check never fails on a missing sheet.
+def _flatten_config(config: dict) -> dict:
+    """Convert the JSON-storage config shape (diagnostic_config as a list of
+    {parameter, value, description} rows) into the flat {parameter: value}
+    dict the engine actually expects. This is the only place that shape
+    conversion happens — everything downstream of this deals in flat dicts.
     """
-    import openpyxl
-    wb = openpyxl.load_workbook(str(input_path))
-
-    # DIAGNOSTIC_CONFIG — create if missing
-    if "DIAGNOSTIC_CONFIG" not in wb.sheetnames:
-        ws = wb.create_sheet("DIAGNOSTIC_CONFIG")
-        ws.cell(1, 1, "Parameter"); ws.cell(1, 2, "Value"); ws.cell(1, 3, "Description")
-    else:
-        ws = wb["DIAGNOSTIC_CONFIG"]
-    for i, row in enumerate(config.get("diagnostic_config", []), start=2):
-        ws.cell(i, 1, row["parameter"])
-        ws.cell(i, 2, row["value"])
-        ws.cell(i, 3, row.get("description", ""))
-
-    # DIAGNOSTIC_SELECTION — create if missing
-    if "DIAGNOSTIC_SELECTION" not in wb.sheetnames:
-        ws = wb.create_sheet("DIAGNOSTIC_SELECTION")
-        ws.cell(1, 1, "Diagnostic"); ws.cell(1, 2, "Enabled")
-    else:
-        ws = wb["DIAGNOSTIC_SELECTION"]
-    for i, row in enumerate(config.get("diagnostic_selection", []), start=2):
-        indent = row.get("indent", 0)
-        name = ("    " * indent) + row["diagnostic"]
-        ws.cell(i, 1, name)
-        ws.cell(i, 2, row["enabled"])
-
-    # MODE_MAPPING — create if missing
-    if "MODE_MAPPING" not in wb.sheetnames:
-        ws = wb.create_sheet("MODE_MAPPING")
-        ws.cell(1, 1, "Category"); ws.cell(1, 2, "Value")
-    else:
-        ws = wb["MODE_MAPPING"]
-        # Clear existing data rows before rewriting
-        for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
-            for cell in row:
-                cell.value = None
-    for i, row in enumerate(config.get("mode_mapping", []), start=2):
-        ws.cell(i, 1, row["category"])
-        ws.cell(i, 2, row["value"])
-
-    # DETECTION_EXCLUSIONS — write {problem_id: [loop1, loop2, ...]} as a flat table
-    excl = config.get("detection_exclusions", {})
-    sheet_name = "DETECTION_EXCLUSIONS"
-    if sheet_name in wb.sheetnames:
-        del wb[sheet_name]
-    if excl:
-        ws = wb.create_sheet(sheet_name)
-        ws.cell(1, 1, "Problem");  ws.cell(1, 2, "Loop")
-        row_idx = 2
-        for problem_id, loops in excl.items():
-            for loop in loops:
-                ws.cell(row_idx, 1, problem_id)
-                ws.cell(row_idx, 2, loop)
-                row_idx += 1
-
-    # UNIT_MAPPING — write {tag: unit} + {tag: uom} to sheet
-    unit_mapping = config.get("unit_mapping", {})
-    uom_mapping  = config.get("uom_mapping", {})
-    if unit_mapping:
-        sheet_name = "UNIT_MAPPING"
-        if sheet_name in wb.sheetnames:
-            ws = wb[sheet_name]
-            for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
-                for cell in row: cell.value = None
-        else:
-            ws = wb.create_sheet(sheet_name)
-            ws.cell(1, 1, "Tag"); ws.cell(1, 2, "Unit"); ws.cell(1, 3, "UOM")
-        for i, (tag, unit) in enumerate(unit_mapping.items(), start=2):
-            ws.cell(i, 1, str(tag).strip())
-            ws.cell(i, 2, str(unit).strip())
-            ws.cell(i, 3, str(uom_mapping.get(tag, '')).strip())
-
-    wb.save(str(input_path))
+    flat = {}
+    for row in config.get("diagnostic_config", []):
+        p = row.get("parameter")
+        if p is not None:
+            flat[p] = row.get("value")
+    return flat
 
 
 # ── Auth endpoints ────────────────────────────────────────────────────────────
@@ -551,10 +500,7 @@ async def upload_file(
     config.pop("unit_mapping", None)
     config.pop("uom_mapping", None)
     _save_config(current_user["sub"], config)
-    try:
-        _write_config_to_excel(dest_path, config)
-    except Exception:
-        pass  # Non-fatal — engine will use whatever is already in the file
+    flat_config = _flatten_config(config)
 
     # ── Start engine immediately with defaults — no config page
     job_id = str(uuid.uuid4())
@@ -566,7 +512,7 @@ async def upload_file(
     }
     thread = threading.Thread(
         target=_run_engine_background,
-        args=(job_id, dest_path, results_folder, mode),
+        args=(job_id, dest_path, results_folder, mode, flat_config),
         daemon=True,
     )
     thread.start()
@@ -637,16 +583,13 @@ async def save_config_and_run(request: Request, current_user: dict = Depends(get
     # Mark that this user has now run with custom settings
     user_custom_run[current_user["sub"]] = True
 
-    # Write config back into the Excel
     dest_path = Path(pending["dest_path"])
-    try:
-        _write_config_to_excel(dest_path, config)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to write config to Excel: {e}")
+    flat_config = _flatten_config(config)
 
-    # Now start engine
+    # Explicit Settings interaction -- force manual mode so auto-calibration
+    # never silently overrides a value the user just set.
     results_folder = pending["results_folder"]
-    mode = pending["mode"]
+    mode = "manual"
     job_id = str(uuid.uuid4())
     jobs[job_id] = {
         "status":         "running",
@@ -656,7 +599,7 @@ async def save_config_and_run(request: Request, current_user: dict = Depends(get
     }
     thread = threading.Thread(
         target=_run_engine_background,
-        args=(job_id, dest_path, results_folder, mode),
+        args=(job_id, dest_path, results_folder, mode, flat_config),
         daemon=True,
     )
     thread.start()
@@ -680,9 +623,7 @@ async def rerun_with_config(request: Request, current_user: dict = Depends(get_c
             folder_name = os.path.basename(rd)
             safe_email  = current_user["sub"].replace("@", "_at_").replace(".", "_")
             is_manual   = folder_name.endswith("_manual")
-            # Strip leading results_<safe_email>_ prefix
-            prefix = f"results_{safe_email}_"
-            stem = folder_name.removeprefix(prefix).removesuffix("_manual")
+            stem = _stem_from_results_folder(rd, current_user["sub"])
             mode        = "manual" if is_manual else "auto"
             results_folder = folder_name
             # Look for matching .xlsx in user upload dir
@@ -713,16 +654,13 @@ async def rerun_with_config(request: Request, current_user: dict = Depends(get_c
     # Save user config
     _save_config(current_user["sub"], config)
 
-    # Write config back into the Excel
     dest_path = Path(pending["dest_path"])
-    try:
-        _write_config_to_excel(dest_path, config)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to write config to Excel: {e}")
+    flat_config = _flatten_config(config)
 
-    # Start engine
+    # Explicit Settings interaction -- force manual mode so auto-calibration
+    # never silently overrides a value the user just set.
     results_folder = pending["results_folder"]
-    mode = pending["mode"]
+    mode = "manual"
     job_id = str(uuid.uuid4())
     jobs[job_id] = {
         "status":         "running",
@@ -732,7 +670,7 @@ async def rerun_with_config(request: Request, current_user: dict = Depends(get_c
     }
     thread = threading.Thread(
         target=_run_engine_background,
-        args=(job_id, dest_path, results_folder, mode),
+        args=(job_id, dest_path, results_folder, mode, flat_config),
         daemon=True,
     )
     thread.start()
@@ -762,12 +700,27 @@ def _get_user_results_dir(current_user: dict) -> str:
     return rd
 
 
+def _stem_from_results_folder(rd: str, email: str) -> str:
+    """Recover the original uploaded filename's stem from a results folder
+    path/name. Results folders are named results_{safe_email}_{stem}, or
+    results_{safe_email}_{stem}_manual for manual-mode runs. This strips
+    both, leaving just the stem — used both to locate the matching file
+    under uploads/{safe_email}/{stem}.xlsx and to build a clean, human-
+    readable display name (no internal naming convention shown to the user).
+    """
+    folder_name = os.path.basename(rd) if rd else ""
+    safe_email = email.replace("@", "_at_").replace(".", "_")
+    prefix = f"results_{safe_email}_"
+    return folder_name.removeprefix(prefix).removesuffix("_manual")
+
+
 @app.get("/api/latest")
 async def get_latest(current_user: dict = Depends(get_current_user)):
     rd = _get_user_results_dir(current_user)
     try:
         data = read_dashboard_data(rd, base_dir=str(BASE_DIR))
         data["is_custom_config"] = _is_custom_config(current_user["sub"])
+        data["run_folder_display"] = _stem_from_results_folder(rd, current_user["sub"]) or data.get("run_folder", "")
         return JSONResponse(content=data)
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -1212,16 +1165,28 @@ async def get_unit_mapping(current_user: dict = Depends(get_current_user)):
     config = _load_config(current_user["sub"])
     needs_save = False
 
+    # Resolve the actual uploaded input file for this user's current results
+    # folder. NOTE: this used to be guessed inside read_unit_mapping() by
+    # stripping a generic "results_" prefix from the folder name and looking
+    # in BASE_DIR directly — but results folders are actually named
+    # results_{safe_email}_{stem}, and uploads live under uploads/{safe_email}/,
+    # not BASE_DIR. That mismatch meant the file was never found, so every
+    # user's unit map silently came back empty and every loop fell back to
+    # "Unknown". Mirrors the same resolution /api/unit-mapping/save uses.
+    safe_email = current_user["sub"].replace("@", "_at_").replace(".", "_")
+    stem = _stem_from_results_folder(rd, current_user["sub"])
+    input_path = str(BASE_DIR / "uploads" / safe_email / f"{stem}.xlsx") if stem else ""
+
     # If unit_mapping not in JSON yet, seed from Excel
     if not config.get("unit_mapping"):
-        excel_data = read_unit_mapping(rd, str(BASE_DIR))
+        excel_data = read_unit_mapping(input_path)
         config["unit_mapping"] = excel_data.get("unit_map", {})
         config["uom_mapping"]  = excel_data.get("uom_map", {})
         needs_save = True
 
     # If uom_mapping not in JSON yet, seed from Excel
     if "uom_mapping" not in config:
-        excel_data = read_unit_mapping(rd, str(BASE_DIR))
+        excel_data = read_unit_mapping(input_path)
         config["uom_mapping"] = excel_data.get("uom_map", {})
         needs_save = True
 
@@ -1251,10 +1216,8 @@ async def save_unit_mapping(request: Request, current_user: dict = Depends(get_c
 
     # ── Find the input Excel for this user's current results folder ──────────
     rd = _get_user_results_dir(current_user)
-    folder_name = os.path.basename(rd)
     safe_email  = current_user["sub"].replace("@", "_at_").replace(".", "_")
-    prefix = f"results_{safe_email}_"
-    stem = folder_name.removeprefix(prefix).removesuffix("_manual")
+    stem = _stem_from_results_folder(rd, current_user["sub"])
     user_upload_dir = BASE_DIR / "uploads" / safe_email
     input_path = user_upload_dir / f"{stem}.xlsx"
 

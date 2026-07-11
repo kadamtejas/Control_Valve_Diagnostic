@@ -30,16 +30,27 @@ def _parse_args():
                    help="Run even if health check found problems "
                         "(NOT recommended)")
     p.add_argument("--quiet", action="store_true", help="Suppress console output")
+    p.add_argument("--config-json", default=None,
+                   help="Path to a JSON file with a flat {parameter: value} "
+                        "config dict, bypassing the Excel DIAGNOSTIC_CONFIG "
+                        "read entirely. Used by the dashboard for per-user "
+                        "config; not needed for plain CLI runs.")
     return p.parse_args()
 
 
 def main():
     args = _parse_args()
     mode = "MANUAL" if args.manual else "AUTO"
+    config = None
+    if args.config_json:
+        import json
+        with open(args.config_json, encoding="utf-8") as f:
+            config = json.load(f)
     code = run_v3(args.input, args.output_dir, mode=mode,
                   verbose=not args.quiet,
                   skip_incomplete=args.skip_incomplete_loops,
-                  force_run_with_problems=args.force)
+                  force_run_with_problems=args.force,
+                  config=config)
     sys.exit(code)
 
 

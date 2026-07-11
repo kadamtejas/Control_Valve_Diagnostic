@@ -7,6 +7,7 @@ references to all the per-loop and plant-level artifacts.
 """
 
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import numpy as np
 
@@ -36,7 +37,81 @@ from .pdf_writer import write_pdf_summary
 from .pdf_writer_styled import write_pdf_summary_styled
 
 
-def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True) -> dict:
+def _process_one_loop(name, cols, df, mode_mapping, tc, config, capabilities,
+                       selection, detection_exclusions, run_stiction, run_harris,
+                       run_hagglund, plot_dir):
+    """Process a single control loop end-to-end: metrics, stiction, oscillation,
+    diagnosis, and its diagnostic plot.
+
+    Every loop is fully independent of every other loop, so this is the unit
+    of work dispatched to a thread pool in run_diagnostics() rather than run
+    in a plain sequential loop. Returns (name, per_loop_entry) instead of
+    mutating shared state directly, so the caller can safely assign results
+    after each future completes.
+    """
+    try:
+        (pv, op, sp, mode_arr, sf, n_total, n_used, mask,
+         pv_u, op_u, sp_u) = apply_mode_filter(cols, df, mode_mapping)
+        ts_full = df["TIMESTAMP"]
+        if len(pv_u) < 30:
+            logger.warning(f"{name}: skipped — insufficient AUTO/CAS data")
+            return name, {"diagnosis": None,
+                          "skip_reason": f"only {len(pv_u)} AUTO samples"}
+
+        dq = assess_data_quality(pv, config)
+        metrics = compute_loop_metrics(pv_u, op_u, sp_u, tc)
+        hi = harris_index(pv_u, sp_u, op_u) if run_harris else float("nan")
+        # FIX: Invalidate Harris when OP is nearly static — the AR model
+        # produces misleadingly high HI when the controller barely moves.
+        op_act_thr_main = safe_float(config.get("OP_ACTIVITY_THRESHOLD", 1.5))
+        if not np.isnan(hi) and metrics.op_activity < op_act_thr_main * 0.1:
+            logger.debug(f"{name}: Harris {hi:.2f} invalidated — OP activity "
+                         f"{metrics.op_activity:.4f} too low for reliable estimate")
+            hi = float("nan")
+        if run_hagglund:
+            osc_reg, osc_period = haglund_oscillation_index(pv_u - sp_u)
+        else:
+            osc_reg, osc_period = float("nan"), 0
+        if run_stiction:
+            sr = stiction_consensus(pv_u, op_u, sp_u, metrics, config, selection)
+        else:
+            sr = StictionResult()
+
+        diag = diagnose_loop(metrics, sr, hi, osc_reg, osc_period, dq, sf,
+                             capabilities, config, tc, selection,
+                             detection_exclusions=detection_exclusions.get(name, set()),
+                             loop_name=name)
+        # Per-loop plot
+        plot_path = os.path.join(plot_dir, f"{name}.png")
+        try:
+            make_loop_diagnostic_plot(name, ts_full, pv, op, sp, mode_arr,
+                                      tc, diag, sr, metrics, hi, osc_reg,
+                                      plot_path, config)
+        except Exception as e:
+            logger.warning(f"{name}: plot generation failed ({e})")
+            plot_path = None
+
+        entry = {
+            "diagnosis": diag,
+            "metrics": metrics,
+            "stiction": sr,
+            "harris": hi,
+            "osc_reg": osc_reg,
+            "osc_period_str": tc.samples_to_display_str(osc_period) if osc_period > 0 else "",
+            "data_quality": dq,
+            "service_factor": sf,
+            "plot_path": plot_path if plot_path and os.path.exists(plot_path) else None,
+        }
+        logger.info(f"{name}: {diag.primary} (health {diag.health_score:.0f}, {diag.severity})")
+        return name, entry
+
+    except Exception as e:
+        logger.error(f"{name}: analysis FAILED — {e}", exc_info=True)
+        return name, {"diagnosis": None, "skip_reason": f"error: {e}"}
+
+
+def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True,
+                    config: dict = None) -> dict:
     """Top-level: run end-to-end. Returns a result dict."""
     os.makedirs(output_dir, exist_ok=True)
     log_path = os.path.join(output_dir, "diagnostics.log")
@@ -49,7 +124,11 @@ def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True) -> d
     logger.info(f"Sample rate: {tc.dt_str()} | duration: {tc.duration_hours:.2f} h | "
                 f"irregular={tc.irregular} | gaps={tc.gap_count}")
 
-    config = load_config(input_path)
+    if config is None:
+        config = load_config(input_path)
+        logger.info("Config loaded from Excel (no config passed in)")
+    else:
+        logger.info("Config passed in directly — no Excel read")
     capabilities = determine_capabilities(tc, config)
     for k, v in capabilities.skip_reasons.items():
         logger.warning(f"Diagnostic '{k}' DISABLED: {v}")
@@ -75,7 +154,7 @@ def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True) -> d
                 f"as unit 'Unknown'): {', '.join(unmapped)}"
             )
 
-    # ── per-loop analysis ──
+    # ── per-loop analysis (parallel — every loop is fully independent) ──
     per_loop = {}
     plot_dir = os.path.join(output_dir, "plots")
     os.makedirs(plot_dir, exist_ok=True)
@@ -85,66 +164,25 @@ def run_diagnostics(input_path: str, output_dir: str, verbose: bool = True) -> d
     run_harris = capabilities.can_harris and selection.harris_index
     run_hagglund = capabilities.can_oscillation and selection.hagglund_oscillation
 
-    for name, cols in loops.items():
-        try:
-            (pv, op, sp, mode_arr, sf, n_total, n_used, mask,
-             pv_u, op_u, sp_u) = apply_mode_filter(cols, df, mode_mapping)
-            ts_full = df["TIMESTAMP"]
-            if len(pv_u) < 30:
-                per_loop[name] = {"diagnosis": None,
-                                  "skip_reason": f"only {len(pv_u)} AUTO samples"}
-                logger.warning(f"{name}: skipped — insufficient AUTO/CAS data")
-                continue
-
-            dq = assess_data_quality(pv, config)
-            metrics = compute_loop_metrics(pv_u, op_u, sp_u, tc)
-            hi = harris_index(pv_u, sp_u, op_u) if run_harris else float("nan")
-            # FIX: Invalidate Harris when OP is nearly static — the AR model
-            # produces misleadingly high HI when the controller barely moves.
-            op_act_thr_main = safe_float(config.get("OP_ACTIVITY_THRESHOLD", 1.5))
-            if not np.isnan(hi) and metrics.op_activity < op_act_thr_main * 0.1:
-                logger.debug(f"{name}: Harris {hi:.2f} invalidated — OP activity "
-                             f"{metrics.op_activity:.4f} too low for reliable estimate")
-                hi = float("nan")
-            if run_hagglund:
-                osc_reg, osc_period = haglund_oscillation_index(pv_u - sp_u)
-            else:
-                osc_reg, osc_period = float("nan"), 0
-            if run_stiction:
-                sr = stiction_consensus(pv_u, op_u, sp_u, metrics, config, selection)
-            else:
-                sr = StictionResult()
-
-            diag = diagnose_loop(metrics, sr, hi, osc_reg, osc_period, dq, sf,
-                                 capabilities, config, tc, selection,
-                                 detection_exclusions=detection_exclusions.get(name, set()),
-                                 loop_name=name)
-            # Per-loop plot
-            plot_path = os.path.join(plot_dir, f"{name}.png")
-            try:
-                make_loop_diagnostic_plot(name, ts_full, pv, op, sp, mode_arr,
-                                          tc, diag, sr, metrics, hi, osc_reg,
-                                          plot_path, config)
-            except Exception as e:
-                logger.warning(f"{name}: plot generation failed ({e})")
-                plot_path = None
-
-            per_loop[name] = {
-                "diagnosis": diag,
-                "metrics": metrics,
-                "stiction": sr,
-                "harris": hi,
-                "osc_reg": osc_reg,
-                "osc_period_str": tc.samples_to_display_str(osc_period) if osc_period > 0 else "",
-                "data_quality": dq,
-                "service_factor": sf,
-                "plot_path": plot_path if plot_path and os.path.exists(plot_path) else None,
-            }
-            logger.info(f"{name}: {diag.primary} (health {diag.health_score:.0f}, {diag.severity})")
-
-        except Exception as e:
-            logger.error(f"{name}: analysis FAILED — {e}", exc_info=True)
-            per_loop[name] = {"diagnosis": None, "skip_reason": f"error: {e}"}
+    # Threads, not processes: this app runs inside a background thread of a
+    # PyInstaller-frozen .exe in the deployed build, where spawning real OS
+    # processes needs multiprocessing.freeze_support() wiring that isn't in
+    # launcher.py and can't be safely added without testing the actual frozen
+    # build. Threads avoid that risk entirely — no new processes, no pickling.
+    # numpy and matplotlib's Agg rendering (the dominant cost per loop) both
+    # release the GIL during their C-level work, so real wall-clock parallelism
+    # is still available across independent loops on a multi-core machine.
+    max_workers = min(len(loops), os.cpu_count() or 4)
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        futures = {
+            pool.submit(_process_one_loop, name, cols, df, mode_mapping, tc,
+                       config, capabilities, selection, detection_exclusions,
+                       run_stiction, run_harris, run_hagglund, plot_dir): name
+            for name, cols in loops.items()
+        }
+        for future in as_completed(futures):
+            name, entry = future.result()
+            per_loop[name] = entry
 
     # ── propagation ──
     if capabilities.can_propagation and selection.cross_loop_propagation:

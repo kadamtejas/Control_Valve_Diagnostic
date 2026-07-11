@@ -36,6 +36,12 @@ class Diagnosis:
     recommended_action: str = ""      # maintenance recommendation
 
 
+def _fmt_stick(v):
+    """Format a Rossi-Scali S/J estimate. None means the reversal-segment
+    estimator found no valid segment to measure (not the same as a genuine
+    zero) — surface that distinction instead of printing a misleading 0.00."""
+    return f"{v:.2f}" if v is not None else "n/a (no valid reversal segment)"
+
 
 def _build_detailed_explanation(diag_type: str, metrics: LoopMetrics,
                                 sr: StictionResult, hi: float,
@@ -87,8 +93,8 @@ def _build_detailed_explanation(diag_type: str, metrics: LoopMetrics,
                 f"Horch CC: {sr.horch_score:.1f}, "
                 f"Yamashita: {sr.yamashita_score:.1f} (shape: {sr.yamashita_shape}), "
                 f"Bicoherence: {sr.bicoherence_score:.1f}. "
-                f"Estimated stickband S = {sr.estimated_S:.2f}% OP, "
-                f"slip-jump J = {sr.estimated_J:.2f}% OP.")
+                f"Estimated stickband S = {_fmt_stick(sr.estimated_S)}% OP, "
+                f"slip-jump J = {_fmt_stick(sr.estimated_J)}% OP.")
 
     def _oscillation_block():
         if np.isnan(osc_reg):
@@ -260,9 +266,9 @@ def _build_detailed_explanation(diag_type: str, metrics: LoopMetrics,
             f"higher harmonics that a linear process would not."
         )
         lines.append(
-            f"ESTIMATED PARAMETERS: Stickband S = {sr.estimated_S:.2f}% OP — this is the "
+            f"ESTIMATED PARAMETERS: Stickband S = {_fmt_stick(sr.estimated_S)}% OP — this is the "
             f"minimum change in controller output required before the valve begins to move. "
-            f"Slip-jump J = {sr.estimated_J:.2f}% OP — this is how far the valve overshoots "
+            f"Slip-jump J = {_fmt_stick(sr.estimated_J)}% OP — this is how far the valve overshoots "
             f"when it breaks free. These values are estimated using the Rossi-Scali method "
             f"by analysing OP reversal segments where PV remains flat."
         )
@@ -535,12 +541,12 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
             diag.primary = "Valve stiction (Confirmed)"
             diag.severity = "FAIL"
             diag.confidence = sr.consensus_score
-        elif sr.consensus_label == "Likely" and sr.estimated_S >= s_min:
+        elif sr.consensus_label == "Likely" and (sr.estimated_S or 0) >= s_min:
             stiction_likely = True
             diag.primary = "Valve stiction (Likely)"
             diag.severity = "WARN"
             diag.confidence = sr.consensus_score
-        elif sr.consensus_label == "Possible" and sr.estimated_S >= s_min and \
+        elif sr.consensus_label == "Possible" and (sr.estimated_S or 0) >= s_min and \
              sr.methods_agreeing >= 2:
             stiction_likely = True
             diag.primary = "Valve stiction (Possible)"
@@ -551,8 +557,8 @@ def diagnose_loop(metrics: LoopMetrics, sr: StictionResult, hi: float,
         diag.health_score = max(20.0, 100.0 - sr.consensus_score)
         diag.rationale = (
             f"Stiction consensus score {sr.consensus_score:.0f}/100 from "
-            f"{sr.methods_agreeing} of 4 methods. Estimated S = {sr.estimated_S:.2f}% OP, "
-            f"J = {sr.estimated_J:.2f}% OP. PV-OP shape: {sr.yamashita_shape}."
+            f"{sr.methods_agreeing} of 4 methods. Estimated S = {_fmt_stick(sr.estimated_S)}% OP, "
+            f"J = {_fmt_stick(sr.estimated_J)}% OP. PV-OP shape: {sr.yamashita_shape}."
         )
         diag.recommended_action = (
             "Schedule valve service: clean stem/packing, check actuator, "

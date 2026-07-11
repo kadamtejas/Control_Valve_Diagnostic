@@ -15,6 +15,8 @@ from typing import Tuple
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 import numpy as np
 import pandas as pd
 
@@ -22,7 +24,7 @@ from .utils import logger, safe_float, safe_pos, DEFAULTS
 from .time_context import TimeContext
 from .loop_metrics import LoopMetrics
 from .stiction_detection import StictionResult
-from .diagnosis import Diagnosis
+from .diagnosis import Diagnosis, _fmt_stick
 from .plant_kpis import PlantKPIs
 
 
@@ -30,10 +32,18 @@ def make_loop_diagnostic_plot(name: str, ts: pd.Series, pv, op, sp, mode_arr,
                               tc: TimeContext, diag: Diagnosis, sr: StictionResult,
                               metrics: LoopMetrics, hi: float, osc_reg: float,
                               save_path: str, config: dict):
-    """4-panel diagnostic plot: PV/SP, OP, PV-OP scatter, error histogram."""
-    fig, axes = plt.subplots(2, 2,
-                             figsize=(safe_pos(config.get("PLOT_WIDTH", 11)),
-                                      safe_pos(config.get("PLOT_HEIGHT", 7))))
+    """4-panel diagnostic plot: PV/SP, OP, PV-OP scatter, error histogram.
+
+    Uses matplotlib's object-oriented Figure API (not pyplot's global
+    plt.subplots()/plt.savefig()) so this function is safe to call from
+    multiple threads concurrently — pyplot's global figure-manager state
+    is not thread-safe, but a Figure created directly and never registered
+    with pyplot has no shared state with any other thread's Figure.
+    """
+    fig = Figure(figsize=(safe_pos(config.get("PLOT_WIDTH", 11)),
+                          safe_pos(config.get("PLOT_HEIGHT", 7))))
+    FigureCanvasAgg(fig)
+    axes = fig.subplots(2, 2)
     fig.suptitle(f"{name} — {diag.primary} (health {diag.health_score:.0f}/100)",
                  fontsize=12, fontweight="bold")
 
@@ -83,15 +93,14 @@ def make_loop_diagnostic_plot(name: str, ts: pd.Series, pv, op, sp, mode_arr,
            f"Hägglund Reg : {osc_reg:.2f}\n"
            f"IAE / hour   : {metrics.iae_per_hour:.0f}\n"
            f"Stiction conf: {sr.consensus_score:.0f} ({sr.consensus_label})\n"
-           f"  S est      : {sr.estimated_S:.2f}% OP\n"
-           f"  J est      : {sr.estimated_J:.2f}% OP")
+           f"  S est      : {_fmt_stick(sr.estimated_S)}% OP\n"
+           f"  J est      : {_fmt_stick(sr.estimated_J)}% OP")
     ax.text(0.02, 0.98, txt, transform=ax.transAxes, fontsize=8,
             family="monospace", verticalalignment="top",
             bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.6))
 
-    plt.tight_layout()
-    plt.savefig(save_path, dpi=110, bbox_inches="tight")
-    plt.close(fig)
+    fig.tight_layout()
+    fig.savefig(save_path, dpi=80)
 
 
 def make_plant_dashboard_plot(kpi: PlantKPIs, save_path: str):
@@ -226,12 +235,12 @@ def make_diagnostic_heatmap(per_loop: dict, save_path: str,
             if s is None:
                 return SEV_SKIP, "skip"
             if primary_kind == "stiction":
-                return SEV_FAIL, f"S={s.estimated_S:.1f}%"
+                return SEV_FAIL, f"S={_fmt_stick(s.estimated_S)}%"
             if primary_kind in oscillation_family:
                 # Another oscillation-family diagnosis owns this loop
                 return SEV_SKIP, "n/a"
             if s.consensus_label == "Possible" and amp_ok:
-                return SEV_BORDER, f"S={s.estimated_S:.1f}%"
+                return SEV_BORDER, f"S={_fmt_stick(s.estimated_S)}%"
             return SEV_HEALTHY, f"cons={s.consensus_score:.0f}"
 
         if key == "aggressive":

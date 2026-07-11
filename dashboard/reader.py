@@ -95,16 +95,12 @@ def read_loop_format(xlsx_path: str) -> dict:
         return DEFAULT
 
 
-def read_unit_mapping(results_dir: str, base_dir: str) -> dict:
+def read_unit_mapping(input_path: str) -> dict:
     """
-    Read UNIT_MAPPING sheet from the original input Excel file.
-    Derives filename from results folder name: results_<stem> -> <stem>.xlsx
-    Returns {unit_map: {tag: unit}, units: [sorted unique units]}
+    Read UNIT_MAPPING sheet from the given input Excel file.
+    Returns {unit_map: {tag: unit}, units: [sorted unique units], uom_map: {tag: uom}}
     """
-    folder_name = os.path.basename(results_dir)
-    stem = folder_name.removeprefix("results_").removesuffix("_manual")
-    input_path = os.path.join(base_dir, f"{stem}.xlsx")
-    if not os.path.exists(input_path):
+    if not input_path or not os.path.exists(input_path):
         return {"unit_map": {}, "units": [], "uom_map": {}}
     try:
         wb = openpyxl.load_workbook(input_path, read_only=True, data_only=True)
@@ -127,12 +123,12 @@ def read_unit_mapping(results_dir: str, base_dir: str) -> dict:
         return {"unit_map": {}, "units": [], "uom_map": {}}
 
 
-def read_unit_mapping_as_list(results_dir: str, base_dir: str) -> list:
+def read_unit_mapping_as_list(input_path: str) -> list:
     """
     Read UNIT_MAPPING sheet and return as list of {loop, unit} dicts
     for use in config JSON (unit_mapping key).
     """
-    data = read_unit_mapping(results_dir, base_dir)
+    data = read_unit_mapping(input_path)
     return [
         {"loop": loop, "unit": unit}
         for loop, unit in data["unit_map"].items()

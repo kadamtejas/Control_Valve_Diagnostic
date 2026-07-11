@@ -60,9 +60,15 @@ from .report_writer import (
 def run_v3(input_path: str, output_dir: str, mode: str = "AUTO",
            verbose: bool = True,
            skip_incomplete: bool = False,
-           force_run_with_problems: bool = False) -> int:
+           force_run_with_problems: bool = False,
+           config: dict = None) -> int:
     """
     Top-level orchestration. Returns exit code (0 = success).
+
+    `config`, if given, is a flat {parameter: value} dict that bypasses
+    Stage 3's Excel read entirely — the caller (the dashboard) already has
+    the resolved per-user config and shouldn't need to round-trip it
+    through a DIAGNOSTIC_CONFIG sheet just to get it back out again.
     """
     os.makedirs(output_dir, exist_ok=True)
     started = datetime.now()
@@ -91,7 +97,7 @@ def run_v3(input_path: str, output_dir: str, mode: str = "AUTO",
         return 2
 
     # ══ Stage 3
-    manual_config = _stage3_config_checks(input_path, report)
+    manual_config = config if config is not None else _stage3_config_checks(input_path, report)
 
     # ══ Stage 4
     data_info = _stage4_data_checks(input_path, sheet_info, report)
@@ -176,8 +182,18 @@ def run_v3(input_path: str, output_dir: str, mode: str = "AUTO",
         print(_print_banner(mode, has_warnings=len(report.warnings) > 0))
         print("\n  Running v2 diagnostic engine on processed data ...")
 
+    # Final resolved config: start from whatever manual/passed-in values we
+    # had, then overlay calibration's decisions for the params it covers
+    # (the 6 auto-calibratable ones in AUTO mode, or all of them verbatim
+    # in MANUAL mode). This is what actually reaches the engine — passed
+    # directly, not re-read from the processed workbook's DIAGNOSTIC_CONFIG
+    # sheet, so there's no Excel round-trip for threshold values anywhere
+    # in this path.
+    final_config = dict(manual_config)
+    final_config.update({d.parameter: d.used_value for d in calib_report.decisions})
+
     try:
-        v2.run_diagnostics(processed_path, output_dir, verbose=verbose)
+        v2.run_diagnostics(processed_path, output_dir, verbose=verbose, config=final_config)
     except Exception as e:
         msg = (f"\n❌  v2 engine failed: {e}\n\n"
                "The earlier modules completed successfully but the diagnostic\n"

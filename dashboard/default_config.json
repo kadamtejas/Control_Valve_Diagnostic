@@ -15,6 +15,7 @@
     {"parameter": "COMPRESSION_FLAT_FRACTION_MAX", "value": 0.3, "description": "Max fraction of compressed (flat) points before flagging"},
     {"parameter": "OSCILLATION_REGULARITY_MIN", "value": 0.6, "description": "Min Hagglund regularity for oscillation flag"},
     {"parameter": "STICTION_S_MIN_PCT", "value": 0.5, "description": "Min S (stickband %) to consider stiction physically present"},
+    {"parameter": "STICTION_MIN_SEGMENT_SAMPLES", "value": 3, "description": "Min samples between OP reversals to trust an S/J stickband estimate"},
     {"parameter": "HARRIS_INDEX_THRESHOLD", "value": 0.3, "description": "Min Harris index for 'good control'"}
   ],
   "diagnostic_selection": [

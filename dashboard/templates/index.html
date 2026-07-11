@@ -37,28 +37,26 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
 .logo-brand-main span{color:#3b82f6;font-weight:300}
 .logo-brand-sub{color:#64748b;font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif}
 .topbar-divider{width:1px;height:24px;background:#e2e8f0;flex-shrink:0}
-.run-badge{background:#eff6ff;color:#1d4ed8;font-size:11px;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Sans',sans-serif;border:1px solid #bfdbfe}
+.run-info{display:flex;flex-direction:column;gap:1px;font-family:'IBM Plex Sans',sans-serif}
+.run-info-name{color:#1d4ed8;font-size:12px;font-weight:600;line-height:1.2}
+.run-info-ts{color:#94a3b8;font-size:10px;line-height:1.2}
 .topbar-right{display:flex;align-items:center;gap:4px}
-.ts-txt{color:#94a3b8;font-size:11px;font-family:'IBM Plex Sans',sans-serif;margin-right:6px}
 .btn-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#64748b;cursor:pointer;border:none;background:transparent;transition:all .18s;flex-shrink:0}
 .btn-icon:hover{background:#f1f5f9;color:#1e3a5f}
-.btn-upload{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;color:#64748b;transition:all .18s;text-decoration:none;border:none;background:transparent;flex-shrink:0}
-.btn-upload:hover{background:#f1f5f9;color:#1e3a5f}
-.btn-settings{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;color:#64748b;transition:all .18s;cursor:pointer;background:transparent;border:none;flex-shrink:0}
-.btn-settings:hover{background:#f1f5f9;color:#1e3a5f}
+.btn-labeled{display:flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:7px;color:#64748b;font-size:11px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;transition:all .18s;text-decoration:none;border:none;background:transparent;cursor:pointer;flex-shrink:0;white-space:nowrap}
+.btn-labeled:hover{background:#f1f5f9;color:#1e3a5f}
+.btn-labeled svg{flex-shrink:0}
 .topbar-sep{width:1px;height:28px;background:#e2e8f0;margin:0 6px;flex-shrink:0}
-.user-wrap{display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:all .18s}
+.user-wrap{position:relative;display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:all .18s}
 .user-wrap:hover{background:#f8fafc;border-color:#e2e8f0}
+.user-dropdown{display:none;position:absolute;top:100%;right:0;margin-top:4px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(15,39,68,.12);padding:10px 14px;min-width:140px;z-index:400}
+.user-wrap:hover .user-dropdown{display:block}
 .user-avatar{width:24px;height:24px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#1d4ed8;flex-shrink:0}
-.user-info{display:flex;flex-direction:column;gap:0}
 .user-welcome{font-size:9px;color:#3b82f6;font-weight:600;text-transform:uppercase;letter-spacing:.06em;line-height:1.2}
 .user-name{font-size:12px;font-weight:600;color:#1e293b;line-height:1.2}
 .user-role{font-size:10px;color:#94a3b8;line-height:1.2}
 .btn-logout{color:#94a3b8;font-size:11px;padding:4px 6px;border-radius:6px;transition:all .2s;cursor:pointer;text-decoration:none;border:none;background:transparent}
 .btn-logout:hover{background:#f1f5f9;color:#1e3a5f}
-.company-mark{display:flex;flex-direction:column;align-items:flex-end;gap:0;padding-left:6px}
-.company-name{font-size:11px;font-weight:800;color:#1e3a5f;letter-spacing:.01em;line-height:1.1}
-.company-tag{font-size:9px;color:#3b82f6;letter-spacing:.08em;text-transform:uppercase;font-weight:600;line-height:1.1}
 .alert-bar{display:none!important}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .section{display:none}.section.active{display:block}
@@ -253,10 +251,10 @@ button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;border:none;backgro
    ══════════════════════════════════════════ */
 .tech-wrap{background:var(--bg);padding:0;margin:0}
 .ekpi-strip{display:flex;flex-wrap:wrap;background:var(--surface);border-bottom:1px solid var(--border)}
-.ekpi{padding:16px 20px;border-right:1px solid var(--border2);flex-shrink:0;min-width:140px;transition:background .2s;position:relative}.ekpi:hover{background:var(--bg2)}
-.ekpi-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:5px}
-.ekpi-val{font-size:24px;font-weight:700;font-family:'IBM Plex Sans',sans-serif}.ekpi-stiction{background:#faf8ff}.ekpi-stiction .ekpi-val{color:#7c3aed}.ekpi-stiction .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#7c3aed;margin-right:5px;flex-shrink:0}.ekpi-harris{background:#f0f7ff}.ekpi-harris .ekpi-val{color:#2563eb}.ekpi-harris .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#2563eb;margin-right:5px;flex-shrink:0}.ekpi-sf{background:#eff6ff}.ekpi-sf .ekpi-val{color:#2563eb}.ekpi-sf .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#2563eb;margin-right:5px;flex-shrink:0}.ekpi-op{background:#fff5f5}.ekpi-op .ekpi-val{color:#dc2626}.ekpi-op .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#dc2626;margin-right:5px;flex-shrink:0}.ekpi-iae{background:#fffcf0}.ekpi-iae .ekpi-val{color:#b45309}.ekpi-iae .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#d97706;margin-right:5px;flex-shrink:0}.ekpi-osc{background:#f0faff}.ekpi-osc .ekpi-val{color:#0891b2}.ekpi-osc .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#0891b2;margin-right:5px;flex-shrink:0}
-.ekpi-sub{font-size:10px;color:var(--text4);margin-top:3px}
+.ekpi{padding:16px 20px;border-right:1px solid #aecdf0;flex-shrink:0;min-width:140px;transition:background .2s;position:relative}.ekpi:hover{background:#3b82f6}
+.ekpi-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:5px;transition:color .2s}.ekpi:hover .ekpi-lbl{color:#eaf3fd}
+.ekpi-val{font-size:24px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;transition:color .2s}.ekpi-stiction,.ekpi-harris,.ekpi-sf,.ekpi-op,.ekpi-iae,.ekpi-osc{background:#eaf3fd}.ekpi-stiction .ekpi-val,.ekpi-harris .ekpi-val,.ekpi-sf .ekpi-val,.ekpi-op .ekpi-val,.ekpi-iae .ekpi-val,.ekpi-osc .ekpi-val{color:#0f2744}.ekpi-stiction .ekpi-lbl::before,.ekpi-harris .ekpi-lbl::before,.ekpi-sf .ekpi-lbl::before,.ekpi-op .ekpi-lbl::before,.ekpi-iae .ekpi-lbl::before,.ekpi-osc .ekpi-lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#3b82f6;margin-right:5px;flex-shrink:0;transition:background .2s}.ekpi:hover .ekpi-val{color:#fff}.ekpi:hover .ekpi-lbl::before{background:#fff}
+.ekpi-sub{font-size:10px;color:var(--text4);margin-top:3px;transition:color .2s}.ekpi:hover .ekpi-sub{color:#dbeafe}
 .ibt{width:14px;height:14px;border-radius:50%;background:var(--border);color:var(--text3);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:help;position:relative;flex-shrink:0}
 #ibt-tooltip{display:none;position:fixed;z-index:9999;background:var(--navy);color:#e8f3fd;font-size:10px;padding:6px 10px;border-radius:6px;white-space:nowrap;font-family:'IBM Plex Sans',sans-serif;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.25)}
 .hm-bar{padding:20px 24px;background:var(--surface);border-bottom:1px solid var(--border)}
@@ -419,7 +417,7 @@ table.et tr:last-child td{border-bottom:none}
 .tex-legend-dot{width:10px;height:3px;border-radius:2px;flex-shrink:0}
 @media(max-width:1100px){.hero-row{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media(max-width:800px){.hero-row{grid-template-columns:repeat(2,minmax(0,1fr));}.bottom-row{grid-template-columns:1fr;}}
-@media(max-width:700px){.hero-row{grid-template-columns:1fr}.bottom-row{grid-template-columns:1fr}.topbar{padding:0 16px}.ts-txt{display:none}}
+@media(max-width:700px){.hero-row{grid-template-columns:1fr}.bottom-row{grid-template-columns:1fr}.topbar{padding:0 16px}}
 
 .excl-tbl-hdr{padding:5px 3px;background:#1a7fd4;color:#fff;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;z-index:2;text-align:center;width:65px;max-width:65px;word-break:break-word;white-space:normal;line-height:1.3}
 .excl-tbl-loop{padding:5px 8px;font-family:'IBM Plex Sans',sans-serif;font-size:10px;font-weight:600;color:var(--navy);background:var(--bg2);border-bottom:1px solid var(--border2);white-space:nowrap;position:sticky;left:0;z-index:1;max-width:140px;overflow:hidden;text-overflow:ellipsis}
@@ -449,31 +447,29 @@ table.et tr:last-child td{border-bottom:none}
       </div>
     </div>
     <div class="topbar-divider"></div>
-    <span class="run-badge" id="runBadge">Loading…</span>
-    <span id="defaultConfigBadge" style="display:none;background:#fff7ed;color:#b45309;font-size:10px;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Sans',sans-serif;border:1px solid #fed7aa;cursor:pointer" onclick="openSettings()" title="Click to change settings">⚙ Default Config</span>
+    <div class="run-info" id="runBadge">
+      <div class="run-info-name" id="runBadgeName">Loading…</div>
+      <div class="run-info-ts" id="runBadgeTs"></div>
+    </div>
+    <span id="defaultConfigBadge" style="display:none;color:#b45309;font-size:10px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer" onclick="openSettings()" title="Click to change settings">⚙ Default Config</span>
   </div>
   <div class="topbar-right">
-    <span class="ts-txt" id="topTs"></span>
-    <a href="/upload" class="btn-upload" title="New Upload"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></a>
-    <button class="btn-settings" id="btnDownloadReport" onclick="downloadReport()" title="Download Report"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-    <button class="btn-settings" id="btnSettings" onclick="openSettings()" title="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    <a href="/upload" class="btn-labeled" title="New Upload"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload</a>
+    <button class="btn-labeled" id="btnDownloadReport" onclick="downloadReport()" title="Download Report"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Report</button>
+    <button class="btn-labeled" id="btnSettings" onclick="openSettings()" title="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
     <div class="topbar-sep"></div>
     {% if user is defined %}
     <div class="user-wrap">
       <div class="user-avatar">{{ user.name[:2].upper() if user.name else 'IA' }}</div>
-      <div class="user-info">
+      <div class="user-name">{{ user.name }}</div>
+      <div class="user-dropdown">
         <div class="user-welcome">Welcome</div>
         <div class="user-name">{{ user.name }}</div>
         <div class="user-role">Corporate</div>
+        <a href="/logout" class="btn-logout" style="display:block;margin-top:8px;padding:4px 0">Sign out</a>
       </div>
     </div>
-    <a href="/logout" class="btn-logout">Sign out</a>
     {% endif %}
-    <div class="topbar-sep"></div>
-    <div class="company-mark">
-      <div class="company-name">Ingenero</div>
-      <div class="company-tag">360 AI</div>
-    </div>
   </div>
 </div>
 
@@ -642,6 +638,7 @@ table.et tr:last-child td{border-bottom:none}
           <option value="">— Select loop —</option>
         </select>
         <button onclick="ovResetAxes()" title="Reset zoom" style="padding:4px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text3);cursor:pointer;white-space:nowrap;flex-shrink:0">↺ Reset</button>
+        <button onclick="openCM('ovC_active','Loop Trends')" title="Expand chart" style="padding:4px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text3);cursor:pointer;white-space:nowrap;flex-shrink:0">⛶ Expand</button>
       </div>
       <div class="trends-body" id="ovTrendsBody">
         <div class="trends-empty" id="ovTrendsEmpty">
@@ -883,6 +880,7 @@ const PROBLEMS=[
 ];
 
 function fN(v,d=2){const n=parseFloat(v);return isNaN(n)?'—':n.toFixed(d);}
+function fmtRunTs(ts){if(!ts)return'';const d=new Date(ts.includes('T')?ts:ts.replace(' ','T'));if(isNaN(d))return ts;return d.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true});}
 function sc(l){const sev=(l.severity||'').toLowerCase();const h=parseFloat(l.health??100);if(sev==='critical'||h<50)return 'critical';if(sev==='poor'||h<75)return 'poor';return 'good';}
 function badge(c){const m={critical:['sb-crit','● Act Now'],poor:['sb-warn','● Watch'],good:['sb-ok','● OK']};const[cls,lbl]=m[c]||['sb-ok','OK'];return `<span class="sbadge ${cls}">${lbl}</span>`;}
 const DM=[[/stiction/i,'Valve stiction detected'],[/oscillat/i,'Loop oscillating'],[/saturat/i,'Output saturating at limit'],[/frozen|freeze/i,'Sensor possibly frozen'],[/poor.?track/i,'Poor setpoint tracking'],[/data.?quality/i,'Insufficient data'],[/good|normal|healthy/i,'Holding setpoint well']];
@@ -1139,9 +1137,10 @@ function clearActionsFilter(){S.problemFilter=null;S.groupFilter=null;renderActi
    OVERVIEW HEATMAP (full functionality from tech page)
    ══════════════════════════════════════════════════════ */
 const OV_HM={selectedUnits:new Set(),allUnits:[]};
+function cfgVal(name,fallback){const row=(S.config?.diagnostic_config||[]).find(r=>r.parameter===name);return row&&row.value!=null&&!isNaN(parseFloat(row.value))?parseFloat(row.value):fallback;}
 const HM_ROWS=[
   {label:'Overall Health',fn(l){const h=parseFloat(l.health);if(isNaN(h))return{cls:'hm-na',txt:'n/a'};if(h>=75)return{cls:'hm-ok',txt:Math.round(h)+'%'};if(h>=50)return{cls:'hm-warn',txt:Math.round(h)+'%'};return{cls:'hm-crit',txt:Math.round(h)+'%'};}},
-  {label:'Stiction',fn(l){const c=l.stiction?.consensus;if(c==null)return{cls:'hm-na',txt:'n/a'};if(l.stiction_label&&/No stiction|OK/i.test(l.stiction_label))return{cls:'hm-ok',txt:'cons='+Math.round(c)};if(c>=50)return{cls:'hm-crit',txt:'S='+fN(c,1)+'%'};if(c>=30)return{cls:'hm-warn',txt:'S='+fN(c,1)+'%'};return{cls:'hm-ok',txt:'cons='+Math.round(c)};}},
+  {label:'Stiction',fn(l){const c=l.stiction?.consensus;if(c==null)return{cls:'hm-na',txt:'n/a'};const stHi=cfgVal('STICT_CONF_HIGH',70),stMed=cfgVal('STICT_CONF_MED',40);if(l.stiction_label&&/No stiction|OK/i.test(l.stiction_label))return{cls:'hm-ok',txt:'cons='+Math.round(c)};if(c>=stHi)return{cls:'hm-crit',txt:'cons='+Math.round(c)};if(c>=stMed)return{cls:'hm-warn',txt:'cons='+Math.round(c)};return{cls:'hm-ok',txt:'cons='+Math.round(c)};}},
   {label:'Aggressive tuning',fn(l){const h=l.hagglund_regularity;if(h==null)return{cls:'hm-na',txt:'n/a'};const d=(l.diagnosis||'').toLowerCase();if(/aggressive/i.test(d))return{cls:'hm-crit',txt:'HI='+fN(h,2)};return{cls:'hm-ok',txt:'—'};}},
   {label:'Sluggish tuning',fn(l){const h=l.hagglund_regularity;if(h==null)return{cls:'hm-na',txt:'n/a'};const d=(l.diagnosis||'').toLowerCase();if(/sluggish/i.test(d))return{cls:'hm-crit',txt:'HI='+fN(h,2)};return{cls:'hm-ok',txt:'—'};}},
   {label:'Ext. oscillation',fn(l){const h=l.hagglund_regularity;if(h==null)return{cls:'hm-na',txt:'n/a'};if(h>=0.7)return{cls:'hm-crit',txt:'Reg='+fN(h,2)};if(h>=0.5)return{cls:'hm-warn',txt:'Reg='+fN(h,2)};return{cls:'hm-ok',txt:'Reg='+fN(h,2)};}},
@@ -1257,7 +1256,8 @@ function ovHmRenderTable(){
     allLoops.forEach(l=>{
       const{cls,txt}=row.fn(l);
       const sevLabel=cls==='hm-ok'?'Healthy':cls==='hm-warn'?'Borderline':cls==='hm-crit'?'Problem':'N/A';
-      bodyRows+=`<td class="hm-cell ${cls}" data-loop="${l.loop}" data-kpi="${row.label}" data-txt="${txt}" data-cls="${cls}" data-sev="${sevLabel}" data-diag="${(l.diagnosis||'').replace(/"/g,'&quot;')}" data-health="${l.health!=null?Math.round(l.health):'—'}">${txt}</td>`;
+      const extraAttrs=row.label==='Stiction'?` data-s="${l.stiction?.estimated_s!=null?fN(l.stiction.estimated_s,2):'—'}" data-j="${l.stiction?.estimated_j!=null?fN(l.stiction.estimated_j,2):'—'}"`:'';
+      bodyRows+=`<td class="hm-cell ${cls}" data-loop="${l.loop}" data-kpi="${row.label}" data-txt="${txt}" data-cls="${cls}" data-sev="${sevLabel}" data-diag="${(l.diagnosis||'').replace(/"/g,'&quot;')}" data-health="${l.health!=null?Math.round(l.health):'—'}"${extraAttrs}>${txt}</td>`;
     });
     bodyRows+='</tr>';
   });
@@ -1268,10 +1268,11 @@ function ovHmInitTooltip(){
   const tip=document.createElement('div');tip.id='hmTip';document.body.appendChild(tip);
   document.addEventListener('mouseover',e=>{
     const cell=e.target.closest('.hm-cell');if(!cell)return;
-    const{loop,kpi,txt,cls,sev,diag,health}=cell.dataset;
+    const{loop,kpi,txt,cls,sev,diag,health,s,j}=cell.dataset;
     const sevCls=cls==='hm-ok'?'ok':cls==='hm-warn'?'warn':cls==='hm-crit'?'crit':'na';
     const desc=HM_KPI_DESC[kpi]||'';
-    tip.innerHTML=`<div class="ht-tag">${loop}</div><div class="ht-kpi">${kpi}</div><div class="ht-val">Value: <b>${txt}</b> &nbsp;|&nbsp; Health: <b>${health}%</b></div><span class="ht-sev ${sevCls}">● ${sev}</span>${diag?`<div style="font-size:11px;color:#a8c8f0;margin-bottom:4px">Diagnosis: ${diag}</div>`:''}${desc?`<div class="ht-desc">${desc}</div>`:''}`;
+    const valLine=kpi==='Stiction'?`<div class="ht-val">Consensus: <b>${txt.replace('cons=','')}</b> &nbsp;|&nbsp; S: <b>${s}%</b> &nbsp;|&nbsp; J: <b>${j}%</b></div><div class="ht-val">Health: <b>${health}%</b></div>`:`<div class="ht-val">Value: <b>${txt}</b> &nbsp;|&nbsp; Health: <b>${health}%</b></div>`;
+    tip.innerHTML=`<div class="ht-tag">${loop}</div><div class="ht-kpi">${kpi}</div>${valLine}<span class="ht-sev ${sevCls}">● ${sev}</span>${diag?`<div style="font-size:11px;color:#a8c8f0;margin-bottom:4px">Diagnosis: ${diag}</div>`:''}${desc?`<div class="ht-desc">${desc}</div>`:''}`;
     tip.style.display='block';positionHmTip(e);
   });
   document.addEventListener('mousemove',e=>{if(tip.style.display==='none')return;if(!e.target.closest('.hm-cell')){tip.style.display='none';return;}positionHmTip(e);});
@@ -1357,8 +1358,7 @@ async function ovLoadLoop(nm){
 
 function renderOvTrendsLoopBtns(){/* removed — loop selector is in dropdown */}
 function ovResetAxes(){
-  if(document.getElementById('ovC_active')?.data)
-    Plotly.relayout('ovC_active',{'xaxis.autorange':true,'yaxis.autorange':true,'yaxis2.autorange':true});
+  if(document.getElementById('ovC_active')?.data)ovDrawChart();
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1387,7 +1387,7 @@ function renderHeatmapTable(){
   units.forEach(u=>{const loops=unitGroups[u];allLoops=allLoops.concat(loops);unitHdrRow+=`<th colspan="${loops.length}" class="hm-unit-hdr">${u}</th>`;loops.forEach(l=>{loopHdrRow+=`<th class="hm-col-lbl" title="${l.loop}">${l.loop}</th>`;});});
   unitHdrRow+='</tr>';loopHdrRow+='</tr>';
   let bodyRows='';
-  HM_ROWS.forEach(row=>{bodyRows+=`<tr><th class="hm-row-lbl">${row.label}</th>`;allLoops.forEach(l=>{const{cls,txt}=row.fn(l);const sevLabel=cls==='hm-ok'?'Healthy':cls==='hm-warn'?'Borderline':cls==='hm-crit'?'Problem':'N/A';bodyRows+=`<td class="hm-cell ${cls}" data-loop="${l.loop}" data-kpi="${row.label}" data-txt="${txt}" data-cls="${cls}" data-sev="${sevLabel}" data-diag="${(l.diagnosis||'').replace(/"/g,'&quot;')}" data-health="${l.health!=null?Math.round(l.health):'—'}">${txt}</td>`;});bodyRows+='</tr>';});
+  HM_ROWS.forEach(row=>{bodyRows+=`<tr><th class="hm-row-lbl">${row.label}</th>`;allLoops.forEach(l=>{const{cls,txt}=row.fn(l);const sevLabel=cls==='hm-ok'?'Healthy':cls==='hm-warn'?'Borderline':cls==='hm-crit'?'Problem':'N/A';const extraAttrs=row.label==='Stiction'?` data-s="${l.stiction?.estimated_s!=null?fN(l.stiction.estimated_s,2):'—'}" data-j="${l.stiction?.estimated_j!=null?fN(l.stiction.estimated_j,2):'—'}"`:'';bodyRows+=`<td class="hm-cell ${cls}" data-loop="${l.loop}" data-kpi="${row.label}" data-txt="${txt}" data-cls="${cls}" data-sev="${sevLabel}" data-diag="${(l.diagnosis||'').replace(/"/g,'&quot;')}" data-health="${l.health!=null?Math.round(l.health):'—'}"${extraAttrs}>${txt}</td>`;});bodyRows+='</tr>';});
   el.innerHTML=`<table class="hm-tbl"><thead>${unitHdrRow}${loopHdrRow}</thead><tbody>${bodyRows}</tbody></table>`;
 }
 
@@ -1405,7 +1405,7 @@ async function init(){
     document.getElementById('ltxt').textContent='Reading results…';
     if(!res.ok){let detail='HTTP '+res.status;try{const j=await res.json();detail=j.detail||detail;}catch{}if(res.status===404)throw new Error('no_results');throw new Error(detail);}
     const data=await res.json();
-    S.loops=data.loops||[];S.plant=data.plant||{};S.runFolder=data.run_folder||'';S.propagation=data.propagation||[];
+    S.loops=data.loops||[];S.plant=data.plant||{};S.runFolder=data.run_folder_display||data.run_folder||'';S.propagation=data.propagation||[];
     S.isCustomConfig=data.is_custom_config||false;
     if(!S.loops.length)throw new Error('no_results');
     try{
@@ -1416,6 +1416,7 @@ async function init(){
     const rawKeys=Object.keys(S.unitMap);const lowerMap={};rawKeys.forEach(k=>lowerMap[k.toLowerCase().trim()]=S.unitMap[k]);
     const resolved={};S.loops.forEach(l=>{const tag=l.loop||'';if(S.unitMap[tag])resolved[tag]=S.unitMap[tag];else if(lowerMap[tag.toLowerCase().trim()])resolved[tag]=lowerMap[tag.toLowerCase().trim()];else if(l.unit)resolved[tag]=l.unit;else resolved[tag]='Unknown';});
     S.unitMap=resolved;if(!S.units.length)S.units=[...new Set(Object.values(S.unitMap))].filter(Boolean).sort();
+    try{const cfgRes=await fetch('/api/config');S.config=cfgRes.ok?await cfgRes.json():null;}catch{S.config=null;}
     populateAll(data);
     /* load tuning recommendations for badge display */
     loadTuningRecs();
@@ -1434,8 +1435,8 @@ async function init(){
 
 function populateAll(data){
   const L=S.loops,P=S.plant;
-  document.getElementById('topTs').textContent=P.run_timestamp?'Run: '+P.run_timestamp:'';
-  document.getElementById('runBadge').textContent=S.runFolder||'Latest Run';
+  document.getElementById('runBadgeName').textContent=S.runFolder||'Latest Run';
+  document.getElementById('runBadgeTs').textContent=P.run_timestamp?fmtRunTs(P.run_timestamp):'';
   document.getElementById('ftxt').textContent='Valve Diagnostics v3 · '+(S.runFolder||'');
   const nOk=L.filter(l=>sc(l)==='good').length;
   const nW=L.filter(l=>sc(l)==='poor').length;
@@ -1477,10 +1478,10 @@ const PL={margin:{t:10,r:72,b:36,l:46},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolo
 const CFG={responsive:true,displayModeBar:false};
 async function fetchTS(nm){if(S.tsCache[nm])return S.tsCache[nm];try{const r=await fetch('/api/timeseries/'+encodeURIComponent(nm));if(!r.ok)return null;const d=await r.json();S.tsCache[nm]=d;return d;}catch{return null;}}
 function normTs(raw){if(!raw||!raw.length)return raw;const first=raw[0];if(typeof first==='string'){const n=Number(first);if(!isNaN(n)&&n>1e12)return raw.map(t=>new Date(Number(t)).toISOString().replace('T',' ').slice(0,19));if(!isNaN(n)&&n>1e9)return raw.map(t=>new Date(Number(t)*1000).toISOString().replace('T',' ').slice(0,19));if(!isNaN(n)&&n>30000)return raw.map(t=>new Date((Number(t)-25569)*86400000).toISOString().replace('T',' ').slice(0,19));return raw.map(t=>t?String(t).replace('T',' ').slice(0,19):null);}if(first>1e12)return raw.map(t=>new Date(t).toISOString().replace('T',' ').slice(0,19));if(first>1e9)return raw.map(t=>new Date(t*1000).toISOString().replace('T',' ').slice(0,19));if(first>30000)return raw.map(t=>new Date((t-25569)*86400000).toISOString().replace('T',' ').slice(0,19));const base=Date.now()-first*1000;return raw.map(t=>new Date(base+t*1000).toISOString().replace('T',' ').slice(0,19));}
-function drawCharts(d,pfx){const ts=normTs(d.timestamps||[]),pv=d.pv||[],sp=d.sp||[],op=d.op||[];const err=pv.map((v,i)=>(v!=null&&sp[i]!=null)?v-sp[i]:null).filter(e=>e!=null);const pvRange=smartYRange(pv,sp,0.05);const opVals=op.filter(v=>v!=null&&!isNaN(v));const opMax=opVals.length?Math.max(...opVals):100;Plotly.newPlot(pfx+'pv_sp',[{x:ts,y:sp,name:'SP',line:{color:'#2e86de',dash:'dot',width:1.5},type:'scatter',mode:'lines'},{x:ts,y:pv,name:'PV',line:{color:'#1a9e5a',width:2},type:'scatter',mode:'lines'}],{...PL,height:200,...(pvRange?{yaxis:{...PL.yaxis,range:pvRange}}:{})},CFG);Plotly.newPlot(pfx+'op',[{x:ts,y:op,name:'OP %',line:{color:'#d97706',width:1.5},type:'scatter',mode:'lines',fill:'tozeroy',fillcolor:'rgba(217,119,6,0.06)'}],{...PL,height:200,yaxis:{...PL.yaxis,range:[0,Math.max(opMax*1.15,10)]}},CFG);if(pfx==='d_'||pfx==='c_'){Plotly.purge(pfx+'sig');Plotly.newPlot(pfx+'sig',[{x:op,y:pv,mode:'markers',marker:{color:'#2e86de',size:5,opacity:.7},type:'scatter',name:'OP vs PV'}],{...PL,height:200,xaxis:{...PL.xaxis,title:'OP (%)',type:'linear',autorange:true},yaxis:{...PL.yaxis,title:'PV',autorange:true}},CFG);Plotly.newPlot(pfx+'eh',[{x:err,type:'histogram',name:'Error dist.',nbinsx:30,marker:{color:'#2e86de',opacity:.7}}],{...PL,height:200,xaxis:{...PL.xaxis,title:'PV − SP',type:'linear'},yaxis:{...PL.yaxis,title:'Count'}},CFG);}}
+function drawCharts(d,pfx){const ts=normTs(d.timestamps||[]),pv=d.pv||[],sp=d.sp||[],op=d.op||[];const err=pv.map((v,i)=>(v!=null&&sp[i]!=null)?v-sp[i]:null).filter(e=>e!=null);const pvRange=smartYRange(pv,sp,0.05);const opVals=op.filter(v=>v!=null&&!isNaN(v));const opMax=opVals.length?Math.max(...opVals):100;Plotly.newPlot(pfx+'pv_sp',[{x:ts,y:sp,name:'SP',line:{color:'#2e86de',dash:'dot',width:1.5},type:'scatter',mode:'lines'},{x:ts,y:pv,name:'PV',line:{color:'#1a9e5a',width:2},type:'scatter',mode:'lines'}],{...PL,height:200,xaxis:{...PL.xaxis,autorange:true},yaxis:{...PL.yaxis,...(pvRange?{range:pvRange,autorange:false}:{autorange:true})}},CFG);Plotly.newPlot(pfx+'op',[{x:ts,y:op,name:'OP %',line:{color:'#d97706',width:1.5},type:'scatter',mode:'lines',fill:'tozeroy',fillcolor:'rgba(217,119,6,0.06)'}],{...PL,height:200,xaxis:{...PL.xaxis,autorange:true},yaxis:{...PL.yaxis,range:[0,Math.max(opMax*1.15,10)],autorange:false}},CFG);if(pfx==='d_'||pfx==='c_'){Plotly.purge(pfx+'sig');Plotly.newPlot(pfx+'sig',[{x:op,y:pv,mode:'markers',marker:{color:'#2e86de',size:5,opacity:.7},type:'scatter',name:'OP vs PV'}],{...PL,height:200,xaxis:{...PL.xaxis,title:'OP (%)',type:'linear',autorange:true},yaxis:{...PL.yaxis,title:'PV',autorange:true}},CFG);Plotly.newPlot(pfx+'eh',[{x:err,type:'histogram',name:'Error dist.',nbinsx:30,marker:{color:'#2e86de',opacity:.7}}],{...PL,height:200,xaxis:{...PL.xaxis,title:'PV − SP',type:'linear',autorange:true},yaxis:{...PL.yaxis,title:'Count',autorange:true}},CFG);}}
 async function loadTrCharts(){const nm=document.getElementById('trSel').value;if(!nm)return;const d=await fetchTS(nm);if(d)drawCharts(d,'c_');}
-function resetAxes(){['c_pv_sp','c_op','c_sig','c_eh'].forEach(id=>{const el=document.getElementById(id);if(el&&el.data)Plotly.relayout(id,{'xaxis.autorange':true,'yaxis.autorange':true});});}
-function resetChart(id){const el=document.getElementById(id);if(el&&el.data)Plotly.relayout(id,{'xaxis.autorange':true,'yaxis.autorange':true});}
+function resetAxes(){const nm=document.getElementById('trSel').value;if(!nm)return;fetchTS(nm).then(d=>{if(d)drawCharts(d,'c_');});}
+function resetChart(id){const el=document.getElementById(id);if(!el||!el.data)return;const nm=S.sel;if(!nm){Plotly.relayout(id,{'xaxis.autorange':true,'yaxis.autorange':true});return;}fetchTS(nm).then(d=>{if(!d){Plotly.relayout(id,{'xaxis.autorange':true,'yaxis.autorange':true});return;}if(id.endsWith('_op')){const opVals=(d.op||[]).filter(v=>v!=null&&!isNaN(v));const opMax=opVals.length?Math.max(...opVals):100;Plotly.relayout(id,{'xaxis.autorange':true,'yaxis.range':[0,Math.max(opMax*1.15,10)]});}else if(id.endsWith('_pv_sp')){const pvRange=smartYRange(d.pv||[],d.sp||[],0.05);Plotly.relayout(id,pvRange?{'xaxis.autorange':true,'yaxis.range':pvRange}:{'xaxis.autorange':true,'yaxis.autorange':true});}else{Plotly.relayout(id,{'xaxis.autorange':true,'yaxis.autorange':true});}});}
 function openCM(srcId,title){const el=document.getElementById(srcId);if(!el||!el.data)return;document.getElementById('cmTitle').textContent=title;const body=document.getElementById('cmBody');body.innerHTML='';Plotly.newPlot(body,el.data,{...el.layout,height:460,margin:{t:20,r:20,b:50,l:52}},{responsive:true});document.getElementById('chartModal').classList.add('open');}
 function openTileModal(type){const titles={all:'All Loops',good:'Loops Running OK',poor:'Loops to Watch',critical:'Act Now — Critical Loops'};document.getElementById('tmTitle').textContent=titles[type]||type;const map={good:'good',poor:'poor',critical:'critical'};const rows=type==='all'?S.loops:S.loops.filter(l=>sc(l)===map[type]);document.getElementById('tmList').innerHTML=rows.map(l=>`<div class="mli" onclick="document.getElementById('tileModal').classList.remove('open');openLD('${l.loop.replace(/'/g,"\\'")}')"><span>${badge(sc(l))}</span><div><div class="mli-nm">${l.loop}</div>${S.uomMap[l.loop]?`<div style="font-size:9px;color:#94a3b8;font-family:'IBM Plex Sans',sans-serif;margin-top:1px">(${S.uomMap[l.loop]})</div>`:''}<div class="mli-dg">${pdiag(l.diagnosis)}</div></div><span style="color:var(--text3);font-size:16px">›</span></div>`).join('');document.getElementById('tileModal').classList.add('open');}
 function switchTab(tab){S.tab=tab;document.querySelectorAll('.vnav-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));const map={ov:'sec-ov',tech:'sec-tech',tr:'sec-tr',ld:'sec-ld'};const sec=document.getElementById(map[tab]);if(sec){sec.classList.remove('hidden');sec.classList.add('active');}/* Hide loop detail tab when navigating away */if(tab!=='ld'){const ldTab=document.getElementById('ldTab');if(ldTab){ldTab.style.display='none';ldTab.classList.add('hidden');}}window.scrollTo({top:0,behavior:'smooth'});}
@@ -1707,7 +1708,7 @@ function applyUnitMapUpdate(newMap,newUnits){
   showToast('Unit mapping applied to all views.');
 }
 
-async function downloadReport(){const btn=document.getElementById('btnDownloadReport');const orig=btn.innerHTML;btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="animation:spin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Generating…`;btn.disabled=true;try{const res=await fetch('/api/report/download');if(!res.ok){const err=await res.json().catch(()=>({detail:'Unknown error'}));throw new Error(err.detail||'HTTP '+res.status);}const blob=await res.blob();const url=URL.createObjectURL(blob);const a=document.createElement('a');const cd=res.headers.get('Content-Disposition')||'';const m=cd.match(/filename=(.+)/);a.href=url;a.download=m?m[1]:'Valve_Diagnostics.zip';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);showToast('✅ Report downloaded — contains PDF summary + Excel detail.');}catch(e){showToast('❌ Report failed: '+e.message,6000);}finally{btn.innerHTML=orig;btn.disabled=false;}}
+async function downloadReport(){const btn=document.getElementById('btnDownloadReport');const orig=btn.innerHTML;const origTitle=btn.title;btn.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="animation:spin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;btn.title='Generating report…';btn.disabled=true;showToast('⏳ Generating your report — this can take a few seconds…',8000);try{const res=await fetch('/api/report/download');if(!res.ok){const err=await res.json().catch(()=>({detail:'Unknown error'}));throw new Error(err.detail||'HTTP '+res.status);}const blob=await res.blob();const url=URL.createObjectURL(blob);const a=document.createElement('a');const cd=res.headers.get('Content-Disposition')||'';const m=cd.match(/filename=(.+)/);a.href=url;a.download=m?m[1]:'Valve_Diagnostics.zip';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);showToast('✅ Report downloaded — contains PDF summary + Excel detail.');}catch(e){showToast('❌ Report failed: '+e.message,6000);}finally{btn.innerHTML=orig;btn.title=origTitle;btn.disabled=false;}}
 
 document.addEventListener('DOMContentLoaded',init);
 

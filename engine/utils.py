@@ -58,6 +58,7 @@ DEFAULTS = {
     "COMPRESSION_FLAT_FRACTION_MAX": 0.30,
     "OSCILLATION_REGULARITY_MIN": 0.6,
     "STICTION_S_MIN_PCT": 0.5,
+    "STICTION_MIN_SEGMENT_SAMPLES": 3,  # min samples between OP reversals to trust an S/J estimate
     "HARRIS_INDEX_THRESHOLD": 0.3,
     # consensus weights for stiction
     "STIC_W_HEURISTIC": 0.20,
