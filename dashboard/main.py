@@ -15,6 +15,7 @@ import subprocess
 import sys
 import threading
 import uuid
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import (
@@ -34,6 +35,7 @@ from reader import (
     read_loop_timeseries,
     read_unit_mapping,
 )
+import db_store
 from dotenv import load_dotenv
 from groq import Groq
 
@@ -192,6 +194,11 @@ static_dir.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 SAMPLE_FILE = static_dir / "sample_plant_data.xlsx"
+
+
+@app.on_event("shutdown")
+async def _shutdown_db_pool():
+    await db_store.close_pool()
 
 
 @app.get("/download/manual")
@@ -470,6 +477,15 @@ async def upload_file(
     if mode not in ("auto", "manual"):
         mode = "auto"
 
+    # Push-to-database is opt-in and admin-only — regular users only ever
+    # get the plain Excel flow, no data leaves the file into Postgres.
+    # Gated server-side (not just hidden in the UI) since a hidden checkbox
+    # alone isn't real access control.
+    save_to_db = (
+        form.get("save_to_db", "false").lower() == "true"
+        and current_user.get("role") == "admin"
+    )
+
     # Tag suffixes — user-defined signal type names e.g. MV, SV, CV, AOUT
     # Fall back to standard PV/SP/OP/MODE if not provided
     raw_suffixes = [
@@ -489,6 +505,19 @@ async def upload_file(
     dest_path     = user_upload_dir / original_name
     with open(dest_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
+
+    # ── Also persist to Postgres so this data can be re-pulled later from
+    #    the "Run from Database" tab without re-uploading. Opt-in, admin-only
+    #    (see save_to_db above). Best-effort even then — if Postgres isn't
+    #    reachable, the Excel flow must still work regardless.
+    if save_to_db:
+        try:
+            rows_written = await db_store.insert_readings_from_excel(
+                str(dest_path), original_name, current_user["sub"]
+            )
+            print(f"[db_store] {rows_written} readings upserted from {original_name}")
+        except Exception as db_exc:
+            print(f"[db_store] WARNING — failed to persist to Postgres: {db_exc}")
 
     # ── Derive results folder name namespaced by user email
     basename       = Path(original_name).stem
@@ -553,6 +582,87 @@ async def poll_job(job_id: str, current_user: dict = Depends(get_current_user)):
         return JSONResponse({"status": "error", "detail": job.get("detail", "Unknown error.")})
 
     return JSONResponse({"status": "running"})
+
+
+# ── Database (Postgres) endpoints ───────────────────────────────────────────
+
+@app.get("/api/db/loops")
+async def db_list_loops(current_user: dict = Depends(get_current_user)):
+    """Loops/tags/date-range currently available in Postgres, for the
+    'Run from Database' tab's loop picker."""
+    try:
+        data = await db_store.list_available_loops()
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Database unavailable: {exc}")
+    return JSONResponse(content=data)
+
+
+@app.post("/api/db/run")
+async def db_run_diagnostics(request: Request, current_user: dict = Depends(get_current_user)):
+    """Pull the selected loops/date-range from Postgres, rebuild it as an
+    Excel file in the exact Sheet1 layout the engine expects, and run
+    diagnostics on it exactly like a normal upload — the engine itself
+    never knows the data came from the DB instead of a user-picked file."""
+    body = await request.json()
+    loops = body.get("loops") or []
+    start = body.get("start")
+    end   = body.get("end")
+    mode  = str(body.get("mode", "auto")).lower()
+    suffix_map = body.get("suffix_map") or None
+    if mode not in ("auto", "manual"):
+        mode = "auto"
+
+    if not loops:
+        raise HTTPException(status_code=400, detail="Select at least one loop.")
+    if not start or not end:
+        raise HTTPException(status_code=400, detail="Select a start and end date/time.")
+
+    safe_email = current_user["sub"].replace("@", "_at_").replace(".", "_")
+    user_upload_dir = BASE_DIR / "uploads" / safe_email
+    user_upload_dir.mkdir(parents=True, exist_ok=True)
+
+    basename  = f"db_pull_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    dest_path = user_upload_dir / f"{basename}.xlsx"
+
+    try:
+        n_rows = await db_store.build_excel_from_db(loops, start, end, str(dest_path), suffix_map=suffix_map)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Database unavailable: {exc}")
+
+    results_folder = f"results_{safe_email}_{basename}" if mode == "auto" else f"results_{safe_email}_{basename}_manual"
+
+    config = _load_config(current_user["sub"])
+    config.pop("unit_mapping", None)
+    config.pop("uom_mapping", None)
+    _save_config(current_user["sub"], config)
+    flat_config = _flatten_config(config)
+
+    job_id = str(uuid.uuid4())
+    jobs[job_id] = {
+        "status":         "running",
+        "results_folder": results_folder,
+        "detail":         "",
+        "email":          current_user["sub"],
+    }
+    thread = threading.Thread(
+        target=_run_engine_background,
+        args=(job_id, dest_path, results_folder, mode, flat_config),
+        daemon=True,
+    )
+    thread.start()
+
+    pending_uploads[current_user["sub"]] = {
+        "dest_path":      str(dest_path),
+        "results_folder": results_folder,
+        "mode":           mode,
+        "original_name":  f"{basename}.xlsx",
+        "tag_suffixes":   ["PV", "SP", "OP", "MODE"],
+    }
+    user_custom_run[current_user["sub"]] = False
+
+    return JSONResponse({"status": "running", "job_id": job_id, "rows_pulled": n_rows})
 
 
 # ── Config endpoints ──────────────────────────────────────────────────────────

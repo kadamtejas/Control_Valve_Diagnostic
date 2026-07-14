@@ -433,6 +433,12 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
         <button class="file-pill-remove" id="pill-remove" title="Remove">✕</button>
       </div>
       <div class="error-box" id="error-box"></div>
+      {% if user.role == 'admin' %}
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#5f5e5a;margin:4px 0 2px;cursor:pointer">
+        <input type="checkbox" id="save-to-db" style="width:15px;height:15px;accent-color:#3b82f6;cursor:pointer"/>
+        Also save this data to the database (lets it be re-run later from the Database tab)
+      </label>
+      {% endif %}
       <button class="btn-run" id="btn-run" disabled>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         <span id="btn-run-txt">Upload &amp; Run</span>
@@ -486,23 +492,6 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
               </div>
               <div class="hint err" id="dateHint" style="align-self:center;padding-bottom:1px"></div>
             </div>
-            <!-- DATA RESOLUTION -->
-            <div class="field">
-              <label>Data resolution</label>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div class="res-toggle">
-                  <button class="res-btn active" data-res="minute" onclick="setResolution('minute')"><span class="res-btn-label">Minute</span></button>
-                  <button class="res-btn" data-res="hourly" onclick="setResolution('hourly')"><span class="res-btn-label">Hourly</span></button>
-                  <button class="res-btn" data-res="daily" onclick="setResolution('daily')"><span class="res-btn-label">Daily</span></button>
-                </div>
-                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-                  <input id="resTimeInp" type="number" min="1" value="1" style="width:58px;height:34px;padding:0 8px;border:.5px solid rgba(0,0,0,.14);border-radius:var(--r);font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:600;text-align:center;background:#f9f8f5;color:var(--text);outline:none" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='rgba(0,0,0,.14)'"/>
-                  <span id="resTimeUnit" style="font-size:11px;color:#5f5e5a;white-space:nowrap">min avg pull</span>
-                </div>
-              </div>
-              <div class="res-hint" id="resHint">Minute-level data — full fidelity, larger dataset</div>
-            </div>
-
             <!-- TAG FORMAT SETUP -->
             <div class="field">
               <label>Tag format suffixes <span style="font-size:9px;font-weight:400;color:#9a9994;text-transform:none;letter-spacing:0">(add possible suffixes per role — leave empty to use defaults)</span></label>
@@ -521,7 +510,7 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
                   <button onclick="confirmFormat()" style="height:34px;padding:0 16px;background:#3b82f6;border:none;border-radius:var(--r);font-size:12px;font-weight:600;color:#fff;cursor:pointer">
                     Save format
                   </button>
-                  <span style="font-size:10px;color:#9a9994">Leave all empty to use defaults (PV · SP · OP · MODE)</span>
+                  <span style="font-size:10px;color:#9a9994">Leave all empty to use defaults (_PV/_MV · _SP · _OP · _mode/_MODE)</span>
                 </div>
               </div>
               <div class="fmt-box fmt-set" id="fmtConfirmedBox" style="display:none">
@@ -562,6 +551,22 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
                 </div>
               </div>
               <div class="ac-hint" id="acHint"></div>
+
+              <!-- QUICK-SELECT: every loop that actually has data in Postgres -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:6px">
+                <span style="font-size:11px;font-weight:600;color:#5f5e5a;text-transform:uppercase;letter-spacing:.03em">Available in database</span>
+                <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#5f5e5a;cursor:pointer;font-weight:400">
+                  <input type="checkbox" id="selectAllLoopsChk" onchange="toggleAllDbLoops(this.checked)" style="width:14px;height:14px;cursor:pointer;accent-color:#3b82f6"/>
+                  Select all
+                </label>
+              </div>
+              <input class="fi fi-mono" id="loopChecklistSearch" type="text"
+                placeholder="Filter loops…" oninput="filterLoopChecklist(this.value)"
+                autocomplete="off" style="margin-bottom:6px;height:32px;font-size:12px"/>
+              <div id="loopChecklist" style="display:flex;flex-wrap:wrap;gap:6px;max-height:170px;overflow-y:auto;padding:8px;border:.5px solid rgba(0,0,0,.1);border-radius:var(--r);background:#fafcfe;margin-bottom:4px">
+                <span style="font-size:11px;color:#9a9994">Loading…</span>
+              </div>
+
               <div class="tbl-toolbar" id="tblToolbar" style="display:none">
                 <input class="tbl-search" id="loopSearch" type="text" placeholder="Search loop ID…"
                   oninput="filterLoopTable(this.value)" autocomplete="off"/>
@@ -571,23 +576,12 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
               <div style="font-size:11px;color:#9a9994;margin-top:2px" id="tagCount"></div>
             </div>
             <div class="fetch-bar">
-              <div class="fetch-status" id="fetchStatus">Add tags and set a date range, then fetch.</div>
-              <button class="btn-fetch" id="fetchBtn" onclick="fetchData()">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
-                Fetch data
-              </button>
-            </div>
-            <div class="fetch-progress" id="fetchProgress">
-              <div class="fp-row" id="fp1"><div class="fp-icon" id="fpi1">⏳</div>Connecting to database…</div>
-              <div class="fp-row" id="fp2"><div class="fp-icon" id="fpi2">⏳</div>Retrieving tag list…</div>
-              <div class="fp-row" id="fp3"><div class="fp-icon" id="fpi3">⏳</div>Pulling time-series data…</div>
-              <div class="fp-row" id="fp4"><div class="fp-icon" id="fpi4">⏳</div>Validating data quality…</div>
-              <div class="fp-row" id="fp5"><div class="fp-icon" id="fpi5">⏳</div>Building loop inventory…</div>
+              <div class="fetch-status" id="fetchStatus">Loading available loops from database…</div>
             </div>
           </div>
         </div>
 
-        <div class="nav"><div></div><button class="btn-next" onclick="mgrShow(2)">Next: Thresholds →</button></div>
+        <div class="nav"><div></div><button class="btn-next" onclick="goToThresholds()">Next: Thresholds →</button></div>
       </div>
 
       <!-- SCREEN 2 -->
@@ -616,9 +610,9 @@ input[type=datetime-local]:focus{outline:none;border-color:#185fa5;box-shadow:0 
         </div>
         <div class="nav">
           <button class="btn-prev" onclick="mgrShow(2)">← Back</button>
-          <button class="btn-next" id="finalSave" onclick="mgrSaveAll()" style="background:#0f6e56">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Save &amp; apply configuration
+          <button class="btn-next" id="finalSave" onclick="runFromDb()" style="background:#0f6e56">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+            Pull data &amp; run diagnostics
           </button>
         </div>
       </div>
@@ -676,6 +670,8 @@ function switchSrc(src){
     document.getElementById('btn-run').disabled=true;
     startSteps();
     const fd=new FormData();fd.append('file',selectedFile);fd.append('mode','auto');
+    const saveToDbEl=document.getElementById('save-to-db');
+    fd.append('save_to_db', (saveToDbEl && saveToDbEl.checked) ? 'true' : 'false');
 
     try{
       const res=await fetch('/upload',{method:'POST',body:fd});
@@ -726,8 +722,7 @@ const METHODS=(()=>{
   ];
   return all;
 })();
-const DEFAULT_TAGS=['YN.ETH1.15FC311','YN.ETH1.15LC094','YN.ETH1.15PC217','YN.ETH1.15FC315','YN.ETH1.15FC316','YN.ETH1.15FFC317','YN.ETH1.15LC095','YN.ETH1.15FC901','YN.ETH1.16FC336','YN.ETH1.17FC347'];
-const LOOP_META={'15FC311':{unit:'Ethylene Fractionator',type:'Flow',uom:'Kg/Hr',pts:4320,status:'ok'},'15LC094':{unit:'Ethylene Fractionator',type:'Level',uom:'Kg/Hr',pts:4320,status:'ok'},'15PC217':{unit:'Ethylene Fractionator',type:'Pressure',uom:'Kg/Hr',pts:4280,status:'warn'},'15FC315':{unit:'Ethylene Fractionator',type:'Flow',uom:'Kg/Hr',pts:4320,status:'ok'},'15FC316':{unit:'Ethylene Fractionator',type:'Flow',uom:'Kg/Hr',pts:4320,status:'ok'},'15FFC317':{unit:'Ethylene Fractionator',type:'Flow',uom:'Kg/Hr',pts:4315,status:'ok'},'15LC095':{unit:'Ethylene Fractionator',type:'Level',uom:'%',pts:4320,status:'ok'},'15FC901':{unit:'Ethylene Fractionator',type:'Flow',uom:'—',pts:4100,status:'ok'},'16FC336':{unit:'Unknown',type:'Flow',uom:'—',pts:3900,status:'na'},'17FC347':{unit:'Unknown',type:'Flow',uom:'—',pts:3850,status:'na'}};
+let DB_LOOPS=[],DB_MIN_TS=null,DB_MAX_TS=null;
 const PROBLEMS=[
   {id:'stiction',label:'Stiction',icon:'🔧'},
   {id:'aggressive_tuning',label:'Aggressive Tuning',icon:'⚡'},
@@ -744,19 +739,50 @@ let selectedTags=[],excl={},dataFetched=false;
 
 PROBLEMS.forEach(p=>excl[p.id]=[]);
 
-/* ── RESOLUTION ── */
-const RES_HINTS={minute:'Minute-level data — full fidelity, larger dataset',hourly:'Hourly averages — good balance of detail and speed',daily:'Daily averages — fast fetch, long-range trends'};
-const RES_UNIT={minute:'min avg pull',hourly:'hr avg pull',daily:'day avg pull'};
-function setResolution(r){
-  currentResolution=r;
-  document.querySelectorAll('.res-btn').forEach(b=>b.classList.toggle('active',b.dataset.res===r));
-  document.getElementById('resHint').textContent=RES_HINTS[r];
-  const u=document.getElementById('resTimeUnit');if(u)u.textContent=RES_UNIT[r];
+/* ── LOAD REAL LOOPS/DATE-RANGE FROM POSTGRES ── */
+async function loadDbLoops(){
+  const fs=document.getElementById('fetchStatus');
+  try{
+    const r=await fetch('/api/db/loops');
+    if(!r.ok) throw new Error('status '+r.status);
+    const data=await r.json();
+    DB_LOOPS=(data.loops||[]).map(l=>l.loop);
+    DB_MIN_TS=data.min_ts;DB_MAX_TS=data.max_ts;
+    KNOWN_BASES=DB_LOOPS;
+    renderLoopChecklist();
+    if(!DB_LOOPS.length){
+      fs.className='fetch-status';
+      fs.textContent='No data in the database yet — upload an Excel file first, it will feed this tab automatically.';
+      return;
+    }
+    fs.className='fetch-status ok';
+    fs.innerHTML='&#10003; '+DB_LOOPS.length+' loop'+(DB_LOOPS.length>1?'s':'')+' available &middot; data from '+(DB_MIN_TS||'').slice(0,10)+' &rarr; '+(DB_MAX_TS||'').slice(0,10);
+    // Default the date range to the real bounds if the user hasn't touched it
+    if(DB_MIN_TS&&DB_MAX_TS){
+      const s=document.getElementById('startDt'),e=document.getElementById('endDt');
+      if(s) s.value=DB_MIN_TS.slice(0,16);
+      if(e) e.value=DB_MAX_TS.slice(0,16);
+      validateDates();
+    }
+  }catch(err){
+    fs.className='fetch-status';
+    fs.textContent='Could not reach the database — check DATABASE_URL / Postgres is running.';
+    const box=document.getElementById('loopChecklist');
+    if(box) box.innerHTML='<span style="font-size:11px;color:#9a9994">Could not load loops.</span>';
+    console.error(err);
+  }
 }
+document.addEventListener('DOMContentLoaded',()=>{
+  loadDbLoops();
+  // Auto-apply default tag-format suffixes on load — the boxes only need
+  // to be touched if someone explicitly wants something non-standard.
+  // confirmFormat() with all inputs blank falls through to SMART_DEFAULTS.
+  confirmFormat();
+});
 
 /* ── TAG FORMAT STATE ── */
 let tagFormat=null;
-// tagFormat = { suffixes: {pv:['PV','MV'], sp:['SP'], op:['OP'], mode:['MODE','mode']} }
+// tagFormat = { suffixes: {pv:['_PV','_MV'], sp:['_SP'], op:['_OP'], mode:['_mode','_MODE']} }
 
 /* ── SUFFIX ROW MANAGEMENT ── */
 function addSuffixRow(role, value=''){
@@ -781,11 +807,16 @@ function applysfx(s){
 
 function confirmFormat(){
   const _v=r=>document.getElementById('fmt'+r)?.value.trim()||'';
+  // If a box is left blank, default to multiple known-common suffix
+  // candidates rather than one rigid string — e.g. PV covers both '_PV'
+  // and '_MV' out of the box, since that's the real-world variation seen
+  // across plants. Typing anything in a box overrides its defaults entirely.
+  const SMART_DEFAULTS={pv:['_PV','_MV'],sp:['_SP'],op:['_OP'],mode:['_mode','_MODE']};
   const sfxMap={
-    pv:  [_v('PV')  ||'PV'],
-    sp:  [_v('SP')  ||'SP'],
-    op:  [_v('OP')  ||'OP'],
-    mode:[_v('MODE')||'MODE'],
+    pv:  _v('PV')  ? [_v('PV')]   : SMART_DEFAULTS.pv,
+    sp:  _v('SP')  ? [_v('SP')]   : SMART_DEFAULTS.sp,
+    op:  _v('OP')  ? [_v('OP')]   : SMART_DEFAULTS.op,
+    mode:_v('MODE')? [_v('MODE')] : SMART_DEFAULTS.mode,
   };
   tagFormat={suffixes: sfxMap};
 
@@ -819,7 +850,7 @@ function resetFormat(){
 /* Change format WITHOUT wiping existing loops */
 function changeFormatKeepLoops(){
   // Pre-fill single inputs with current suffix values
-  const prev=tagFormat?.suffixes||{pv:['PV'],sp:['SP'],op:['OP'],mode:['MODE']};
+  const prev=tagFormat?.suffixes||{pv:['_PV','_MV'],sp:['_SP'],op:['_OP'],mode:['_mode','_MODE']};
   ['PV','SP','OP','MODE'].forEach(r=>{
     const inp=document.getElementById('fmt'+r);
     if(inp) inp.value=(prev[r.toLowerCase()]||[''])[0]||'';
@@ -875,7 +906,7 @@ function buildLoopTags(shortId){
 }
 
 /* ── KNOWN BASES for autocomplete (short IDs) ── */
-const KNOWN_BASES=['15FC311','15LC094','15PC217','15FC315','15FC316','15FFC317','15LC095','15FC901','16FC336','17FC347'];
+let KNOWN_BASES=[];
 
 function onTagInput(val){
   acIndex=-1;
@@ -945,7 +976,7 @@ function addTagFromInput(overrideId){
   const base=shortId;
   if(selectedTags.find(l=>l.base===base)){mgrToast('Loop already added','warn');document.getElementById('tagInput').value='';return;}
   const unit=(document.getElementById('unitInput').value||'').trim();
-  const sfxSnap=JSON.parse(JSON.stringify(tagFormat?.suffixes||{pv:['PV'],sp:['SP'],op:['OP'],mode:['MODE']}));
+  const sfxSnap=JSON.parse(JSON.stringify(tagFormat?.suffixes||{pv:['_PV','_MV'],sp:['_SP'],op:['_OP'],mode:['_mode','_MODE']}));
   selectedTags.push({base,unit,suffixes:sfxSnap});
   addUnitSuggestion(unit);
   renderTagPool();
@@ -986,7 +1017,7 @@ async function importTagsFromExcel(e){
       const shortId=extractShortId(rawLoop.toUpperCase());
       const base=shortId;
       if(!selectedTags.find(l=>l.base===base)){
-        const _sfxSnap=JSON.parse(JSON.stringify(tagFormat?.suffixes||{pv:['PV'],sp:['SP'],op:['OP'],mode:['MODE']}));
+        const _sfxSnap=JSON.parse(JSON.stringify(tagFormat?.suffixes||{pv:['_PV','_MV'],sp:['_SP'],op:['_OP'],mode:['_mode','_MODE']}));
         selectedTags.push({base,unit,suffixes:_sfxSnap});
         if(unit) addUnitSuggestion(unit);
         added++;
@@ -1079,12 +1110,91 @@ function renderTagPool(){
   fs.textContent=selectedTags.length
     ?selectedTags.length+' loop'+(selectedTags.length>1?'s':'')+' ready to fetch'
     :'Add loops and set a date range, then fetch.';
+  syncLoopChecklist();
+}
+
+function renderLoopChecklist(){
+  const box=document.getElementById('loopChecklist');
+  if(!box) return;
+  if(!DB_LOOPS.length){
+    box.innerHTML='<span style="font-size:11px;color:#9a9994">No data in the database yet — upload an Excel file first.</span>';
+    return;
+  }
+  box.innerHTML=DB_LOOPS.map(loop=>{
+    const id='chk_'+loop.replace(/[^a-zA-Z0-9]/g,'_');
+    const eb=loop.replace(/'/g,"\\'");
+    return `<label style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:'IBM Plex Mono',monospace;background:#fff;border:.5px solid rgba(0,0,0,.1);border-radius:5px;padding:4px 8px;cursor:pointer">
+      <input type="checkbox" id="${id}" data-loop="${eb}" onchange="onLoopChecklistToggle(this)" style="width:13px;height:13px;cursor:pointer;accent-color:#3b82f6"/>
+      ${loop.split('.').pop()}
+    </label>`;
+  }).join('');
+  syncLoopChecklist();
+}
+
+function syncLoopChecklist(){
+  const box=document.getElementById('loopChecklist');
+  if(!box) return;
+  const allCbs=[...box.querySelectorAll('input[type=checkbox][data-loop]')];
+  allCbs.forEach(cb=>{ cb.checked=selectedTags.some(t=>t.base===cb.dataset.loop); });
+  // "Select all" reflects only the currently-visible (filtered) loops,
+  // not the full list — so it behaves as "select all matching this search"
+  const visibleCbs=allCbs.filter(cb=>cb.closest('label').style.display!=='none');
+  const allEl=document.getElementById('selectAllLoopsChk');
+  if(allEl) allEl.checked=visibleCbs.length>0 && visibleCbs.every(cb=>cb.checked);
+}
+
+function filterLoopChecklist(query){
+  const q=query.trim().toLowerCase();
+  const box=document.getElementById('loopChecklist');
+  if(!box) return;
+  box.querySelectorAll('label').forEach(lbl=>{
+    const cb=lbl.querySelector('input[data-loop]');
+    if(!cb) return;
+    lbl.style.display=(!q||cb.dataset.loop.toLowerCase().includes(q))?'':'none';
+  });
+  syncLoopChecklist();
+}
+
+function onLoopChecklistToggle(el){
+  if(!tagFormat){mgrToast('Set the tag format first','warn');el.checked=false;return;}
+  const loop=el.dataset.loop;
+  if(el.checked){
+    if(!selectedTags.find(t=>t.base===loop)){
+      const sfxSnap=JSON.parse(JSON.stringify(tagFormat.suffixes));
+      selectedTags.push({base:loop,unit:'',suffixes:sfxSnap});
+    }
+  } else {
+    selectedTags=selectedTags.filter(t=>t.base!==loop);
+  }
+  renderTagPool();
+}
+
+function toggleAllDbLoops(checked){
+  if(checked&&!tagFormat){mgrToast('Set the tag format first','warn');document.getElementById('selectAllLoopsChk').checked=false;return;}
+  const box=document.getElementById('loopChecklist');
+  const visibleLoops=box
+    ? [...box.querySelectorAll('label')]
+        .filter(l=>l.style.display!=='none')
+        .map(l=>l.querySelector('input[data-loop]')?.dataset.loop)
+        .filter(Boolean)
+    : DB_LOOPS;
+  if(checked){
+    visibleLoops.forEach(loop=>{
+      if(!selectedTags.find(t=>t.base===loop)){
+        const sfxSnap=JSON.parse(JSON.stringify(tagFormat.suffixes));
+        selectedTags.push({base:loop,unit:'',suffixes:sfxSnap});
+      }
+    });
+  } else {
+    selectedTags=selectedTags.filter(t=>!visibleLoops.includes(t.base));
+  }
+  renderTagPool();
 }
 
 function updateLoopSuffix(base,role,val){
   const l=selectedTags.find(t=>t.base===base);
   if(!l)return;
-  if(!l.suffixes)l.suffixes={pv:['PV'],sp:['SP'],op:['OP'],mode:['MODE']};
+  if(!l.suffixes)l.suffixes={pv:['_PV','_MV'],sp:['_SP'],op:['_OP'],mode:['_mode','_MODE']};
   // val is full tag(s) like "YN.ETH1.15FC311_MV, YN.ETH1.15FC311_PV"
   // extract suffix by stripping base prefix
   l.suffixes[role]=val.split(',').map(v=>{
@@ -1125,12 +1235,14 @@ function onInfoChange(){
   const fmt=d=>d.toISOString().slice(0,16);
   document.getElementById('startDt').value=fmt(past);document.getElementById('endDt').value=fmt(now);
   document.querySelector('.rng[data-r="30"]').classList.add('on');
+  // loadDbLoops() overrides these with the real data range once it responds
 })();
 
 function setRange(days){
-  const now=new Date(),past=new Date(now);past.setDate(past.getDate()-days);
+  const anchor=DB_MAX_TS?new Date(DB_MAX_TS):new Date();
+  const past=new Date(anchor);past.setDate(past.getDate()-days);
   const fmt=d=>d.toISOString().slice(0,16);
-  document.getElementById('startDt').value=fmt(past);document.getElementById('endDt').value=fmt(now);
+  document.getElementById('startDt').value=fmt(past);document.getElementById('endDt').value=fmt(anchor);
   document.querySelectorAll('.rng').forEach(b=>b.classList.toggle('on',+b.dataset.r===days));validateDates();
 }
 
@@ -1138,37 +1250,73 @@ function validateDates(){
   const s=document.getElementById('startDt').value,e=document.getElementById('endDt').value;
   const hint=document.getElementById('dateHint');
   if(!s||!e){hint.textContent='';return;}
-  if(new Date(s)>=new Date(e)){hint.textContent='⚠ Start must be before end date';return false;}
+  if(new Date(s)>=new Date(e)){hint.className='hint err';hint.textContent='⚠ Start must be before end date';return false;}
+  if(DB_MIN_TS&&DB_MAX_TS&&(new Date(s)<new Date(DB_MIN_TS)||new Date(e)>new Date(DB_MAX_TS))){
+    hint.className='hint err';hint.textContent='⚠ Outside available data range ('+DB_MIN_TS.slice(0,10)+' → '+DB_MAX_TS.slice(0,10)+')';return false;
+  }
   const days=(new Date(e)-new Date(s))/(1000*86400);
   hint.className='hint ok-msg';hint.textContent='✓ '+Math.round(days)+' days selected';return true;
 }
 
-async function fetchData(){
+function goToThresholds(){
   if(!validateDates()){mgrToast('Fix the date range first','warn');return;}
   if(!selectedTags.length){mgrToast('Add at least one loop','warn');return;}
-  const btn=document.getElementById('fetchBtn'),prog=document.getElementById('fetchProgress');
-  prog.classList.add('visible');btn.disabled=true;btn.innerHTML='<div class="fetch-spinner"></div> Fetching…';
-  const steps=[['fp1','fpi1'],['fp2','fpi2'],['fp3','fpi3'],['fp4','fpi4'],['fp5','fpi5']];
-  for(let i=0;i<steps.length;i++){const[r,ico]=steps[i];document.getElementById(r).className='fp-row active';document.getElementById(ico).textContent='⟳';await sleep(400+Math.random()*300);document.getElementById(r).className='fp-row done';document.getElementById(ico).textContent='✓';}
-  await sleep(200);
-  btn.disabled=false;btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg> Re-fetch';
-  const start=document.getElementById('startDt').value,end=document.getElementById('endDt').value;
-  const fs=document.getElementById('fetchStatus');fs.className='fetch-status ok';
-  fs.innerHTML='&#10003; '+selectedTags.length+' loop'+(selectedTags.length>1?'s':'')+' loaded &middot; '+start.slice(0,10)+' &rarr; '+end.slice(0,10)+' &middot; <b>'+currentResolution+'</b>';
-  dataFetched=true;populateOverview(start,end);mgrToast('Data fetched — '+selectedTags.length+' loops, '+currentResolution+' resolution');
+  if(!tagFormat){mgrToast('Set the tag format first','warn');return;}
+  dataFetched=true;
+  mgrShow(2);
 }
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
-function populateOverview(start,end){
-  document.getElementById('overviewLocked').style.display='none';document.getElementById('overviewLoaded').style.display='block';
-  const plant=document.getElementById('infoPlant').value.trim()||'Plant';
-  document.getElementById('overviewTitle').textContent='Plant overview — '+plant;
-  document.getElementById('overviewSub').textContent=selectedTags.length+' loops · '+start.slice(0,10)+' → '+end.slice(0,10)+' · '+currentResolution+' resolution';
-  const meta=selectedTags.map(l=>{const s=l.base.split('.').pop();return LOOP_META[s]||{unit:'Unknown',type:'Unknown',uom:'—',pts:0,status:'na'};});
-  const flow=meta.filter(m=>m.type==='Flow').length,level=meta.filter(m=>m.type==='Level').length,pressure=meta.filter(m=>m.type==='Pressure').length;
-  document.getElementById('kpiGrid').innerHTML=`<div class="gbox"><div class="kpi-lbl">Total loops</div><div class="kpi-val">${selectedTags.length}</div><div class="kpi-sub">fetched from DB</div></div><div class="gbox"><div class="kpi-lbl">Flow loops</div><div class="kpi-val" style="color:#0f6e56">${flow}</div><div class="kpi-sub">FC / FFC tags</div></div><div class="gbox"><div class="kpi-lbl">Level loops</div><div class="kpi-val" style="color:#185fa5">${level}</div><div class="kpi-sub">LC tags</div></div><div class="gbox"><div class="kpi-lbl">Pressure loops</div><div class="kpi-val" style="color:#854f0b">${pressure}</div><div class="kpi-sub">PC tags</div></div>`;
-  const typeBadge={Flow:'b-flow',Level:'b-level',Pressure:'b-pressure',Unknown:'b-unknown'};
-  document.getElementById('loopTbody').innerHTML=selectedTags.map((l,i)=>{const sh=l.base.split('.').pop();const m=LOOP_META[sh]||{unit:'Unknown',type:'Unknown',uom:'—',pts:'—',status:'na'};const dot=m.status==='ok'?'dok':m.status==='warn'?'dwarn':'dna';const st=m.status==='ok'?'Active':m.status==='warn'?'Review':'Unmapped';return `<tr style="animation:fadeIn .2s ease ${i*40}ms both"><td><span class="tag-mono">${l.base}</span></td><td>${m.unit}</td><td><span class="badge ${typeBadge[m.type]||'b-unknown'}">${m.type}</span></td><td>${m.uom}</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px">${typeof m.pts==='number'?m.pts.toLocaleString():m.pts}</td><td><span class="sdot ${dot}"></span>${st}</td></tr>`;}).join('');
+async function runFromDb(){
+  if(!validateDates()||!selectedTags.length||!tagFormat){mgrToast('Go back and finish Session & data first','warn');mgrShow(1);return;}
+  const btn=document.getElementById('finalSave');
+  btn.disabled=true;
+  document.getElementById('loading-overlay').classList.add('show');
+  document.getElementById('ltxt').textContent='Pulling data from database…';
+  for(let i=1;i<=4;i++)document.getElementById('lstep-'+i)?.classList.remove('active','done');
+  document.getElementById('lstep-1')?.classList.add('active');
+
+  // Save thresholds/exclusions config first (same payload mgrSaveAll sends)
+  try{
+    const cfgPayload={session:{affiliate:document.getElementById('infoAffiliate').value.trim(),plant:document.getElementById('infoPlant').value.trim(),location:document.getElementById('infoLocation').value.trim(),start:document.getElementById('startDt').value,end:document.getElementById('endDt').value,loops:selectedTags.map(t=>t.base),suffix_map:tagFormat?.suffixes||{pv:['_PV','_MV'],sp:['_SP'],op:['_OP'],mode:['_mode','_MODE']}},diagnostic_config:THRESHOLDS.map(t=>({parameter:t.p,value:t.v,description:t.desc})),diagnostic_selection:METHODS.map(m=>({diagnostic:m.name,enabled:m.enabled?1:0,indent:m.sub?1:0})),detection_exclusions:excl};
+    await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cfgPayload)});
+  }catch(e){/* non-fatal — engine still runs with existing config */}
+
+  const body={
+    loops: selectedTags.map(t=>t.base),
+    start: document.getElementById('startDt').value,
+    end:   document.getElementById('endDt').value,
+    mode:  'auto',
+    suffix_map: tagFormat?.suffixes || {pv:['_PV','_MV'],sp:['_SP'],op:['_OP'],mode:['_mode','_MODE']},
+  };
+
+  try{
+    const res=await fetch('/api/db/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await res.json();
+    if(!res.ok){
+      document.getElementById('loading-overlay').classList.remove('show');
+      btn.disabled=false;
+      mgrToast('Error: '+(data.detail||'Unknown error.'),'warn');
+      return;
+    }
+    document.getElementById('ltxt').textContent='Running diagnostics engine…';
+    document.getElementById('lstep-1')?.classList.replace('active','done');
+    document.getElementById('lstep-2')?.classList.add('done');
+    document.getElementById('lstep-3')?.classList.add('done');
+    document.getElementById('lstep-4')?.classList.add('active');
+    const jobId=data.job_id;
+    const poll=setInterval(async()=>{
+      try{
+        const pr=await fetch('/api/job/'+jobId);
+        const pd=await pr.json();
+        if(pd.status==='done'){clearInterval(poll);window.location.href='/';}
+        else if(pd.status==='error'){clearInterval(poll);document.getElementById('loading-overlay').classList.remove('show');btn.disabled=false;mgrToast('Engine error: '+(pd.detail||'Unknown error.'),'warn');}
+      }catch{}
+    },2000);
+  }catch(e){
+    document.getElementById('loading-overlay').classList.remove('show');
+    btn.disabled=false;
+    mgrToast('Network error — please try again','warn');
+  }
 }
 
 const THR_PLAIN={
@@ -1297,7 +1445,7 @@ function renderReview(){
 }
 
 async function mgrSaveAll(){
-  const payload={session:{affiliate:document.getElementById('infoAffiliate').value.trim(),plant:document.getElementById('infoPlant').value.trim(),location:document.getElementById('infoLocation').value.trim(),start:document.getElementById('startDt').value,end:document.getElementById('endDt').value,loops:selectedTags.map(t=>t.base),suffix_map:tagFormat?.suffixes||{pv:['PV'],sp:['SP'],op:['OP'],mode:['MODE']}},diagnostic_config:THRESHOLDS.map(t=>({parameter:t.p,value:t.v,description:t.desc})),diagnostic_selection:METHODS.map(m=>({diagnostic:m.name,enabled:m.enabled?1:0,indent:m.sub?1:0})),detection_exclusions:excl};
+  const payload={session:{affiliate:document.getElementById('infoAffiliate').value.trim(),plant:document.getElementById('infoPlant').value.trim(),location:document.getElementById('infoLocation').value.trim(),start:document.getElementById('startDt').value,end:document.getElementById('endDt').value,loops:selectedTags.map(t=>t.base),suffix_map:tagFormat?.suffixes||{pv:['_PV','_MV'],sp:['_SP'],op:['_OP'],mode:['_mode','_MODE']}},diagnostic_config:THRESHOLDS.map(t=>({parameter:t.p,value:t.v,description:t.desc})),diagnostic_selection:METHODS.map(m=>({diagnostic:m.name,enabled:m.enabled?1:0,indent:m.sub?1:0})),detection_exclusions:excl};
   try{const r=await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(r.ok)onMgrSaved();else mgrToast('Server error — check console','warn');}catch(e){onMgrSaved();}
 }
 function onMgrSaved(){
