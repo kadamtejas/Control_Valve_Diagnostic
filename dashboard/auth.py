@@ -1,39 +1,36 @@
 """
 auth.py - JWT-based authentication for Valve Diagnostics POC
 
-Users are stored in users.json at the project root.
+Users are stored in Postgres (see db_store.get_user_by_email / create_user).
 JWT token is issued on login and stored as an HTTP-only cookie.
+
+SECRET_KEY has no hardcoded fallback — it must be set as an environment
+variable, or the app refuses to start. Same for the initial admin account:
+there is no built-in credential; call ensure_bootstrap_admin() once at
+startup and it creates ADMIN_EMAIL/ADMIN_PASSWORD (from env) as the first
+user, if those env vars are set and that account doesn't already exist.
 """
 
-import json
-import os
 import hashlib
+import os
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 from typing import Optional
 
 import jwt
 from fastapi import Cookie, HTTPException, status
 
+import db_store
+
 # ── Config ────────────────────────────────────────────────────────────────────
-SECRET_KEY = os.environ.get("SECRET_KEY", "ingenero-valve-poc-secret-key-2024")
+SECRET_KEY = os.environ.get("SECRET_KEY", "").strip()
+if not SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY environment variable is not set. Generate one, e.g.\n"
+        '    python -c "import secrets; print(secrets.token_hex(32))"\n'
+        "and add it to your .env (local) / Render environment settings (prod)."
+    )
 ALGORITHM  = "HS256"
 TOKEN_TTL_HOURS = 8
-
-USERS_FILE = Path(__file__).parent.parent / "users.json"
-
-# ── Built-in fallback users (used when users.json is not present e.g. on Render)
-FALLBACK_USERS = [
-    {
-        "email": "admin@ingenero.com",
-        "password": "ingenero@2024",
-        "name": "Ingenero Admin",
-        "role": "admin"
-    }
-]
-
-# ── In-memory user store (survives within a single server process, wiped on restart)
-_runtime_users: list[dict] = []
 
 
 # ── User store ────────────────────────────────────────────────────────────────
@@ -43,71 +40,41 @@ def _hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 
-def _load_users() -> list[dict]:
-    """Return combined list: file users + runtime-registered users."""
-    file_users = []
-    if USERS_FILE.exists():
-        try:
-            with open(USERS_FILE, "r") as f:
-                file_users = json.load(f)["users"]
-        except Exception:
-            file_users = list(FALLBACK_USERS)
-    else:
-        file_users = list(FALLBACK_USERS)
-    # Merge: runtime users take precedence (avoid duplicates by email)
-    file_emails = {u["email"].lower() for u in file_users}
-    extra = [u for u in _runtime_users if u["email"].lower() not in file_emails]
-    return file_users + extra
+async def ensure_bootstrap_admin():
+    """Create the initial admin account from ADMIN_EMAIL/ADMIN_PASSWORD env
+    vars, if it doesn't already exist. No-op (with a warning) if those env
+    vars aren't set — there is no hardcoded fallback credential. Call this
+    once at app startup."""
+    admin_email = os.getenv("ADMIN_EMAIL", "").strip().lower()
+    admin_password = os.getenv("ADMIN_PASSWORD", "").strip()
+    if not admin_email or not admin_password:
+        print("⚠️  ADMIN_EMAIL / ADMIN_PASSWORD not set — no bootstrap admin "
+              "created. Set both env vars if you need an initial admin login.")
+        return
+    if await db_store.get_user_by_email(admin_email):
+        return
+    await db_store.create_user(admin_email, _hash_password(admin_password),
+                                "Admin", role="admin")
+    print(f"✅  Bootstrap admin created: {admin_email}")
 
 
-def register_user(email: str, password: str, name: str) -> tuple[bool, str]:
-    """
-    Register a new user. Returns (success, message).
-    Saves to users.json if writable, otherwise stores in memory only.
-    """
+async def register_user(email: str, password: str, name: str) -> tuple[bool, str]:
+    """Register a new user in Postgres. Returns (success, message)."""
     email = email.strip().lower()
     if not email or not password or not name:
         return False, "All fields are required."
-    # Check duplicate across all users
-    for u in _load_users():
-        if u["email"].lower() == email:
-            return False, "An account with this email already exists."
-    new_user = {
-        "email": email,
-        "password": _hash_password(password),
-        "name": name.strip(),
-        "role": "client",
-        "hashed": True,
-    }
-    # Try to persist to users.json
-    try:
-        if USERS_FILE.exists():
-            with open(USERS_FILE, "r") as f:
-                data = json.load(f)
-        else:
-            data = {"users": list(FALLBACK_USERS)}
-        data["users"].append(new_user)
-        with open(USERS_FILE, "w") as f:
-            json.dump(data, f, indent=2)
-    except Exception:
-        # Filesystem not writable (e.g. Render) — store in memory only
-        pass
-    _runtime_users.append(new_user)
+    ok = await db_store.create_user(email, _hash_password(password), name, role="client")
+    if not ok:
+        return False, "An account with this email already exists."
     return True, "Account created successfully."
 
 
-def authenticate_user(email: str, password: str) -> Optional[dict]:
+async def authenticate_user(email: str, password: str) -> Optional[dict]:
     """Return user dict if credentials match, else None."""
     email = email.strip().lower()
-    for user in _load_users():
-        stored_pw = user["password"]
-        # Support both hashed (new) and plain-text (legacy) passwords
-        if user.get("hashed"):
-            match = stored_pw == _hash_password(password)
-        else:
-            match = stored_pw == password
-        if user["email"].lower() == email and match:
-            return user
+    user = await db_store.get_user_by_email(email)
+    if user and user["password_hash"] == _hash_password(password):
+        return {"email": user["email"], "name": user["name"], "role": user["role"]}
     return None
 
 

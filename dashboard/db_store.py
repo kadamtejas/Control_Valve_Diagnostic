@@ -205,6 +205,31 @@ async def _refresh_loop_summary(conn, touched_tag_names: set):
         )
 
 
+async def get_user_by_email(email: str) -> Optional[dict]:
+    """Look up a user by email (case-insensitive). Returns None if not found."""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT email, password_hash, name, role FROM users WHERE lower(email) = lower($1)",
+            email,
+        )
+    return dict(row) if row else None
+
+
+async def create_user(email: str, password_hash: str, name: str, role: str = "client") -> bool:
+    """Insert a new user. Returns False if the email already exists."""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        try:
+            await conn.execute(
+                "INSERT INTO users (email, password_hash, name, role) VALUES ($1, $2, $3, $4)",
+                email.strip().lower(), password_hash, name.strip(), role,
+            )
+            return True
+        except asyncpg.UniqueViolationError:
+            return False
+
+
 async def list_available_loops() -> dict:
     """Loop names + overall date range currently stored. Reads from the
     loop_summary fast-path table; falls back to a full scan only if that

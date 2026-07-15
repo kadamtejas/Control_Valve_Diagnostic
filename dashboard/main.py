@@ -28,16 +28,7 @@ from fastapi.responses import (
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from auth import authenticate_user, create_access_token, get_current_user, register_user
-from reader import (
-    read_all_loop_names,
-    read_dashboard_data,
-    read_loop_timeseries,
-    read_unit_mapping,
-)
-import db_store
 from dotenv import load_dotenv
-from groq import Groq
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 # When running as a PyInstaller .exe, VALVE_BASE_DIR is set by launcher.py
@@ -46,6 +37,20 @@ if os.environ.get("VALVE_BASE_DIR"):
     BASE_DIR = Path(os.environ["VALVE_BASE_DIR"])
 else:
     BASE_DIR = Path(__file__).parent.parent   # …/Valve_Diagnostic_Tool_POC
+
+# Load .env BEFORE importing any local module (auth.py reads SECRET_KEY at
+# import time and raises if it's missing — it has to see the loaded env vars).
+load_dotenv(BASE_DIR / ".env")
+
+from auth import authenticate_user, create_access_token, get_current_user, register_user, ensure_bootstrap_admin
+from reader import (
+    read_all_loop_names,
+    read_dashboard_data,
+    read_loop_timeseries,
+    read_unit_mapping,
+)
+import db_store
+from groq import Groq
 
 DASHBOARD_DIR = Path(__file__).parent
 UPLOADS_DIR   = BASE_DIR / "uploads"
@@ -57,7 +62,6 @@ USER_CONFIG_DIR = BASE_DIR / "user_configs"
 USER_CONFIG_DIR.mkdir(exist_ok=True)
 
 # ── Chatbot (Groq) ────────────────────────────────────────────────────────────
-load_dotenv(BASE_DIR / ".env")
 KNOWLEDGE_PATH = BASE_DIR / "chatbot_knowledge.md"
 GROQ_MODEL = "llama-3.3-70b-versatile"
 CHAT_HISTORY_LIMIT = 10
@@ -194,6 +198,11 @@ static_dir.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 SAMPLE_FILE = static_dir / "sample_plant_data.xlsx"
+
+
+@app.on_event("startup")
+async def _startup_bootstrap_admin():
+    await ensure_bootstrap_admin()
 
 
 @app.on_event("shutdown")
@@ -389,7 +398,7 @@ async def login_submit(request: Request):
     email    = form.get("email", "").strip()
     password = form.get("password", "")
 
-    user = authenticate_user(email, password)
+    user = await authenticate_user(email, password)
     if not user:
         return templates.TemplateResponse(
             request, "login.html",
@@ -440,7 +449,7 @@ async def register_submit(request: Request):
             status_code=400,
         )
 
-    success, message = register_user(email, password, name)
+    success, message = await register_user(email, password, name)
     if not success:
         return templates.TemplateResponse(
             request, "register.html",

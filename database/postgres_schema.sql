@@ -41,3 +41,18 @@ CREATE TABLE IF NOT EXISTS loop_summary (
     max_ts        TIMESTAMP,
     updated_at    TIMESTAMP NOT NULL DEFAULT now()
 );
+
+
+-- ============================================================
+--  users — login accounts. Replaces users.json / the hardcoded
+--  FALLBACK_USERS in auth.py (both removed — no credentials live
+--  in source control or code anymore). password_hash is SHA-256,
+--  matching auth.py's existing _hash_password().
+-- ============================================================
+CREATE TABLE IF NOT EXISTS users (
+    email         TEXT PRIMARY KEY,
+    password_hash TEXT NOT NULL,
+    name          TEXT NOT NULL,
+    role          TEXT NOT NULL DEFAULT 'client',
+    created_at    TIMESTAMP NOT NULL DEFAULT now()
+);
